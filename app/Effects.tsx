@@ -13,10 +13,9 @@ function buildWave(el: HTMLElement, seed: number) {
 
 export default function Effects() {
   useEffect(() => {
-    const wave1 = document.getElementById("wave1");
-    const wave2 = document.getElementById("wave2");
-    if (wave1) buildWave(wave1, 1);
-    if (wave2) buildWave(wave2, 2.4);
+    document.querySelectorAll<HTMLElement>(".waveform").forEach((el, i) => {
+      buildWave(el, 1 + i * 1.4);
+    });
 
     const io = new IntersectionObserver(
       (entries) => {
