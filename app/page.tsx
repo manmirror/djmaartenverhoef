@@ -122,14 +122,6 @@ export default function Home() {
           </div>
 
           <p className="tagline">{settings.tagline}</p>
-          <div className="btnrow">
-            <a href={whatsappWithText} target="_blank" rel="noopener" className="btn-primary">
-              {settings.primaryButtonLabel}
-            </a>
-            <a href="#muziek" className="btn-ghost">
-              {settings.secondaryButtonLabel}
-            </a>
-          </div>
         </div>
       </section>
 

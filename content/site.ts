@@ -15,8 +15,6 @@ export const siteContent = {
   heroTitleLine2: "VERHOEF",
   tagline:
     "Van intieme cafés tot Koningsdag op het plein — al ruim 30 jaar lees ik elke zaal (en plein) en hou ik de dansvloer vol.",
-  primaryButtonLabel: "App voor een offerte",
-  secondaryButtonLabel: "Beluister zijn sets",
 
   // Drie labels boven de grote hero-foto.
   heroLabels: ["Bruiloften", "Bedrijfsfeesten", "Kroeg & festival"],

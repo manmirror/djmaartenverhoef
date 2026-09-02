@@ -130,18 +130,7 @@ h1.wordmark em{
 }
 .hero-card-name{display:block; font-size:14px; font-weight:800;}
 .hero-card-text{display:block; font-size:12px; color:var(--muted); margin-top:2px;}
-.tagline{max-width:520px; margin:26px 0 36px; font-size:18px; color:var(--muted); line-height:1.5;}
-.btnrow{display:flex; gap:16px; flex-wrap:wrap;}
-.btn-primary{
-  background:linear-gradient(90deg,var(--pink),var(--violet));
-  padding:16px 30px; border-radius:999px; font-weight:800; font-size:15px;
-  display:inline-block; transition:transform .2s ease;
-}
-.btn-primary:hover{transform:translateY(-2px);}
-.btn-ghost{
-  border:1px solid var(--line); padding:16px 30px; border-radius:999px;
-  font-weight:700; font-size:15px; color:var(--ink);
-}
+.tagline{max-width:520px; margin:26px 0 0; font-size:18px; color:var(--muted); line-height:1.5;}
 
 /* SEQUENCE */
 .sequence{padding:110px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--bg-soft);}
