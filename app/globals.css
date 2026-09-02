@@ -76,14 +76,7 @@ h1.wordmark{margin:0 0 28px;}
 /* Smal scherm: twee regels, zodat de naam groot leesbaar blijft. */
 @media(max-width:640px){
   .wordmark-wide{display:none;}
-  .wordmark-stack{
-    display:flex; flex-direction:column;
-    font-family:var(--font-display), "Helvetica Neue", Arial, sans-serif;
-    letter-spacing:-0.02em; line-height:0.95; white-space:nowrap;
-    font-size:calc((100vw - 56px) / var(--wm-chars-line, 5));
-    background:linear-gradient(90deg,var(--pink),var(--violet),var(--orange));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-  }
+  .wordmark-stack{display:block; width:100%; height:auto;}
 }
 
 /* Fotopaneel onder het woordmerk */
@@ -370,7 +363,12 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 .foot-top{display:flex; justify-content:space-between; gap:40px; flex-wrap:wrap;}
 .foot-col{display:flex; flex-direction:column; gap:16px;}
 .foot-col-right{align-items:flex-end; gap:22px;}
-@media(max-width:640px){.foot-col-right{align-items:flex-start;}}
+/* Op smal scherm staan de kolommen onder elkaar en vullen ze de volle breedte,
+   zodat het formulier netjes uitlijnt met de rest van de footer. */
+@media(max-width:640px){
+  .foot-col{width:100%;}
+  .foot-col-right{align-items:stretch;}
+}
 .foot-name{font-weight:900; font-size:16px; letter-spacing:-0.02em;}
 .foot-links{display:flex; gap:20px; flex-wrap:wrap; font-size:13px; color:var(--muted);}
 .foot-links a:hover{color:var(--ink);}
@@ -382,7 +380,8 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 }
 .foot-socials a:hover{color:var(--ink); border-color:var(--ink);}
 
-.callback{display:flex; flex-direction:column; gap:12px; width:min(100%,380px);}
+.callback{display:flex; flex-direction:column; gap:12px; width:100%; max-width:380px;}
+@media(max-width:640px){.callback{max-width:none;}}
 .callback-head{font-size:17px; font-weight:800; letter-spacing:-0.01em; margin-bottom:2px;}
 /* Velden onder elkaar, allebei over de volle breedte. */
 .callback-fields{display:flex; flex-direction:column; gap:12px;}
@@ -409,8 +408,7 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
   margin:24px 16px 0; opacity:.9;
 }
 /* Het echte display-lettertype voor beide woordmerken. */
-.wordmark-wide text,
-.foot-wordmark text{
+.wordmark-svg text{
   font-family:var(--font-display), "Helvetica Neue", Arial, sans-serif;
 }
 .wm-stop-1{stop-color:var(--pink);}

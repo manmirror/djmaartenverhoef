@@ -16,17 +16,9 @@ const SOCIAL_ICONS: Record<string, string> = {
     "M16.5 2h-3v13.2a2.7 2.7 0 1 1-2.7-2.7c.28 0 .55.04.8.12V9.5a6 6 0 1 0 5 5.91V9.06a7.3 7.3 0 0 0 4 1.2V7.2a4.3 4.3 0 0 1-4.1-4.2V2Z",
 };
 
-// Breedte van een hoofdletter is ongeveer 0.66x de tekengrootte; daarmee kunnen
-// we de woordmerken precies zo groot maken dat ze de regel vullen, ongeacht
-// welke tekst er in content/site.ts staat.
-const CHAR_WIDTH = 0.66;
-
 export default function Home() {
   const settings = siteContent;
   const visibleSocials = settings.footerSocials.filter((social) => social.href);
-
-  const heroLineChars =
-    Math.max(settings.heroTitleLine1.length, settings.heroTitleLine2.length) * CHAR_WIDTH;
 
   const whatsappBase = `https://wa.me/${settings.whatsappNumber}`;
   const whatsappWithText = `${whatsappBase}?text=${encodeURIComponent(
@@ -65,7 +57,6 @@ export default function Home() {
           <h1
             className="wordmark"
             aria-label={`${settings.heroTitleLine1} ${settings.heroTitleLine2}`}
-            style={{ ["--wm-chars-line" as string]: heroLineChars.toFixed(2) }}
           >
             {/* Breed scherm: één regel die precies de breedte vult. */}
             <Wordmark
@@ -74,10 +65,11 @@ export default function Home() {
               lines={[`${settings.heroTitleLine1} ${settings.heroTitleLine2}`]}
             />
             {/* Smal scherm: twee regels, zodat de naam groot leesbaar blijft. */}
-            <span className="wordmark-stack" aria-hidden="true">
-              <span>{settings.heroTitleLine1}</span>
-              <span>{settings.heroTitleLine2}</span>
-            </span>
+            <Wordmark
+              className="wordmark-stack"
+              gradientId="hero-wordmark-stacked"
+              lines={[settings.heroTitleLine1, settings.heroTitleLine2]}
+            />
           </h1>
 
           <div className="hero-panel">
