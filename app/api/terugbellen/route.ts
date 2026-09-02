@@ -5,11 +5,12 @@ import { siteContent } from "@/content/site";
 
 export const runtime = "nodejs";
 
-// Afzender én ontvanger is het adres uit content/site.ts, zodat beide meelopen
-// als dat adres ooit verandert. Het moet wel op het geverifieerde domein in
-// Resend staan. "Website" ervoor maakt in de inbox meteen duidelijk dat het
-// bericht van het formulier komt.
-const FROM = process.env.CALLBACK_FROM || `Website <${siteContent.email}>`;
+// Verstuurd vanaf het subdomein dat Resend mag gebruiken. Het hoofddomein
+// djmaartenverhoef.nl heeft een SPF die op "-all" staat en alleen Hostnet
+// toestaat; mail die daar vandaan lijkt te komen maar via Resend wordt
+// verstuurd, wordt daardoor geweigerd. Antwoorden gaan wel naar het gewone
+// adres, dus in de praktijk merk je hier niets van.
+const FROM = process.env.CALLBACK_FROM || "Website <formulier@send.djmaartenverhoef.nl>";
 
 const MAX_NAME = 100;
 const MAX_PHONE = 40;
@@ -85,6 +86,7 @@ export async function POST(request: Request) {
   const { error } = await new Resend(apiKey).emails.send({
     from: FROM,
     to: siteContent.email,
+    replyTo: siteContent.email,
     subject: `Terugbelverzoek van ${name}`,
     text: [
       `${name} wil teruggebeld worden.`,
