@@ -13,7 +13,7 @@ export const siteContent = {
   heroTitleLine1: "DJ MAARTEN",
   heroTitleLine2: "VERHOEF",
   tagline:
-    "Van intieme cafés tot Koningsdag op het plein — al ruim 30 jaar leest hij elke zaal en houdt hij de dansvloer vol.",
+    "Van intieme cafés tot Koningsdag op het plein — al ruim 30 jaar leest hij elke zaal (en plein) en houdt hij de dansvloer vol.",
   primaryButtonLabel: "App voor een offerte",
   secondaryButtonLabel: "Beluister zijn sets",
 
@@ -33,12 +33,15 @@ export const siteContent = {
   // Zet bv. "/images/maarten-optreden.jpg", of laat op null voor de placeholder.
   aboutPhoto: null as string | null,
   venues: [
-    "Koningsdag",
+    "Koningsdag Uithoorn",
+    "Watch Me Now",
+    "Uithoorn Crossfit",
+    "CrossFit Culemborg",
     "Ibiza Night aan de Amstel",
-    "café De River",
-    "café Bloemenbeppie",
-    "Qui Vive",
-    "The Good Men events",
+    "Café De River",
+    "Café Bloemenbeppie",
+    "Hockeyclub Qui Vive",
+    "Sportvereniging Legmeervogels",
   ],
 
   chatHeading: "Altijd dichtbij.",
