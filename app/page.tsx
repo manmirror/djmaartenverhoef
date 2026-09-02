@@ -1,6 +1,7 @@
 import CallbackForm from "./CallbackForm";
 import ChatCard from "./ChatCard";
 import Effects from "./Effects";
+import Wordmark from "./Wordmark";
 import { buildEmbed } from "./embeds";
 import { siteContent } from "@/content/site";
 
@@ -19,16 +20,11 @@ const SOCIAL_ICONS: Record<string, string> = {
 // we de woordmerken precies zo groot maken dat ze de regel vullen, ongeacht
 // welke tekst er in content/site.ts staat.
 const CHAR_WIDTH = 0.66;
-// In de hero staan twee helften naast elkaar; iets kleiner zetten geeft de
-// ruimte ertussen die het woordmerk leesbaar houdt.
-const HERO_CHAR_WIDTH = 0.74;
 
 export default function Home() {
   const settings = siteContent;
   const visibleSocials = settings.footerSocials.filter((social) => social.href);
 
-  const heroChars =
-    (settings.heroTitleLine1.length + settings.heroTitleLine2.length) * HERO_CHAR_WIDTH;
   const heroLineChars =
     Math.max(settings.heroTitleLine1.length, settings.heroTitleLine2.length) * CHAR_WIDTH;
 
@@ -68,13 +64,21 @@ export default function Home() {
           <div className="eyebrow">{settings.eyebrow}</div>
           <h1
             className="wordmark"
-            style={{
-              ["--wm-chars" as string]: heroChars.toFixed(2),
-              ["--wm-chars-line" as string]: heroLineChars.toFixed(2),
-            }}
+            aria-label={`${settings.heroTitleLine1} ${settings.heroTitleLine2}`}
+            style={{ ["--wm-chars-line" as string]: heroLineChars.toFixed(2) }}
           >
-            <span>{settings.heroTitleLine1}</span>
-            <em>{settings.heroTitleLine2}</em>
+            {/* Breed scherm: één regel die precies de breedte vult. */}
+            <Wordmark
+              className="wordmark-wide"
+              gradientId="hero-wordmark"
+              strokeWidth={2.5}
+              lines={[`${settings.heroTitleLine1} ${settings.heroTitleLine2}`]}
+            />
+            {/* Smal scherm: twee regels, zodat de naam groot leesbaar blijft. */}
+            <span className="wordmark-stack" aria-hidden="true">
+              <span>{settings.heroTitleLine1}</span>
+              <span>{settings.heroTitleLine2}</span>
+            </span>
           </h1>
 
           <div className="hero-panel">
@@ -420,31 +424,12 @@ export default function Home() {
           <div className="copyright">{settings.footerCopyright}</div>
         </div>
 
-        {/* Als SVG, zodat de tekst zich exact op de breedte past — ongeacht
-            het lettertype van de bezoeker of hoe lang de naam is. */}
-        <svg
+        <Wordmark
           className="foot-wordmark"
-          viewBox="0 0 1000 104"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <defs>
-            <linearGradient id="wordmark-gradient" x1="0" y1="0" x2="1" y2="0">
-              <stop className="wm-stop-1" offset="0%" />
-              <stop className="wm-stop-2" offset="50%" />
-              <stop className="wm-stop-3" offset="100%" />
-            </linearGradient>
-          </defs>
-          <text
-            x="0"
-            y="86"
-            fontSize="100"
-            textLength="1000"
-            lengthAdjust="spacingAndGlyphs"
-          >
-            {settings.footerWordmark}
-          </text>
-        </svg>
+          gradientId="footer-wordmark"
+          strokeWidth={2.5}
+          lines={[settings.footerWordmark]}
+        />
       </footer>
 
       <Effects />

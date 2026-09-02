@@ -69,20 +69,20 @@ nav.wrap{
 .eyebrow{color:var(--muted); font-size:13px; font-weight:700; letter-spacing:0.03em; margin-bottom:18px;}
 
 /* Groot woordmerk: twee helften naar de buitenranden */
-h1.wordmark{
-  margin:0 0 28px; display:flex; justify-content:space-between; align-items:baseline; gap:16px;
-  font-weight:900; letter-spacing:-0.045em; line-height:0.9; white-space:nowrap;
-  /* schaalt mee met het aantal letters, zodat beide helften de regel vullen */
-  font-size:calc((min(100vw, var(--maxw)) - 56px) / var(--wm-chars, 9));
-  /* hetzelfde verloop als het woordmerk onderaan, over de hele regel */
-  background:linear-gradient(90deg,var(--pink),var(--violet),var(--orange));
-  -webkit-background-clip:text; background-clip:text; color:transparent;
-}
-h1.wordmark em{font-style:normal;}
+h1.wordmark{margin:0 0 28px;}
+/* Breed scherm: één regel als SVG, die zichzelf exact op de breedte past. */
+.wordmark-wide{display:block; width:100%; height:auto;}
+.wordmark-stack{display:none;}
+/* Smal scherm: twee regels, zodat de naam groot leesbaar blijft. */
 @media(max-width:640px){
-  h1.wordmark{
-    flex-direction:column; align-items:flex-start; gap:0;
+  .wordmark-wide{display:none;}
+  .wordmark-stack{
+    display:flex; flex-direction:column;
+    font-weight:900; letter-spacing:-0.045em; line-height:0.9; white-space:nowrap;
     font-size:calc((100vw - 56px) / var(--wm-chars-line, 5));
+    background:linear-gradient(90deg,var(--pink),var(--violet),var(--orange));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    -webkit-text-stroke:0.02em currentColor;
   }
 }
 
