@@ -11,16 +11,9 @@ type Props = {
   lines: string[];
   gradientId: string;
   className?: string;
-  /** Verdikt de letters; Arial/Helvetica houdt op bij gewicht 900. */
-  strokeWidth?: number;
 };
 
-export default function Wordmark({
-  lines,
-  gradientId,
-  className,
-  strokeWidth = 0,
-}: Props) {
+export default function Wordmark({ lines, gradientId, className }: Props) {
   return (
     <svg
       className={className}
@@ -44,10 +37,6 @@ export default function Wordmark({
           textLength={VIEWBOX_WIDTH}
           lengthAdjust="spacingAndGlyphs"
           fill={`url(#${gradientId})`}
-          stroke={strokeWidth ? `url(#${gradientId})` : undefined}
-          strokeWidth={strokeWidth || undefined}
-          strokeLinejoin="round"
-          paintOrder="stroke"
         >
           {line}
         </text>

@@ -78,11 +78,11 @@ h1.wordmark{margin:0 0 28px;}
   .wordmark-wide{display:none;}
   .wordmark-stack{
     display:flex; flex-direction:column;
-    font-weight:900; letter-spacing:-0.045em; line-height:0.9; white-space:nowrap;
+    font-family:var(--font-display), "Helvetica Neue", Arial, sans-serif;
+    letter-spacing:-0.02em; line-height:0.95; white-space:nowrap;
     font-size:calc((100vw - 56px) / var(--wm-chars-line, 5));
     background:linear-gradient(90deg,var(--pink),var(--violet),var(--orange));
     -webkit-background-clip:text; background-clip:text; color:transparent;
-    -webkit-text-stroke:0.02em currentColor;
   }
 }
 
@@ -406,9 +406,10 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
   display:block; width:calc(100% - 32px); height:auto;
   margin:24px 16px 0; opacity:.9;
 }
+/* Het echte display-lettertype voor beide woordmerken. */
+.wordmark-wide text,
 .foot-wordmark text{
-  font-family:inherit; font-weight:900;
-  fill:url(#wordmark-gradient);
+  font-family:var(--font-display), "Helvetica Neue", Arial, sans-serif;
 }
 .wm-stop-1{stop-color:var(--pink);}
 .wm-stop-2{stop-color:var(--violet);}

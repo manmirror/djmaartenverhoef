@@ -1,5 +1,15 @@
 import type { Metadata } from "next";
+import { Archivo_Black } from "next/font/google";
 import "./globals.css";
+
+// Echt zwaar display-lettertype voor het woordmerk; Arial en Helvetica houden
+// op bij gewicht 900 en zijn daarvoor te licht.
+const displayFont = Archivo_Black({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-display",
+});
 
 const siteUrl = "https://djmaartenverhoef.nl";
 const description =
@@ -25,7 +35,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="nl">
+    <html lang="nl" className={displayFont.variable}>
       <body>{children}</body>
     </html>
   );

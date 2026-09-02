@@ -71,7 +71,6 @@ export default function Home() {
             <Wordmark
               className="wordmark-wide"
               gradientId="hero-wordmark"
-              strokeWidth={2.5}
               lines={[`${settings.heroTitleLine1} ${settings.heroTitleLine2}`]}
             />
             {/* Smal scherm: twee regels, zodat de naam groot leesbaar blijft. */}
@@ -427,7 +426,6 @@ export default function Home() {
         <Wordmark
           className="foot-wordmark"
           gradientId="footer-wordmark"
-          strokeWidth={2.5}
           lines={[settings.footerWordmark]}
         />
       </footer>
