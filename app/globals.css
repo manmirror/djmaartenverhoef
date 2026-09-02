@@ -382,20 +382,22 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 }
 .foot-socials a:hover{color:var(--ink); border-color:var(--ink);}
 
-.callback{display:flex; flex-direction:column; gap:10px; width:min(100%,340px);}
-.callback-head{font-size:14px; font-weight:800;}
-.callback-fields{display:flex; gap:10px; flex-wrap:wrap;}
+.callback{display:flex; flex-direction:column; gap:12px; width:min(100%,380px);}
+.callback-head{font-size:17px; font-weight:800; letter-spacing:-0.01em; margin-bottom:2px;}
+/* Velden onder elkaar, allebei over de volle breedte. */
+.callback-fields{display:flex; flex-direction:column; gap:12px;}
 .callback input{
-  flex:1 1 140px; min-width:0;
-  background:var(--bg-soft); border:1px solid var(--line); border-radius:999px;
-  padding:11px 16px; font-size:13px; color:var(--ink); font-family:inherit;
+  width:100%; min-width:0;
+  background:var(--bg-soft); border:1px solid var(--line); border-radius:16px;
+  padding:16px 20px; font-size:15px; color:var(--ink); font-family:inherit;
 }
 .callback input::placeholder{color:var(--muted);}
 .callback input:focus{outline:none; border-color:var(--violet);}
 .callback-btn{
+  width:100%;
   background:linear-gradient(90deg,var(--pink),var(--violet)); color:#fff;
-  border:none; border-radius:999px; padding:12px 22px;
-  font-size:14px; font-weight:800; font-family:inherit; cursor:pointer;
+  border:none; border-radius:16px; padding:17px 22px;
+  font-size:16px; font-weight:800; font-family:inherit; cursor:pointer;
   transition:transform .2s ease;
 }
 .callback-btn:hover{transform:translateY(-2px);}

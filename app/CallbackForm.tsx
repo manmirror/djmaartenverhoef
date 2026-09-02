@@ -38,18 +38,22 @@ export default function CallbackForm({
       <div className="callback-head">{heading}</div>
       <div className="callback-fields">
         <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={nameLabel}
-          aria-label={nameLabel}
-        />
-        <input
           type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder={phoneLabel}
           aria-label={phoneLabel}
+          autoComplete="tel"
+          required
+        />
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder={nameLabel}
+          aria-label={nameLabel}
+          autoComplete="name"
+          required
         />
       </div>
       <button type="submit" className="callback-btn">

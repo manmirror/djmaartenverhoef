@@ -241,9 +241,9 @@ export const siteContent = {
   ] as { network: "instagram" | "facebook" | "linkedin" | "tiktok"; href: string }[],
   // Terugbelblokje: opent WhatsApp met de ingevulde naam en het nummer erin.
   callbackHeading: "Graag even bellen?",
-  callbackNameLabel: "Je naam",
-  callbackPhoneLabel: "Je nummer",
-  callbackButtonLabel: "Bel me terug",
+  callbackNameLabel: "Naam*",
+  callbackPhoneLabel: "Telefoon*",
+  callbackButtonLabel: "Bel me terug!",
   // Groot woordmerk onderaan de pagina.
   footerWordmark: "DJ MAARTEN VERHOEF",
   footerCopyright: "© 2026 djmaartenverhoef.nl",
