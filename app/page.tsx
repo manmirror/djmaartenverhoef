@@ -1,3 +1,4 @@
+import ChatCard from "./ChatCard";
 import Effects from "./Effects";
 import { siteContent } from "@/content/site";
 
@@ -114,12 +115,26 @@ export default function Home() {
             <h2>{settings.chatHeading}</h2>
             <p>{settings.chatText}</p>
           </div>
-          <div className="phone">
-            <div className="bubble them">Hey! 👋 Ben je nog vrij op 14 juni?</div>
-            <div className="bubble me">Zeker weten! 🎉 Wat voor feest wordt het?</div>
-            <div className="bubble them">50-jarig huwelijksfeest, zo&apos;n 80 gasten.</div>
-            <div className="bubble me">Leuk! Zullen we morgen even bellen?</div>
-          </div>
+          <ChatCard
+            label={settings.chatCardLabel}
+            messages={settings.chatMessages}
+            avatarThem={settings.chatAvatarThem}
+            avatarMe={settings.chatAvatarMe}
+            avatarMeInitial={settings.chatAvatarMeInitial}
+          />
+        </div>
+      </section>
+
+      <section className="contact" id="contact">
+        <div className="wrap contact-grid">
+          <h2>{settings.contactHeading}</h2>
+          <p>{settings.contactText}</p>
+          <a className="wa-btn" href={whatsappWithText} target="_blank" rel="noopener">
+            <svg className="wa-icon" viewBox="0 0 32 32" fill="currentColor">
+              <path d="M16.02 3C9.4 3 4 8.36 4 15.02c0 2.35.64 4.55 1.86 6.48L4 29l7.68-1.82a11.9 11.9 0 0 0 4.34.82h.01c6.62 0 12.02-5.36 12.02-12.02C28.05 8.36 22.66 3 16.02 3zm7.02 17.14c-.3.85-1.5 1.55-2.46 1.75-.65.13-1.5.24-4.36-.93-3.66-1.5-6.02-5.2-6.2-5.44-.18-.24-1.5-2-1.5-3.8 0-1.8.94-2.68 1.28-3.05.34-.37.73-.46.97-.46.25 0 .49 0 .7.01.23.01.53-.09.83.63.3.74 1.03 2.54 1.12 2.73.09.19.15.42.03.66-.12.24-.18.39-.36.6-.18.21-.38.47-.55.63-.18.18-.37.37-.16.73.21.36.94 1.55 2.02 2.5 1.39 1.24 2.56 1.62 2.92 1.8.36.18.57.15.78-.09.21-.24.9-1.05 1.14-1.41.24-.36.48-.3.81-.18.33.12 2.1.99 2.46 1.17.36.18.6.27.69.42.09.15.09.85-.21 1.7z" />
+            </svg>
+            App met Maarten
+          </a>
         </div>
       </section>
 
@@ -187,19 +202,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="contact" id="contact">
-        <div className="wrap contact-grid">
-          <h2>{settings.contactHeading}</h2>
-          <p>{settings.contactText}</p>
-          <a className="wa-btn" href={whatsappWithText} target="_blank" rel="noopener">
-            <svg className="wa-icon" viewBox="0 0 32 32" fill="currentColor">
-              <path d="M16.02 3C9.4 3 4 8.36 4 15.02c0 2.35.64 4.55 1.86 6.48L4 29l7.68-1.82a11.9 11.9 0 0 0 4.34.82h.01c6.62 0 12.02-5.36 12.02-12.02C28.05 8.36 22.66 3 16.02 3zm7.02 17.14c-.3.85-1.5 1.55-2.46 1.75-.65.13-1.5.24-4.36-.93-3.66-1.5-6.02-5.2-6.2-5.44-.18-.24-1.5-2-1.5-3.8 0-1.8.94-2.68 1.28-3.05.34-.37.73-.46.97-.46.25 0 .49 0 .7.01.23.01.53-.09.83.63.3.74 1.03 2.54 1.12 2.73.09.19.15.42.03.66-.12.24-.18.39-.36.6-.18.21-.38.47-.55.63-.18.18-.37.37-.16.73.21.36.94 1.55 2.02 2.5 1.39 1.24 2.56 1.62 2.92 1.8.36.18.57.15.78-.09.21-.24.9-1.05 1.14-1.41.24-.36.48-.3.81-.18.33.12 2.1.99 2.46 1.17.36.18.6.27.69.42.09.15.09.85-.21 1.7z" />
-            </svg>
-            App met Maarten
-          </a>
         </div>
       </section>
 

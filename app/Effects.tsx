@@ -27,26 +27,7 @@ export default function Effects() {
     );
     document.querySelectorAll(".step").forEach((el) => io.observe(el));
 
-    const chatIo = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            document.querySelectorAll(".bubble").forEach((b, i) => {
-              setTimeout(() => b.classList.add("in"), i * 450);
-            });
-            chatIo.disconnect();
-          }
-        });
-      },
-      { threshold: 0.4 }
-    );
-    const phone = document.querySelector(".phone");
-    if (phone) chatIo.observe(phone);
-
-    return () => {
-      io.disconnect();
-      chatIo.disconnect();
-    };
+    return () => io.disconnect();
   }, []);
 
   return null;

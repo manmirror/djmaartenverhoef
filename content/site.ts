@@ -43,9 +43,23 @@ export const siteContent = {
     "Sportvereniging Legmeervogels",
   ],
 
-  chatHeading: "Altijd dichtbij.",
+  chatHeading: "Eén dj, meerdere stijlen.",
   chatText:
     "Geen omweg via een booker of formulier-limbo. Je appt, en binnen no time weet je waar je aan toe bent.",
+  // Kleine kop bovenin het chat-kaartje (wordt in hoofdletters getoond).
+  chatCardLabel: "Altijd dichtbij",
+  // Optionele rondjes-foto's naast de berichten, bv. "/images/maarten.jpg".
+  // Op null: een silhouet voor de klant en een gekleurd rondje met initiaal voor Maarten.
+  chatAvatarThem: null as string | null,
+  chatAvatarMe: null as string | null,
+  chatAvatarMeInitial: "M",
+  // Het gesprek dat zich in het kaartje afspeelt. "them" = klant, "me" = Maarten.
+  chatMessages: [
+    { from: "them", text: "Hey! 👋 Ben je nog vrij op 14 juni?" },
+    { from: "me", text: "Zeker weten! 🎉 Wat voor feest wordt het?" },
+    { from: "them", text: "50-jarig huwelijksfeest, zo'n 80 gasten." },
+    { from: "me", text: "Leuk! Zullen we morgen even bellen?" },
+  ] as { from: "them" | "me"; text: string }[],
 
   mediaHeading: "Media",
   mediaSubtext: "Sfeerbeelden van optredens door de jaren heen.",
