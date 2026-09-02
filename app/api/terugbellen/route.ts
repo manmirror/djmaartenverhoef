@@ -5,9 +5,11 @@ import { siteContent } from "@/content/site";
 
 export const runtime = "nodejs";
 
-// Het adres waarvandaan de mail verstuurd wordt. Moet op het geverifieerde
-// domein in Resend staan; het antwoord komt bij `email` uit content/site.ts.
-const FROM = process.env.CALLBACK_FROM || "Website <website@djmaartenverhoef.nl>";
+// Afzender én ontvanger is het adres uit content/site.ts, zodat beide meelopen
+// als dat adres ooit verandert. Het moet wel op het geverifieerde domein in
+// Resend staan. "Website" ervoor maakt in de inbox meteen duidelijk dat het
+// bericht van het formulier komt.
+const FROM = process.env.CALLBACK_FROM || `Website <${siteContent.email}>`;
 
 const MAX_NAME = 100;
 const MAX_PHONE = 40;
