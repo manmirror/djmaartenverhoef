@@ -331,6 +331,10 @@ h1.wordmark em{
 .player-title{font-weight:800; font-size:14px;}
 .waveform{display:flex; align-items:flex-end; gap:3px; height:56px;}
 .waveform span{flex:1; background:linear-gradient(180deg,var(--pink),var(--violet)); border-radius:3px; opacity:.85;}
+.player-embed{width:100%; border:0; border-radius:12px; display:block;}
+.player-audio{width:100%; margin-top:14px;}
+.player-link{display:inline-block; margin-top:14px; font-size:13px; font-weight:700; color:var(--muted);}
+.player-link:hover{color:var(--ink);}
 
 /* CONTACT */
 .contact{padding:120px 0;}

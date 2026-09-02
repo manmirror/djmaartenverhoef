@@ -1,6 +1,7 @@
 import CallbackForm from "./CallbackForm";
 import ChatCard from "./ChatCard";
 import Effects from "./Effects";
+import { buildEmbed } from "./embeds";
 import { siteContent } from "@/content/site";
 
 const SOCIAL_ICONS: Record<string, string> = {
@@ -326,37 +327,43 @@ export default function Home() {
             <p>{settings.musicSubtext}</p>
           </div>
           <div className="player-grid">
-            {settings.tracks.map((track, i) => (
-              <div className="player" key={i}>
-                <div className="player-top">
-                  <span className="dot" style={{ background: track.dotColor || "var(--pink)" }} />
-                  <span className="player-title">{track.title}</span>
+            {settings.tracks.map((track, i) => {
+              const embed = buildEmbed(track.embedUrl);
+              return (
+                <div className="player" key={i}>
+                  <div className="player-top">
+                    <span className="dot" style={{ background: track.dotColor || "var(--pink)" }} />
+                    <span className="player-title">{track.title}</span>
+                  </div>
+                  {embed ? (
+                    <iframe
+                      className="player-embed"
+                      src={embed.src}
+                      height={embed.height}
+                      title={`${track.title} — ${embed.title}`}
+                      loading="lazy"
+                      allow="autoplay; encrypted-media; clipboard-write; fullscreen; picture-in-picture"
+                    />
+                  ) : (
+                    <>
+                      <div className="waveform" />
+                      {track.audioFile ? (
+                        <audio className="player-audio" controls src={track.audioFile} />
+                      ) : track.externalUrl ? (
+                        <a
+                          className="player-link"
+                          href={track.externalUrl}
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          Beluister deze track →
+                        </a>
+                      ) : null}
+                    </>
+                  )}
                 </div>
-                <div className="waveform" />
-                {track.audioFile ? (
-                  <audio
-                    controls
-                    src={track.audioFile}
-                    style={{ width: "100%", marginTop: 14 }}
-                  />
-                ) : track.externalUrl ? (
-                  <a
-                    href={track.externalUrl}
-                    target="_blank"
-                    rel="noopener"
-                    style={{
-                      display: "inline-block",
-                      marginTop: 14,
-                      fontSize: 13,
-                      fontWeight: 700,
-                      color: "var(--muted)",
-                    }}
-                  >
-                    Beluister deze track →
-                  </a>
-                ) : null}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

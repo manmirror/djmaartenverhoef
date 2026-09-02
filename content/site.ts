@@ -164,16 +164,25 @@ export const siteContent = {
 
   musicHeading: "Muziek",
   musicSubtext: "Beluister recente sets — van rustig tot rauw.",
+  // Muziek afspelen op de site zelf:
+  //  - `embedUrl`: plak de gewone link van je SoundCloud-track, -set of
+  //    Spotify-playlist (bv. "https://soundcloud.com/maartenverhoef/zomerset").
+  //    De speler verschijnt dan ín de pagina; bezoekers gaan er niet vanaf.
+  //  - `audioFile`: een eigen mp3 uit /public/music/ (bv. "/music/set.mp3").
+  //  - `externalUrl`: alleen een link naar buiten, zonder speler.
+  // Het eerste veld dat is ingevuld wordt gebruikt.
   tracks: [
     {
       title: "SoundCloud — Zomerset 2026",
       dotColor: "var(--pink)",
+      embedUrl: "",
       audioFile: null as string | null,
       externalUrl: null as string | null,
     },
     {
       title: "Spotify — Bruiloften Mix",
       dotColor: "var(--violet)",
+      embedUrl: "",
       audioFile: null as string | null,
       externalUrl: null as string | null,
     },
