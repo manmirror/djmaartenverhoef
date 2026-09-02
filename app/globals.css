@@ -74,12 +74,11 @@ h1.wordmark{
   font-weight:900; letter-spacing:-0.045em; line-height:0.9; white-space:nowrap;
   /* schaalt mee met het aantal letters, zodat beide helften de regel vullen */
   font-size:calc((min(100vw, var(--maxw)) - 56px) / var(--wm-chars, 9));
-}
-h1.wordmark em{
-  font-style:normal;
-  background:linear-gradient(90deg,var(--pink),var(--orange));
+  /* hetzelfde verloop als het woordmerk onderaan, over de hele regel */
+  background:linear-gradient(90deg,var(--pink),var(--violet),var(--orange));
   -webkit-background-clip:text; background-clip:text; color:transparent;
 }
+h1.wordmark em{font-style:normal;}
 @media(max-width:640px){
   h1.wordmark{
     flex-direction:column; align-items:flex-start; gap:0;
@@ -404,12 +403,13 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 .foot-legal{display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; padding-top:36px;}
 .copyright{font-size:12px; color:var(--muted);}
 .foot-wordmark{
-  margin-top:24px; padding:0 12px;
-  font-weight:900; letter-spacing:-0.045em; line-height:0.85;
-  /* schaalt mee met het aantal letters, zodat het woordmerk de breedte vult */
-  font-size:calc((100vw - 32px) / var(--wm-chars, 10));
-  text-align:center; white-space:nowrap;
-  background:linear-gradient(90deg,var(--pink),var(--violet),var(--orange));
-  -webkit-background-clip:text; background-clip:text; color:transparent;
-  opacity:.9;
+  display:block; width:calc(100% - 32px); height:auto;
+  margin:24px 16px 0; opacity:.9;
 }
+.foot-wordmark text{
+  font-family:inherit; font-weight:900;
+  fill:url(#wordmark-gradient);
+}
+.wm-stop-1{stop-color:var(--pink);}
+.wm-stop-2{stop-color:var(--violet);}
+.wm-stop-3{stop-color:var(--orange);}

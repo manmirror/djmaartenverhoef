@@ -31,7 +31,6 @@ export default function Home() {
     (settings.heroTitleLine1.length + settings.heroTitleLine2.length) * HERO_CHAR_WIDTH;
   const heroLineChars =
     Math.max(settings.heroTitleLine1.length, settings.heroTitleLine2.length) * CHAR_WIDTH;
-  const footerChars = settings.footerWordmark.length * CHAR_WIDTH;
 
   const whatsappBase = `https://wa.me/${settings.whatsappNumber}`;
   const whatsappWithText = `${whatsappBase}?text=${encodeURIComponent(
@@ -421,13 +420,31 @@ export default function Home() {
           <div className="copyright">{settings.footerCopyright}</div>
         </div>
 
-        <div
+        {/* Als SVG, zodat de tekst zich exact op de breedte past — ongeacht
+            het lettertype van de bezoeker of hoe lang de naam is. */}
+        <svg
           className="foot-wordmark"
+          viewBox="0 0 1000 104"
           aria-hidden="true"
-          style={{ ["--wm-chars" as string]: footerChars.toFixed(2) }}
+          focusable="false"
         >
-          {settings.footerWordmark}
-        </div>
+          <defs>
+            <linearGradient id="wordmark-gradient" x1="0" y1="0" x2="1" y2="0">
+              <stop className="wm-stop-1" offset="0%" />
+              <stop className="wm-stop-2" offset="50%" />
+              <stop className="wm-stop-3" offset="100%" />
+            </linearGradient>
+          </defs>
+          <text
+            x="0"
+            y="86"
+            fontSize="100"
+            textLength="1000"
+            lengthAdjust="spacingAndGlyphs"
+          >
+            {settings.footerWordmark}
+          </text>
+        </svg>
       </footer>
 
       <Effects />
