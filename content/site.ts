@@ -14,7 +14,7 @@ export const siteContent = {
   heroTitleLine1: "MAARTEN",
   heroTitleLine2: "VERHOEF",
   tagline:
-    "Van intieme cafés tot Koningsdag op het plein — al ruim 30 jaar leest hij elke zaal (en plein) en houdt hij de dansvloer vol.",
+    "Van intieme cafés tot Koningsdag op het plein — al ruim 30 jaar lees ik elke zaal (en plein) en hou ik de dansvloer vol.",
   primaryButtonLabel: "App voor een offerte",
   secondaryButtonLabel: "Beluister zijn sets",
 
