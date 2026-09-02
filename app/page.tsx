@@ -1,31 +1,14 @@
 import Effects from "./Effects";
-import { urlFor } from "@/sanity/lib/image";
-import {
-  getMediaItems,
-  getSiteSettings,
-  getTracks,
-  getVenues,
-} from "@/sanity/lib/queries";
+import { siteContent } from "@/content/site";
 
-export const revalidate = 30;
-
-export default async function Home() {
-  const [settings, venues, mediaItems, tracks] = await Promise.all([
-    getSiteSettings(),
-    getVenues(),
-    getMediaItems(),
-    getTracks(),
-  ]);
+export default function Home() {
+  const settings = siteContent;
 
   const whatsappBase = `https://wa.me/${settings.whatsappNumber}`;
   const whatsappWithText = `${whatsappBase}?text=${encodeURIComponent(
     settings.whatsappMessage
   )}`;
   const telHref = `tel:+${settings.whatsappNumber}`;
-
-  const aboutPhotoUrl = settings.aboutPhoto
-    ? urlFor(settings.aboutPhoto)?.width(800).height(1000).fit("crop").url()
-    : null;
 
   return (
     <>
@@ -95,9 +78,9 @@ export default async function Home() {
           <div
             className="over-photo"
             style={
-              aboutPhotoUrl
+              settings.aboutPhoto
                 ? {
-                    backgroundImage: `url(${aboutPhotoUrl})`,
+                    backgroundImage: `url(${settings.aboutPhoto})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     color: "transparent",
@@ -105,7 +88,7 @@ export default async function Home() {
                 : undefined
             }
           >
-            {!aboutPhotoUrl && "Foto van Maarten tijdens een optreden"}
+            {!settings.aboutPhoto && "Foto van Maarten tijdens een optreden"}
           </div>
           <div>
             <h2>{settings.aboutHeading}</h2>
@@ -116,9 +99,9 @@ export default async function Home() {
                 <p key={i}>{paragraph}</p>
               ))}
             <div className="venues">
-              {venues.map((venue, i) => (
-                <span className="venue-tag" key={venue._id ?? i}>
-                  {venue.name}
+              {settings.venues.map((venue) => (
+                <span className="venue-tag" key={venue}>
+                  {venue}
                 </span>
               ))}
             </div>
@@ -148,18 +131,13 @@ export default async function Home() {
             <p>{settings.mediaSubtext}</p>
           </div>
           <div className="media-grid">
-            {mediaItems.map((item, i) => {
-              const imageUrl = item.image
-                ? urlFor(item.image)?.width(600).height(700).fit("crop").url()
-                : null;
-              const background = imageUrl
-                ? `url(${imageUrl}) center / cover`
-                : `linear-gradient(160deg, ${item.gradientFrom ?? "#8b5cf6"}, ${
-                    item.gradientTo ?? "#241638"
-                  })`;
+            {settings.mediaItems.map((item, i) => {
+              const background = item.image
+                ? `url(${item.image}) center / cover`
+                : `linear-gradient(160deg, ${item.gradientFrom}, ${item.gradientTo})`;
               return (
                 <div
-                  key={item._id ?? i}
+                  key={i}
                   className={`media-item${item.tall ? " tall" : ""}`}
                   style={{ background }}
                 >
@@ -178,17 +156,17 @@ export default async function Home() {
             <p>{settings.musicSubtext}</p>
           </div>
           <div className="player-grid">
-            {tracks.map((track, i) => (
-              <div className="player" key={track._id ?? i}>
+            {settings.tracks.map((track, i) => (
+              <div className="player" key={i}>
                 <div className="player-top">
                   <span className="dot" style={{ background: track.dotColor || "var(--pink)" }} />
                   <span className="player-title">{track.title}</span>
                 </div>
                 <div className="waveform" />
-                {track.audioUrl ? (
+                {track.audioFile ? (
                   <audio
                     controls
-                    src={track.audioUrl}
+                    src={track.audioFile}
                     style={{ width: "100%", marginTop: 14 }}
                   />
                 ) : track.externalUrl ? (
