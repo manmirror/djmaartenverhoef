@@ -1,4 +1,4 @@
-// Alle teksten, afbeeldingen en muziek voor maartenverhoef.nl staan hier.
+// Alle teksten, afbeeldingen en muziek voor djmaartenverhoef.nl staan hier.
 //
 // Teksten aanpassen: verander gewoon de tekst tussen de aanhalingstekens.
 // Afbeeldingen toevoegen: zet het bestand in /public/images/ en vul hieronder
@@ -246,5 +246,5 @@ export const siteContent = {
   callbackButtonLabel: "Bel me terug",
   // Groot woordmerk onderaan de pagina.
   footerWordmark: "DJ MAARTEN VERHOEF",
-  footerCopyright: "© 2026 maartenverhoef.nl",
+  footerCopyright: "© 2026 djmaartenverhoef.nl",
 };

@@ -1,4 +1,4 @@
-# DJ Maarten Verhoef — maartenverhoef.nl
+# DJ Maarten Verhoef — djmaartenverhoef.nl
 
 Next.js (App Router, TypeScript) versie van de statische promosite voor DJ Maarten Verhoef, geconverteerd vanuit het oorspronkelijke HTML/CSS/JS-prototype.
 
