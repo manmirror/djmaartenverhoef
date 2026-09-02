@@ -17,6 +17,15 @@ type Props = {
 
 type Status = "idle" | "sending" | "success" | "error";
 
+// Per oorzaak een eigen melding, zodat een bezoeker weet wat hij eraan kan doen
+// en jij bij een storing meteen ziet waar het fout gaat.
+const REASON_MESSAGES: Record<string, string> = {
+  ratelimited:
+    "Je hebt net al een verzoek gestuurd. Wacht even een kwartier, of",
+  phone: "Dat telefoonnummer lijkt niet te kloppen. Controleer het even, of",
+  incomplete: "Vul allebei de velden in, of",
+};
+
 export default function CallbackForm({
   heading,
   nameLabel,
@@ -32,6 +41,7 @@ export default function CallbackForm({
   const [phone, setPhone] = useState("");
   const [website, setWebsite] = useState(""); // honeypot: blijft leeg bij mensen
   const [status, setStatus] = useState<Status>("idle");
+  const [reason, setReason] = useState<string | null>(null);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -44,11 +54,19 @@ export default function CallbackForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, phone, website }),
       });
-      if (!response.ok) throw new Error(String(response.status));
+      if (!response.ok) {
+        // De server vertelt wát er misging; dat helpt bij het oplossen.
+        const body = await response.json().catch(() => null);
+        setReason(body?.error ?? `http-${response.status}`);
+        setStatus("error");
+        return;
+      }
       setStatus("success");
       setName("");
       setPhone("");
     } catch {
+      // De aanvraag kwam niet eens bij de server aan.
+      setReason("netwerk");
       setStatus("error");
     }
   }
@@ -102,10 +120,11 @@ export default function CallbackForm({
       </button>
       {status === "error" && (
         <p className="callback-error" role="alert">
-          {errorMessage}{" "}
+          {REASON_MESSAGES[reason ?? ""] ?? errorMessage}{" "}
           <a href={whatsappHref} target="_blank" rel="noopener">
             {errorLinkLabel}
           </a>
+          {reason && <span className="callback-code"> (code: {reason})</span>}
         </p>
       )}
     </form>

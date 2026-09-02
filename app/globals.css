@@ -423,3 +423,4 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 .wm-stop-2{stop-color:var(--violet);}
 .wm-stop-3{stop-color:var(--orange);}
 .callback-error a{color:var(--ink); font-weight:700; text-decoration:underline;}
+.callback-code{color:var(--muted); font-weight:400;}
