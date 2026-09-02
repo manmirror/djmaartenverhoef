@@ -10,12 +10,29 @@
 
 export const siteContent = {
   eyebrow: "DJ · Uithoorn e.o. · sinds 1994",
-  heroTitleLine1: "DJ MAARTEN",
+  // Groot woordmerk bovenaan: linkerhelft en rechterhelft.
+  heroTitleLine1: "MAARTEN",
   heroTitleLine2: "VERHOEF",
   tagline:
     "Van intieme cafés tot Koningsdag op het plein — al ruim 30 jaar leest hij elke zaal (en plein) en houdt hij de dansvloer vol.",
   primaryButtonLabel: "App voor een offerte",
   secondaryButtonLabel: "Beluister zijn sets",
+
+  // Drie labels boven de grote hero-foto.
+  heroLabels: ["Bruiloften", "Bedrijfsfeesten", "Kroeg & festival"],
+  // Grote sfeerfoto in de hero. Zet bv. "/images/hero.jpg", of laat op null.
+  heroImage: null as string | null,
+  // Tekst linksonder over de foto.
+  heroOverlayEyebrow: "Al ruim 30 jaar",
+  heroOverlayTitle: "Dansvloer vol.",
+  // Kaartje rechtsonder over de foto.
+  heroCardName: "App met Maarten",
+  heroCardText: "Direct antwoord, geen booker ertussen",
+
+  // Losse uitspraak-band onder de over-sectie.
+  statementEyebrow: "Waarom een dj",
+  statementText:
+    "Niemand onthoudt de setlist. Iedereen onthoudt de avond. Daar draait het om.",
 
   // Internationaal formaat zonder + of spaties, bv. 31621211313
   whatsappNumber: "31621211313",
@@ -43,7 +60,21 @@ export const siteContent = {
     "Sportvereniging Legmeervogels",
   ],
 
+  // Linkerkaart van het drieluik: tekst in het midden, stijlen draaien eromheen.
   chatHeading: "Eén dj, meerdere stijlen.",
+  orbitStyles: [
+    "Electro",
+    "Dance",
+    "Pop",
+    "R&B",
+    "Disco",
+    "Nederlandstalig",
+    "Classics",
+    "Feest",
+  ],
+  // Kaart rechtsonder in het drieluik.
+  reachHeading: "Eén appje bij je vandaan.",
+  reachButtonLabel: "Stuur een appje",
   chatText:
     "Geen omweg via een booker of formulier-limbo. Je appt, en binnen no time weet je waar je aan toe bent.",
   // Kleine kop bovenin het chat-kaartje (wordt in hoofdletters getoond).
@@ -60,6 +91,29 @@ export const siteContent = {
     { from: "them", text: "50-jarig huwelijksfeest, zo'n 80 gasten." },
     { from: "me", text: "Leuk! Zullen we morgen even bellen?" },
   ] as { from: "them" | "me"; text: string }[],
+
+  // ---- REVIEWS ----
+  // LET OP: vul hier alleen échte reviews in van echte klanten.
+  // Zolang `quote` leeg is, wordt het hele reviewblok niet getoond.
+  reviewsEyebrow: "Reviews",
+  reviewsHeading: "Dit zeggen tevreden klanten",
+  reviews: [
+    {
+      quote: "",
+      name: "",
+      role: "",
+      // Optionele foto bij de review, bv. "/images/bruiloft.jpg"
+      image: null as string | null,
+      // Aantal sterren (1 t/m 5)
+      stars: 5,
+    },
+  ],
+  // Optioneel kaartje met je Google-beoordeling; laat `rating` leeg om te verbergen.
+  googleReview: {
+    rating: "",
+    label: "Google reviews",
+    url: "",
+  },
 
   mediaHeading: "Media",
   mediaSubtext: "Sfeerbeelden van optredens door de jaren heen.",
@@ -129,5 +183,25 @@ export const siteContent = {
   contactText:
     "Geen formulier, geen omweg. App gewoon je datum en het type feest — je hoort binnen no time of Maarten beschikbaar is.",
 
+  // ---- FOOTER ----
+  footerName: "DJ Maarten Verhoef",
+  footerLinks: [
+    { label: "Over", href: "#over" },
+    { label: "Media", href: "#media" },
+    { label: "Muziek", href: "#muziek" },
+    { label: "Contact", href: "#contact" },
+  ],
+  // Laat `href` leeg om een icoon te verbergen.
+  footerSocials: [
+    { network: "instagram", href: "" },
+    { network: "facebook", href: "" },
+  ] as { network: "instagram" | "facebook" | "linkedin" | "tiktok"; href: string }[],
+  // Terugbelblokje: opent WhatsApp met de ingevulde naam en het nummer erin.
+  callbackHeading: "Graag even bellen?",
+  callbackNameLabel: "Je naam",
+  callbackPhoneLabel: "Je nummer",
+  callbackButtonLabel: "Bel me terug",
+  // Groot woordmerk onderaan de pagina.
+  footerWordmark: "MAARTEN VERHOEF",
   footerCopyright: "© 2026 maartenverhoef.nl",
 };
