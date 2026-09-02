@@ -36,7 +36,7 @@ export const siteContent = {
   whatsappNumber: "31621211313",
   // Vooraf ingevulde tekst voor de WhatsApp-knop in de contact-sectie
   whatsappMessage: "Hoi Maarten, ik wil graag een offerte aanvragen voor...",
-  email: "info@maartenverhoef.nl",
+  email: "feest@djmaartenverhoef.nl",
 
   sequenceHeading: "Van eerste contact tot lichten aan.",
   // De stappen onder die kop. `color` bepaalt de streep en het nummer;
