@@ -244,6 +244,11 @@ export const siteContent = {
   callbackNameLabel: "Naam*",
   callbackPhoneLabel: "Telefoon*",
   callbackButtonLabel: "Bel me terug!",
+  callbackSendingLabel: "Versturen…",
+  callbackSuccessMessage:
+    "Gelukt! Je verzoek is verstuurd — Maarten belt je zo snel mogelijk terug.",
+  callbackErrorMessage: "Er ging iets mis met versturen. Probeer het nog eens, of",
+  callbackErrorLinkLabel: "app Maarten direct →",
   // Groot woordmerk onderaan de pagina.
   footerWordmark: "DJ MAARTEN VERHOEF",
   footerCopyright: "© 2026 djmaartenverhoef.nl",

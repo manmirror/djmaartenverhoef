@@ -7,29 +7,60 @@ type Props = {
   nameLabel: string;
   phoneLabel: string;
   buttonLabel: string;
-  whatsappNumber: string;
+  sendingLabel: string;
+  successMessage: string;
+  errorMessage: string;
+  errorLinkLabel: string;
+  /** Uitwijk als versturen niet lukt, bijvoorbeeld door een adblocker. */
+  whatsappHref: string;
 };
+
+type Status = "idle" | "sending" | "success" | "error";
 
 export default function CallbackForm({
   heading,
   nameLabel,
   phoneLabel,
   buttonLabel,
-  whatsappNumber,
+  sendingLabel,
+  successMessage,
+  errorMessage,
+  errorLinkLabel,
+  whatsappHref,
 }: Props) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [website, setWebsite] = useState(""); // honeypot: blijft leeg bij mensen
+  const [status, setStatus] = useState<Status>("idle");
 
-  // Geen server nodig: het verzoek gaat als WhatsApp-bericht naar Maarten.
-  function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    const message = `Hoi Maarten, bel je me even terug?${
-      name ? `\nNaam: ${name}` : ""
-    }${phone ? `\nNummer: ${phone}` : ""}`;
-    window.open(
-      `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
-      "_blank",
-      "noopener"
+    if (status === "sending") return;
+    setStatus("sending");
+
+    try {
+      const response = await fetch("/api/terugbellen", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phone, website }),
+      });
+      if (!response.ok) throw new Error(String(response.status));
+      setStatus("success");
+      setName("");
+      setPhone("");
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  if (status === "success") {
+    return (
+      <div className="callback">
+        <div className="callback-head">{heading}</div>
+        <p className="callback-success" role="status">
+          {successMessage}
+        </p>
+      </div>
     );
   }
 
@@ -55,10 +86,28 @@ export default function CallbackForm({
           autoComplete="name"
           required
         />
+        {/* Onzichtbaar voor bezoekers; vult een bot dit in, dan negeren we het. */}
+        <input
+          type="text"
+          className="callback-honeypot"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+        />
       </div>
-      <button type="submit" className="callback-btn">
-        {buttonLabel}
+      <button type="submit" className="callback-btn" disabled={status === "sending"}>
+        {status === "sending" ? sendingLabel : buttonLabel}
       </button>
+      {status === "error" && (
+        <p className="callback-error" role="alert">
+          {errorMessage}{" "}
+          <a href={whatsappHref} target="_blank" rel="noopener">
+            {errorLinkLabel}
+          </a>
+        </p>
+      )}
     </form>
   );
 }

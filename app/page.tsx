@@ -406,7 +406,11 @@ export default function Home() {
               nameLabel={settings.callbackNameLabel}
               phoneLabel={settings.callbackPhoneLabel}
               buttonLabel={settings.callbackButtonLabel}
-              whatsappNumber={settings.whatsappNumber}
+              sendingLabel={settings.callbackSendingLabel}
+              successMessage={settings.callbackSuccessMessage}
+              errorMessage={settings.callbackErrorMessage}
+              errorLinkLabel={settings.callbackErrorLinkLabel}
+              whatsappHref={whatsappBase}
             />
           </div>
         </div>

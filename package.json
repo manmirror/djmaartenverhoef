@@ -9,9 +9,11 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "botid": "^1.5.11",
     "next": "16.3.4",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "resend": "^6.25.0"
   },
   "devDependencies": {
     "@types/node": "^20",

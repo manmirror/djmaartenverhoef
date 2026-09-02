@@ -399,7 +399,15 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
   font-size:16px; font-weight:800; font-family:inherit; cursor:pointer;
   transition:transform .2s ease;
 }
-.callback-btn:hover{transform:translateY(-2px);}
+.callback-btn:hover:not(:disabled){transform:translateY(-2px);}
+.callback-btn:disabled{opacity:.6; cursor:default;}
+/* Honeypot: onzichtbaar voor bezoekers, maar wel invulbaar voor bots. */
+.callback-honeypot{
+  position:absolute; left:-9999px; width:1px; height:1px;
+  opacity:0; pointer-events:none;
+}
+.callback-success{margin:0; font-size:15px; line-height:1.6; color:var(--ink);}
+.callback-error{margin:0; font-size:14px; line-height:1.5; color:var(--pink);}
 
 .foot-legal{display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; padding-top:36px;}
 .copyright{font-size:12px; color:var(--muted);}
@@ -414,3 +422,4 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 .wm-stop-1{stop-color:var(--pink);}
 .wm-stop-2{stop-color:var(--violet);}
 .wm-stop-3{stop-color:var(--orange);}
+.callback-error a{color:var(--ink); font-weight:700; text-decoration:underline;}

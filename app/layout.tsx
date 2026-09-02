@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Archivo_Black } from "next/font/google";
+import { BotIdClient } from "botid/client";
 import "./globals.css";
+
+// Onzichtbare bot-controle op het terugbelformulier: bezoekers merken er niets
+// van, bots worden op de server geweigerd.
+const protectedRoutes = [{ path: "/api/terugbellen", method: "POST" }];
 
 // Echt zwaar display-lettertype voor het woordmerk; Arial en Helvetica houden
 // op bij gewicht 900 en zijn daarvoor te licht.
@@ -36,6 +41,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="nl" className={displayFont.variable}>
+      <head>
+        <BotIdClient protect={protectedRoutes} />
+      </head>
       <body>{children}</body>
     </html>
   );
