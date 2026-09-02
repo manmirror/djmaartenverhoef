@@ -165,9 +165,16 @@ export const siteContent = {
   musicHeading: "Muziek",
   musicSubtext: "Beluister recente sets — van rustig tot rauw.",
   // Muziek afspelen op de site zelf:
-  //  - `embedUrl`: plak de gewone link van je SoundCloud-track, -set of
-  //    Spotify-playlist (bv. "https://soundcloud.com/maartenverhoef/zomerset").
-  //    De speler verschijnt dan ín de pagina; bezoekers gaan er niet vanaf.
+  //  - `embedUrl`: het adres van je SoundCloud-track of -set, zoals het in de
+  //    adresbalk staat als je de track op soundcloud.com opent. Dus:
+  //      "https://soundcloud.com/maartenverhoef/naam-van-de-track"
+  //    Een speler-link (w.soundcloud.com/player/?url=...) werkt ook; die wordt
+  //    automatisch omgezet. Twee dingen die NIET werken:
+  //      * de complete <iframe>-code uit SoundCloud: de dubbele quotes daarin
+  //        breken deze regel. Gebruik alleen het adres.
+  //      * deel-links (on.soundcloud.com/...): open die eerst in je browser en
+  //        kopieer dan het adres uit de adresbalk.
+  //    Spotify-links werken op dezelfde manier als SoundCloud.
   //  - `audioFile`: een eigen mp3 uit /public/music/ (bv. "/music/set.mp3").
   //  - `externalUrl`: alleen een link naar buiten, zonder speler.
   // Het eerste veld dat is ingevuld wordt gebruikt.
@@ -175,7 +182,8 @@ export const siteContent = {
     {
       title: "Startup Set - Koningsdag Uithoorn aan de Amstel 2025",
       dotColor: "var(--pink)",
-      embedUrl: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A2091525978&color=%23ff5500",
+      embedUrl:
+        "https://soundcloud.com/maartenverhoef/startup-set-koningsdag-uithoorn-aan-de-amstel-2025",
       audioFile: null as string | null,
       externalUrl: null as string | null,
     },
