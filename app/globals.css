@@ -187,9 +187,6 @@ h1.title em{
 }
 .wa-btn:hover{transform:translateY(-2px);}
 .wa-icon{width:24px; height:24px; flex:none;}
-.contact-alt{display:flex; gap:28px; flex-wrap:wrap; justify-content:center; font-size:14px; color:var(--muted); margin-top:4px;}
-.contact-alt a{color:var(--ink); font-weight:700;}
-.contact-alt a:hover{color:var(--pink);}
 
 /* FOOTER */
 footer{padding:50px 0; border-top:1px solid var(--line);}

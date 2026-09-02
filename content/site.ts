@@ -21,7 +21,6 @@ export const siteContent = {
   whatsappNumber: "31621211313",
   // Vooraf ingevulde tekst voor de WhatsApp-knop in de contact-sectie
   whatsappMessage: "Hoi Maarten, ik wil graag een offerte aanvragen voor...",
-  phoneNumber: "06 - 21 21 13 13",
   email: "info@maartenverhoef.nl",
 
   sequenceHeading: "Van eerste plaat tot lichten aan.",

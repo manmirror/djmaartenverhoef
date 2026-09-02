@@ -8,7 +8,6 @@ export default function Home() {
   const whatsappWithText = `${whatsappBase}?text=${encodeURIComponent(
     settings.whatsappMessage
   )}`;
-  const telHref = `tel:+${settings.whatsappNumber}`;
 
   return (
     <>
@@ -201,14 +200,6 @@ export default function Home() {
             </svg>
             App met Maarten
           </a>
-          <div className="contact-alt">
-            <span>
-              Liever bellen? <a href={telHref}>{settings.phoneNumber}</a>
-            </span>
-            <span>
-              Of mail naar <a href={`mailto:${settings.email}`}>{settings.email}</a>
-            </span>
-          </div>
         </div>
       </section>
 
