@@ -129,18 +129,20 @@ export default function Home() {
         <div className="wrap">
           <div className="seq-head">{settings.sequenceHeading}</div>
           <div className="seq-grid">
-            <div className="step" style={{ ["--stepcolor" as string]: "var(--pink)" }}>
-              <div className="step-num">01 — LEZEN</div>
-              <div className="step-line">De zaal bepaalt de richting.</div>
-            </div>
-            <div className="step" style={{ ["--stepcolor" as string]: "var(--violet)" }}>
-              <div className="step-num">02 — VERZOEKEN</div>
-              <div className="step-line">Jij vraagt. Ik draai. Soms.</div>
-            </div>
-            <div className="step" style={{ ["--stepcolor" as string]: "var(--orange)" }}>
-              <div className="step-num">03 — DANSEN</div>
-              <div className="step-line">Tot de lichten aangaan.</div>
-            </div>
+            {settings.steps.map((step, i) => (
+              <div
+                className="step"
+                key={step.number}
+                style={{
+                  ["--stepcolor" as string]: step.color,
+                  ["--stepdelay" as string]: `${0.05 + i * 0.13}s`,
+                }}
+              >
+                <div className="step-num">{step.number}</div>
+                <div className="step-line">{step.line}</div>
+                <p className="step-text">{step.text}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

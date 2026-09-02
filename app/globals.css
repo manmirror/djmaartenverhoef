@@ -135,20 +135,19 @@ h1.wordmark em{
 /* SEQUENCE */
 .sequence{padding:110px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--bg-soft);}
 .seq-head{font-weight:900; letter-spacing:-0.02em; font-size:clamp(30px,4.4vw,52px); max-width:680px; line-height:1.05; margin-bottom:64px;}
-.seq-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:32px;}
-@media(max-width:780px){.seq-grid{grid-template-columns:1fr;}}
+.seq-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:32px;}
+@media(max-width:980px){.seq-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:560px){.seq-grid{grid-template-columns:1fr;}}
 .step{
   padding-top:28px; border-top:2px solid var(--line);
   opacity:0; transform:translateY(24px);
   transition:opacity .6s ease, transform .6s ease, border-color .3s ease;
+  transition-delay:var(--stepdelay, 0s);
 }
-.step.in{opacity:1; transform:translateY(0);}
-.step:nth-child(1){transition-delay:.05s;}
-.step:nth-child(2){transition-delay:.18s;}
-.step:nth-child(3){transition-delay:.31s;}
-.step.in{border-color:var(--stepcolor);}
+.step.in{opacity:1; transform:translateY(0); border-color:var(--stepcolor);}
 .step-num{font-size:13px; font-weight:800; letter-spacing:0.04em; color:var(--stepcolor); margin-bottom:14px;}
-.step-line{font-size:22px; font-weight:700; letter-spacing:-0.01em;}
+.step-line{font-size:20px; font-weight:700; letter-spacing:-0.01em;}
+.step-text{margin:12px 0 0; color:var(--muted); font-size:15px; line-height:1.6;}
 
 /* OVER */
 .over{padding:120px 0;}

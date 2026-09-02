@@ -11,7 +11,7 @@
 export const siteContent = {
   eyebrow: "DJ · Uithoorn e.o. · sinds 1994",
   // Groot woordmerk bovenaan: linkerhelft en rechterhelft.
-  heroTitleLine1: "MAARTEN",
+  heroTitleLine1: "DJ MAARTEN",
   heroTitleLine2: "VERHOEF",
   tagline:
     "Van intieme cafés tot Koningsdag op het plein — al ruim 30 jaar lees ik elke zaal (en plein) en hou ik de dansvloer vol.",
@@ -38,7 +38,35 @@ export const siteContent = {
   whatsappMessage: "Hoi Maarten, ik wil graag een offerte aanvragen voor...",
   email: "info@maartenverhoef.nl",
 
-  sequenceHeading: "Van eerste plaat tot lichten aan.",
+  sequenceHeading: "Van eerste contact tot lichten aan.",
+  // De stappen onder die kop. `color` bepaalt de streep en het nummer;
+  // kies uit var(--pink), var(--violet) of var(--orange).
+  steps: [
+    {
+      number: "01 — AFSTEMMEN",
+      line: "Eerst even kennismaken.",
+      text: "Datum, locatie, tijden, geluid, licht en natuurlijk de muziek. We bespreken wat je zoekt, wat er nodig is en wat het gaat kosten.",
+      color: "var(--pink)",
+    },
+    {
+      number: "02 — LEZEN",
+      line: "De zaal bepaalt de richting.",
+      text: "Geen avond is hetzelfde. Ik start met een plan, maar lees de zaal en pas mijn muziekkeuze aan op wat er op de dansvloer gebeurt.",
+      color: "var(--violet)",
+    },
+    {
+      number: "03 — VERZOEKEN",
+      line: "Jij vraagt. Ik draai. Soms.",
+      text: "Verzoekje? Altijd welkom. Past ’ie in de avond, dan draai ik ’m. Maar garanties zijn er niet — de dansvloer gaat voor.",
+      color: "var(--orange)",
+    },
+    {
+      number: "04 — DANSEN",
+      line: "Tot de lichten aangaan.",
+      text: "De juiste platen, op het juiste moment. Opbouwen, doortrekken en zorgen dat de dansvloer blijft staan tot het echt klaar is.",
+      color: "var(--pink)",
+    },
+  ],
 
   aboutHeading: "Meer dan 30 jaar op de dansvloer.",
   // Elke nieuwe regel (Enter) wordt een eigen alinea.
@@ -217,6 +245,6 @@ export const siteContent = {
   callbackPhoneLabel: "Je nummer",
   callbackButtonLabel: "Bel me terug",
   // Groot woordmerk onderaan de pagina.
-  footerWordmark: "MAARTEN VERHOEF",
+  footerWordmark: "DJ MAARTEN VERHOEF",
   footerCopyright: "© 2026 maartenverhoef.nl",
 };
