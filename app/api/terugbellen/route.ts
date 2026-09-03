@@ -5,12 +5,12 @@ import { siteContent } from "@/content/site";
 
 export const runtime = "nodejs";
 
-// Verstuurd vanaf het subdomein dat Resend mag gebruiken. Het hoofddomein
-// djmaartenverhoef.nl heeft een SPF die op "-all" staat en alleen Hostnet
-// toestaat; mail die daar vandaan lijkt te komen maar via Resend wordt
-// verstuurd, wordt daardoor geweigerd. Antwoorden gaan wel naar het gewone
-// adres, dus in de praktijk merk je hier niets van.
-const FROM = process.env.CALLBACK_FROM || "Website <formulier@send.djmaartenverhoef.nl>";
+// Het domein dat in Resend geverifieerd is, is djmaartenverhoef.nl zelf — de
+// DKIM-sleutel staat daar. Het subdomein send.djmaartenverhoef.nl is alleen de
+// route voor bounces, geen adres waar vandaan verstuurd mag worden.
+// Bewust een ander postvak dan de ontvanger: mail van en naar precies hetzelfde
+// adres wordt door ontvangende servers eerder als spoofing gelezen.
+const FROM = process.env.CALLBACK_FROM || "Website <formulier@djmaartenverhoef.nl>";
 
 const MAX_NAME = 100;
 const MAX_PHONE = 40;
@@ -100,7 +100,11 @@ export async function POST(request: Request) {
 
   if (error) {
     console.error("Resend gaf een fout bij het terugbelverzoek:", error);
-    return Response.json({ error: "send" }, { status: 502 });
+    // De melding van Resend meesturen, anders is een storing niet te herleiden.
+    return Response.json(
+      { error: "send", detail: error.message ?? error.name },
+      { status: 502 }
+    );
   }
 
   return Response.json({ ok: true });

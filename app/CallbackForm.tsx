@@ -65,7 +65,11 @@ export default function CallbackForm({
       if (!response.ok) {
         // De server vertelt wát er misging; dat helpt bij het oplossen.
         const body = await response.json().catch(() => null);
-        setReason(body?.error ?? `http-${response.status}`);
+        setReason(
+          body?.detail
+            ? `${body.error}: ${body.detail}`
+            : (body?.error ?? `http-${response.status}`)
+        );
         setStatus("error");
         return;
       }
