@@ -37,22 +37,30 @@ export default function CallbackForm({
   errorLinkLabel,
   whatsappHref,
 }: Props) {
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [website, setWebsite] = useState(""); // honeypot: blijft leeg bij mensen
   const [status, setStatus] = useState<Status>("idle");
   const [reason, setReason] = useState<string | null>(null);
 
-  async function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (status === "sending") return;
-    setStatus("sending");
 
+    // Rechtstreeks uit het formulier lezen in plaats van uit de React-status.
+    // Vult de browser velden automatisch in, dan komt dat niet altijd in die
+    // status terecht en zou er leegte verstuurd worden.
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const payload = {
+      name: String(data.get("naam") ?? ""),
+      phone: String(data.get("telefoon") ?? ""),
+      website: String(data.get("bedrijfsnaam") ?? ""),
+    };
+
+    setStatus("sending");
     try {
       const response = await fetch("/api/terugbellen", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, website }),
+        body: JSON.stringify(payload),
       });
       if (!response.ok) {
         // De server vertelt wát er misging; dat helpt bij het oplossen.
@@ -62,8 +70,7 @@ export default function CallbackForm({
         return;
       }
       setStatus("success");
-      setName("");
-      setPhone("");
+      form.reset();
     } catch {
       // De aanvraag kwam niet eens bij de server aan.
       setReason("netwerk");
@@ -88,8 +95,7 @@ export default function CallbackForm({
       <div className="callback-fields">
         <input
           type="tel"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          name="telefoon"
           placeholder={phoneLabel}
           aria-label={phoneLabel}
           autoComplete="tel"
@@ -97,19 +103,18 @@ export default function CallbackForm({
         />
         <input
           type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          name="naam"
           placeholder={nameLabel}
           aria-label={nameLabel}
           autoComplete="name"
           required
         />
-        {/* Onzichtbaar voor bezoekers; vult een bot dit in, dan negeren we het. */}
+        {/* Onzichtbaar voor bezoekers; vult een bot dit in, dan negeren we het.
+            De naam is bewust iets wat de browser niet automatisch invult. */}
         <input
           type="text"
+          name="bedrijfsnaam"
           className="callback-honeypot"
-          value={website}
-          onChange={(e) => setWebsite(e.target.value)}
           tabIndex={-1}
           autoComplete="off"
           aria-hidden="true"
