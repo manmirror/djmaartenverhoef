@@ -12,6 +12,11 @@ export const runtime = "nodejs";
 // adres wordt door ontvangende servers eerder als spoofing gelezen.
 const FROM = process.env.CALLBACK_FROM || "Website <formulier@djmaartenverhoef.nl>";
 
+// Waar de melding heen gaat. Standaard het adres uit content/site.ts, maar met
+// CALLBACK_TO kun je een ander postvak kiezen — handig als de mailprovider van
+// het eigen domein bericht van buitenaf blokkeert.
+const TO = process.env.CALLBACK_TO || siteContent.email;
+
 const MAX_NAME = 100;
 const MAX_PHONE = 40;
 
@@ -85,7 +90,7 @@ export async function POST(request: Request) {
 
   const { error } = await new Resend(apiKey).emails.send({
     from: FROM,
-    to: siteContent.email,
+    to: TO,
     replyTo: siteContent.email,
     subject: `Terugbelverzoek van ${name}`,
     text: [
