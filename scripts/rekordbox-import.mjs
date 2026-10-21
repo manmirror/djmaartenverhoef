@@ -81,6 +81,31 @@ function leesAttributen(tekst, vanaf) {
   return { attributen, einde: i };
 }
 
+/**
+ * Bestanden uit DJ-pools hebben vaak een rommelige titel: een tracknummer
+ * ervoor ("1_", "2. "), een "_pn" erachter, en de artiest in de titel in plaats
+ * van in het artiestveld. Dat ruimen we op, voorzichtig: alleen wat zeker is.
+ */
+function schoonOp(titel, artiest) {
+  let t = titel
+    .replace(/_pn$/i, "")
+    .replace(/^\d{1,2}(?:_|\.\s+)(?=[A-Za-z])/, "")
+    .trim();
+  let a = artiest;
+
+  // "Artiest - Titel" zonder artiestveld: splitsen, maar alleen bij precies
+  // één streepje en niet bij mixtapes als "[SUMMER MIXTAPE] ... - CHILL".
+  if (!a && !/^[[_]/.test(t)) {
+    const stukken = t.split(" - ");
+    if (stukken.length === 2 && stukken[0].trim() && stukken[1].trim()) {
+      a = stukken[0].trim();
+      t = stukken[1].trim();
+    }
+  }
+
+  return { titel: t, artiest: a };
+}
+
 function getal(waarde) {
   if (!waarde) return null;
   const nummer = Number.parseFloat(waarde);
@@ -116,8 +141,10 @@ while (positie !== -1) {
   // In <PLAYLISTS> staan verwijzingen zonder titel; die hebben we niet nodig.
   if (attributen.Name) {
     bekeken++;
-    const titel = ontsnap(attributen.Name).trim();
-    const artiest = ontsnap(attributen.Artist ?? "").trim();
+    const { titel, artiest } = schoonOp(
+      ontsnap(attributen.Name).trim(),
+      ontsnap(attributen.Artist ?? "").trim()
+    );
 
     if (!titel) {
       overgeslagen++;

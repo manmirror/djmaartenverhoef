@@ -34,5 +34,20 @@ export const feesten: Feest[] = [
     slug: "bo-chantal-en-mitchel",
     naam: "Bo Chantal & Mitchel",
     datum: "2026-10-24",
+    plaats: "De Vink, Vinkeveen",
+  },
+  {
+    // De namen volgen nog. Die kun je gewoon bij `naam` invullen; de slug
+    // blijft staan, zodat een al geprinte poster blijft werken.
+    slug: "de-vink-20-november",
+    naam: "Privéfeest",
+    datum: "2026-11-20",
+    plaats: "De Vink, Vinkeveen",
+  },
+  {
+    slug: "kim-en-nicole",
+    naam: "Kim & Nicole",
+    datum: "2026-12-12",
+    plaats: "Qui Vive, De Kwakel",
   },
 ];

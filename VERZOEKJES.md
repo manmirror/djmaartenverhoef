@@ -137,7 +137,13 @@ npm run verzoekjes:collectie -- ~/Downloads/rekordbox.xml
 ```
 
 Alleen titel, artiest, bpm, toonaard, genre en jaar gaan mee. Het pad naar je
-muziekbestanden blijft op je eigen computer.
+muziekbestanden blijft op je eigen computer. Hetzelfde nummer dat meerdere
+keren in je collectie staat, komt er één keer in.
+
+Titels uit DJ-pools worden voorzichtig opgeschoond: een tracknummer ervoor
+("1_", "2. ") en "_pn" erachter gaan eraf, en staat de artiest in de titel
+terwijl het artiestveld leeg is ("Artiest - Titel"), dan wordt dat gesplitst.
+Mixtapes en titels met meerdere streepjes blijven zoals ze zijn.
 
 - Terwijl een gast typt, stelt het formulier nummers uit jóuw collectie voor.
 - Typt iemand zelf een titel, dan zoeken we die alsnog op — ook zonder
