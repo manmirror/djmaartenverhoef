@@ -7,6 +7,7 @@ import {
   naarInfo,
   vindFeest,
 } from "@/app/verzoekjes/feesten";
+import { leesOudeVerzoekjesIn } from "@/app/verzoekjes/import";
 import { isHandmatigOpen, leesVerzoeken, opslagActief } from "@/app/verzoekjes/store";
 
 export const runtime = "nodejs";
@@ -35,6 +36,7 @@ export async function GET(request: Request) {
     });
   }
 
+  await leesOudeVerzoekjesIn([feest]);
   const handmatig = await isHandmatigOpen(feest.slug);
 
   return Response.json({

@@ -58,12 +58,19 @@ type Geheugen = {
   lijsten: Map<string, Map<string, Verzoek>>;
   open: Map<string, number>;
   rem: Map<string, number[]>;
+  import: Map<string, number>;
 };
 const gedeeld = globalThis as typeof globalThis & { __verzoekjes?: Geheugen };
-gedeeld.__verzoekjes ??= { lijsten: new Map(), open: new Map(), rem: new Map() };
+gedeeld.__verzoekjes ??= {
+  lijsten: new Map(),
+  open: new Map(),
+  rem: new Map(),
+  import: new Map(),
+};
 const geheugen = gedeeld.__verzoekjes.lijsten;
 const geheugenOpen = gedeeld.__verzoekjes.open;
 const geheugenRem = gedeeld.__verzoekjes.rem;
+const geheugenImport = gedeeld.__verzoekjes.import;
 
 function geheugenLijst(feest: string): Map<string, Verzoek> {
   let lijst = geheugen.get(feest);
@@ -192,6 +199,36 @@ export async function verwijderVerzoek(feest: string, id: string): Promise<boole
   const redis = geefClient();
   if (!redis) return geheugenLijst(feest).delete(id);
   return (await redis.hdel(sleutel(feest), id)) > 0;
+}
+
+// ---- verzoekjes van oude feesten, uit content/feesten.ts ----
+
+/** Hoeveel regels van dit feest al eens zijn ingelezen. */
+export async function importStand(feest: string): Promise<number> {
+  const redis = geefClient();
+  if (!redis) return geheugenImport.get(feest) ?? 0;
+  return Number((await redis.get(`verzoekjes:import:${feest}`)) ?? 0);
+}
+
+export async function zetImportStand(feest: string, regels: number): Promise<void> {
+  const redis = geefClient();
+  if (redis) await redis.set(`verzoekjes:import:${feest}`, regels);
+  else geheugenImport.set(feest, regels);
+}
+
+/**
+ * Zet een ingelezen verzoekje erin, maar alleen als er nog niets met dat id
+ * staat. De ids van ingelezen regels liggen vast, dus lezen twee servers
+ * tegelijk in, dan komt elke regel er toch maar één keer in.
+ */
+export async function voegToeAlsNieuw(verzoek: Verzoek): Promise<void> {
+  const redis = geefClient();
+  if (redis) {
+    await redis.hsetnx(sleutel(verzoek.feest), verzoek.id, JSON.stringify(verzoek));
+    return;
+  }
+  const lijst = geheugenLijst(verzoek.feest);
+  if (!lijst.has(verzoek.id)) lijst.set(verzoek.id, verzoek);
 }
 
 /**

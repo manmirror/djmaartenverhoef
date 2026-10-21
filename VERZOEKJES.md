@@ -72,6 +72,7 @@ De feesten staan in `content/feesten.ts`. Per feest één regel:
   vanafUur: 12,                    // optioneel, standaard 12
   totUur: 6,                       // optioneel, standaard 6 (de ochtend erna)
   test: true,                      // optioneel: telt niet mee in de jaarlijst
+  verzoekjes: ["Bievenpad", "..."], // optioneel, alleen voor oude feesten
 },
 ```
 
@@ -80,6 +81,22 @@ Elk feest krijgt dan vanzelf een eigen poster op `/verzoekjes/qr`.
 
 **Verander de slug niet meer nadat je de poster hebt geprint.** De code op
 papier wijst naar dat adres.
+
+### Oude feesten, van vóór de verzoekjespagina
+
+Een feest dat al geweest is kan erin met de verzoekjes van die avond erbij, als
+lijstje onder `verzoekjes`, één per regel, zoals ze gevraagd zijn. Zo staat
+Justin & Rachel 30 jaar! erin.
+
+De eerste keer dat de booth zo'n feest opent, worden de verzoekjes in de
+database gezet en aan je collectie gekoppeld, om 21:00 die avond en daarna een
+minuut per regel. Vanaf dan zijn het gewone verzoekjes: in het archief kun je
+ze koppelen, afvinken als gedraaid en weghalen, en ze tellen mee in de
+jaarlijst.
+
+- Wat je in de booth weghaalt, blijft weg: het wordt niet opnieuw ingelezen.
+- Regels die je later **onderaan** toevoegt, komen er de volgende keer bij.
+- Een regel die al is ingelezen, verander je in de booth, niet in dit bestand.
 
 ### Wanneer staat een feest open?
 
@@ -108,6 +125,20 @@ voor gedeployd te worden.
 
 Er is met opzet geen knop meer om een hele lijst te wissen: samen vormen die
 lijsten het archief.
+
+---
+
+## 3b. Het archief
+
+In de booth onder **Archief** staan alle feesten die al begonnen zijn, het
+nieuwste bovenaan, met per feest hoeveel verzoekjes er waren, hoeveel daarvan
+in je collectie staan en hoeveel je gedraaid hebt.
+
+Tik op een feest voor de hele lijst van die avond, open en afgehandeld door
+elkaar. Alles wat in de live-lijst kan, kan hier ook: een match aanpassen of
+zelf koppelen, afvinken als gedraaid, en weghalen. Handig om na afloop rustig
+de verzoekjes te koppelen die niet vanzelf gevonden werden, zodat de jaarlijst
+klopt.
 
 ---
 

@@ -62,6 +62,14 @@ export function nogNietBegonnen(feest: Feest, nu = Date.now()): boolean {
   return nu < venster(feest).van;
 }
 
+/**
+ * Tijdstip voor een ingelezen verzoekje van een oud feest: om 21:00 die avond,
+ * en daarna een minuut per regel, zodat de volgorde bewaard blijft.
+ */
+export function tijdstipVoorRegel(feest: Feest, regel: number): number {
+  return lokaalNaarTijdstip(feest.datum, 21) + regel * 60_000;
+}
+
 export function isOpen(feest: Feest, nu = Date.now()): boolean {
   const { van, tot } = venster(feest);
   return nu >= van && nu < tot;

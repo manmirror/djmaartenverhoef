@@ -56,8 +56,10 @@ type Jaarlijst = {
   totaal: number;
   top: TopNummer[];
 };
+/** Eén feest in het archief, met tellingen. */
+type ArchiefFeest = FeestInfo & { aantal: number; gekoppeld: number; gedraaid: number };
 type Sortering = "tijd" | "bpm";
-type Weergave = "lijst" | "top";
+type Weergave = "lijst" | "archief" | "top";
 
 export default function Booth() {
   // Op de server weten we de code niet; vandaar de lege derde waarde.
@@ -73,6 +75,14 @@ export default function Booth() {
   const [top, setTop] = useState<Jaarlijst | null>(null);
   /** Het verzoekje waarvan het koppelpaneel open staat. */
   const [koppelId, setKoppelId] = useState<string | null>(null);
+  const [archief, setArchief] = useState<ArchiefFeest[] | null>(null);
+  /** Het feest dat in het archief openstaat; null is het overzicht. */
+  const [archiefFeest, setArchiefFeest] = useState<string | null>(null);
+
+  // Welk feest de lijst laat zien: in het archief het daar gekozen feest, en
+  // anders het feest uit de keuzelijst (of, zonder keuze, dat van vanavond).
+  const actiefFeest = weergave === "archief" ? archiefFeest : gekozenFeest;
+  const toontLijst = weergave === "lijst" || (weergave === "archief" && archiefFeest !== null);
 
   const haal = useCallback(async (metCode: string, feest: string | null) => {
     const adres = feest
@@ -108,12 +118,12 @@ export default function Booth() {
   }, []);
 
   useEffect(() => {
-    if (!code || weergave !== "lijst") return;
+    if (!code || !toontLijst) return;
 
     let actief = true;
     async function vernieuw() {
       try {
-        await haal(code, gekozenFeest);
+        await haal(code, actiefFeest);
       } catch {
         if (actief) setFout("Geen verbinding. De lijst probeert het straks opnieuw.");
       }
@@ -128,7 +138,7 @@ export default function Booth() {
       actief = false;
       clearInterval(tik);
     };
-  }, [code, gekozenFeest, haal, weergave]);
+  }, [code, actiefFeest, haal, toontLijst]);
 
   const feest = lijst?.feest ?? null;
 
@@ -156,7 +166,7 @@ export default function Booth() {
     );
     try {
       await stuur("status", { feest: feest.slug, id, status });
-      await haal(code, gekozenFeest);
+      await haal(code, actiefFeest);
     } catch {
       setFout("Kon dat niet opslaan. Probeer het nog eens.");
     } finally {
@@ -170,7 +180,7 @@ export default function Booth() {
     setBezigMet(verzoek.id);
     try {
       await stuur("status", { feest: feest.slug, id: verzoek.id, verwijder: true });
-      await haal(code, gekozenFeest);
+      await haal(code, actiefFeest);
     } catch {
       setFout("Kon dat niet weghalen.");
     } finally {
@@ -205,7 +215,7 @@ export default function Booth() {
       }
       if (!antwoord.ok) return `Koppelen lukte niet (${antwoord.status}).`;
       setKoppelId(null);
-      await haal(code, gekozenFeest);
+      await haal(code, actiefFeest);
       return null;
     } catch {
       return "Geen verbinding. Probeer het nog eens.";
@@ -216,7 +226,7 @@ export default function Booth() {
     if (!feest) return;
     try {
       await stuur("open", { feest: feest.slug });
-      await haal(code, gekozenFeest);
+      await haal(code, actiefFeest);
     } catch {
       setFout("Kon het feest niet openzetten.");
     }
@@ -252,9 +262,80 @@ export default function Booth() {
     laad();
   }, [code, haalTop, weergave]);
 
+  useEffect(() => {
+    if (!code || weergave !== "archief" || archiefFeest !== null) return;
+
+    async function laad() {
+      try {
+        const antwoord = await fetch("/api/verzoekjes/archief", {
+          headers: { [CODE_HEADER]: code },
+          cache: "no-store",
+        });
+        if (!antwoord.ok) {
+          setFout(`Kon het archief niet ophalen (${antwoord.status}).`);
+          return;
+        }
+        setArchief(((await antwoord.json()) as { feesten: ArchiefFeest[] }).feesten);
+        setFout(null);
+      } catch {
+        setFout("Kon het archief niet ophalen.");
+      }
+    }
+    laad();
+  }, [archiefFeest, code, weergave]);
+
+  function kiesWeergave(nieuw: Weergave) {
+    setWeergave(nieuw);
+    setKoppelId(null);
+    // Anders staat heel even de lijst van het vorige scherm in beeld.
+    setLijst(null);
+    if (nieuw === "archief") setArchiefFeest(null);
+  }
+
+  function openArchiefFeest(slug: string | null) {
+    setKoppelId(null);
+    setLijst(null);
+    setArchiefFeest(slug);
+  }
+
   if (!code) {
     return <CodeHek fout={fout} />;
   }
+
+  const rij = (verzoek: Verzoek) => (
+    <Rij
+      key={verzoek.id}
+      verzoek={verzoek}
+      bezig={bezigMet === verzoek.id}
+      onStatus={stuurStatus}
+      onWeg={verwijder}
+      koppelOpen={koppelId === verzoek.id}
+      onKoppelOpen={() => setKoppelId((vorig) => (vorig === verzoek.id ? null : verzoek.id))}
+      zoek={zoek}
+      koppel={(keuze) => koppel(verzoek.id, keuze)}
+    />
+  );
+
+  const sorteerKnoppen = (
+    <div className="bt-balk">
+      <div className="bt-sorteer">
+        <button
+          type="button"
+          className={sortering === "tijd" ? "aan" : undefined}
+          onClick={() => setSortering("tijd")}
+        >
+          Nieuwste eerst
+        </button>
+        <button
+          type="button"
+          className={sortering === "bpm" ? "aan" : undefined}
+          onClick={() => setSortering("bpm")}
+        >
+          Op bpm
+        </button>
+      </div>
+    </div>
+  );
 
   const alles = lijst?.verzoeken ?? [];
   const nieuw = sorteer(
@@ -271,7 +352,9 @@ export default function Booth() {
           <p>
             {weergave === "lijst"
               ? `${nieuw.length} open${afgehandeld.length > 0 ? ` · ${afgehandeld.length} afgehandeld` : ""}`
-              : "Vaakst gevraagd"}
+              : weergave === "archief"
+                ? "Eerdere feesten"
+                : "Vaakst gevraagd"}
             {lijst && lijst.collectie > 0 &&
               ` · ${lijst.collectie.toLocaleString("nl-NL")} nummers in de collectie`}
           </p>
@@ -285,14 +368,21 @@ export default function Booth() {
         <button
           type="button"
           className={weergave === "lijst" ? "aan" : undefined}
-          onClick={() => setWeergave("lijst")}
+          onClick={() => kiesWeergave("lijst")}
         >
           Verzoekjes
         </button>
         <button
           type="button"
+          className={weergave === "archief" ? "aan" : undefined}
+          onClick={() => kiesWeergave("archief")}
+        >
+          Archief
+        </button>
+        <button
+          type="button"
           className={weergave === "top" ? "aan" : undefined}
-          onClick={() => setWeergave("top")}
+          onClick={() => kiesWeergave("top")}
         >
           Jaarlijst
         </button>
@@ -310,6 +400,40 @@ export default function Booth() {
 
       {weergave === "top" ? (
         <Jaaroverzicht data={top} opHalen={haalTop} />
+      ) : weergave === "archief" ? (
+        archiefFeest === null ? (
+          <Archiefoverzicht feesten={archief} onOpen={openArchiefFeest} />
+        ) : (
+          <>
+            <button type="button" className="bt-terug" onClick={() => openArchiefFeest(null)}>
+              ← Alle feesten
+            </button>
+            {!lijst || !feest ? (
+              <p className="bt-leeg">Laden…</p>
+            ) : (
+              <>
+                <div className="bt-archiefkop">
+                  <h2>{feest.naam}</h2>
+                  <p>
+                    {feest.voluit}
+                    {feest.plaats && ` · ${feest.plaats}`}
+                    {feest.test && " · test"}
+                  </p>
+                  <p>
+                    {alles.length} verzoekjes · {alles.filter((v) => v.match).length} in je
+                    collectie · {alles.filter((v) => v.status === "gedraaid").length} gedraaid
+                  </p>
+                </div>
+                {sorteerKnoppen}
+                {alles.length === 0 ? (
+                  <p className="bt-leeg">Bij dit feest zijn geen verzoekjes binnengekomen.</p>
+                ) : (
+                  <ul className="bt-lijst">{sorteer(alles, sortering).map(rij)}</ul>
+                )}
+              </>
+            )}
+          </>
+        )
       ) : (
         <>
           {lijst && lijst.agenda.length > 0 && (
@@ -355,24 +479,7 @@ export default function Booth() {
             </p>
           )}
 
-          <div className="bt-balk">
-            <div className="bt-sorteer">
-              <button
-                type="button"
-                className={sortering === "tijd" ? "aan" : undefined}
-                onClick={() => setSortering("tijd")}
-              >
-                Nieuwste eerst
-              </button>
-              <button
-                type="button"
-                className={sortering === "bpm" ? "aan" : undefined}
-                onClick={() => setSortering("bpm")}
-              >
-                Op bpm
-              </button>
-            </div>
-          </div>
+          {sorteerKnoppen}
 
           {!lijst && <p className="bt-leeg">Laden…</p>}
 
@@ -380,23 +487,7 @@ export default function Booth() {
             <p className="bt-leeg">Nog geen open verzoekjes voor dit feest.</p>
           )}
 
-          <ul className="bt-lijst">
-            {nieuw.map((verzoek) => (
-              <Rij
-                key={verzoek.id}
-                verzoek={verzoek}
-                bezig={bezigMet === verzoek.id}
-                onStatus={stuurStatus}
-                onWeg={verwijder}
-                koppelOpen={koppelId === verzoek.id}
-                onKoppelOpen={() =>
-                  setKoppelId((vorig) => (vorig === verzoek.id ? null : verzoek.id))
-                }
-                zoek={zoek}
-                koppel={(keuze) => koppel(verzoek.id, keuze)}
-              />
-            ))}
-          </ul>
+          <ul className="bt-lijst">{nieuw.map(rij)}</ul>
 
           {afgehandeld.length > 0 && (
             <>
@@ -409,21 +500,7 @@ export default function Booth() {
               </button>
               {toonAf && (
                 <ul className="bt-lijst bt-lijst-af">
-                  {sorteer(afgehandeld, sortering).map((verzoek) => (
-                    <Rij
-                      key={verzoek.id}
-                      verzoek={verzoek}
-                      bezig={bezigMet === verzoek.id}
-                      onStatus={stuurStatus}
-                      onWeg={verwijder}
-                      koppelOpen={koppelId === verzoek.id}
-                      onKoppelOpen={() =>
-                        setKoppelId((vorig) => (vorig === verzoek.id ? null : verzoek.id))
-                      }
-                      zoek={zoek}
-                      koppel={(keuze) => koppel(verzoek.id, keuze)}
-                    />
-                  ))}
+                  {sorteer(afgehandeld, sortering).map(rij)}
                 </ul>
               )}
             </>
@@ -578,6 +655,46 @@ function Rij({
         <Koppelen verzoek={verzoek} zoek={zoek} koppel={koppel} sluit={onKoppelOpen} />
       )}
     </li>
+  );
+}
+
+function Archiefoverzicht({
+  feesten,
+  onOpen,
+}: {
+  feesten: ArchiefFeest[] | null;
+  onOpen: (slug: string) => void;
+}) {
+  if (!feesten) return <p className="bt-leeg">Laden…</p>;
+  if (feesten.length === 0) return <p className="bt-leeg">Nog geen feesten geweest.</p>;
+
+  return (
+    <ul className="bt-archief">
+      {feesten.map((feest) => (
+        <li key={feest.slug}>
+          <button type="button" onClick={() => onOpen(feest.slug)}>
+            <span className="bt-archief-tekst">
+              <span className="bt-titel">
+                {feest.naam}
+                {feest.test && <span className="bt-archief-test">test</span>}
+              </span>
+              <span className="bt-artiest">
+                {feest.kort}
+                {feest.plaats && ` · ${feest.plaats}`}
+              </span>
+              <span className="bt-meta">
+                <span>{feest.gekoppeld} in je collectie</span>
+                <span>{feest.gedraaid} gedraaid</span>
+              </span>
+            </span>
+            <span className="bt-aantal">
+              {feest.aantal}
+              <small>verzoekjes</small>
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
   );
 }
 

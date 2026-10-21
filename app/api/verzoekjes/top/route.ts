@@ -1,6 +1,7 @@
 import { codeAntwoord, controleerCode } from "@/app/verzoekjes/code";
 import { kenmerk } from "@/app/verzoekjes/collectie";
-import { alleFeesten, jaarVan } from "@/app/verzoekjes/feesten";
+import { alleFeesten, jaarVan, venster } from "@/app/verzoekjes/feesten";
+import { leesOudeVerzoekjesIn } from "@/app/verzoekjes/import";
 import { leesMeerdere } from "@/app/verzoekjes/store";
 import type { TopNummer } from "@/app/verzoekjes/types";
 
@@ -24,6 +25,7 @@ export async function GET(request: Request) {
   const agenda = alleFeesten().filter(
     (feest) => !feest.test && (jaar === null || jaarVan(feest) === jaar)
   );
+  await leesOudeVerzoekjesIn(agenda);
   const lijsten = await leesMeerdere(agenda.map((feest) => feest.slug));
 
   // Per nummer optellen. Verschillende schrijfwijzes van dezelfde plaat
@@ -67,7 +69,8 @@ export async function GET(request: Request) {
     jaren: [...new Set(alleFeesten().filter((feest) => !feest.test).map(jaarVan))].sort(
       (a, b) => b - a
     ),
-    feesten: agenda.length,
+    // Alleen feesten die al begonnen zijn; de rest heeft nog niets te tellen.
+    feesten: agenda.filter((feest) => venster(feest).van <= Date.now()).length,
     totaal,
     top,
   });
