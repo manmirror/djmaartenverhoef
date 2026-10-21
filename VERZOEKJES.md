@@ -10,6 +10,7 @@ eind van het jaar zien wat er het vaakst gevraagd is.
 | `/verzoekjes/f/<slug>` | het formulier voor de gasten van één feest |
 | `/verzoekjes/qr` | alle posters op een rij, één per feest |
 | `/verzoekjes/qr/<slug>` | de poster van één feest: printen, of downloaden als PNG/SVG |
+| `/verzoekjes/sticker` | een sticker van 20 × 20 cm met de algemene code, voor op de laptop |
 | `/verzoekjes/dj` | jouw booth (achter een code): de lijst per feest en de jaarlijst |
 | `/verzoekjes` | algemeen adres: wijst vanzelf naar het feest dat op dat moment bezig is |
 
@@ -129,6 +130,19 @@ voor gedeployd te worden.
 
 Er is met opzet geen knop meer om een hele lijst te wissen: samen vormen die
 lijsten het archief.
+
+---
+
+## 3a. De sticker
+
+Op `/verzoekjes/sticker` staat een vierkante sticker van 20 × 20 cm, met de
+algemene code erop. Die wijst altijd naar het feest dat op dat moment bezig
+is, dus de sticker kan blijvend op je laptop: hij werkt op elk feest.
+
+Print hem vanuit de browser met **Marges: geen** en **Achtergrondafbeeldingen**
+aan, of bewaar hem zo als pdf voor de drukker. Vraagt de drukker om afloop
+(bleed), gebruik dan `/verzoekjes/sticker?afloop=3`: die is 20,6 × 20,6 cm,
+met rondom 3 mm extra achtergrond die er bij het snijden af gaat.
 
 ---
 

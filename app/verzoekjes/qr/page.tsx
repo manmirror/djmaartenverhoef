@@ -49,6 +49,17 @@ export default function QrOverzicht() {
             </span>
           </Link>
         </li>
+
+        <li>
+          <Link href="/verzoekjes/sticker">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/api/verzoekjes/qr/algemeen" alt="" width={120} height={120} />
+            <span>
+              <strong>Sticker, 20 × 20 cm</strong>
+              <small>met de algemene code, voor op je laptop</small>
+            </span>
+          </Link>
+        </li>
       </ul>
 
       {feesten.length === 0 && (
