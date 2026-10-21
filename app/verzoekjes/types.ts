@@ -60,6 +60,11 @@ export type CollectieTrack = {
   g: string | null;
   /** jaar */
   y: number | null;
+  /**
+   * 1 als titel en artiest bij het inlezen uit één veld zijn gehaald. Dan is
+   * niet zeker welke kant welke is, en probeert het koppelen allebei.
+   */
+  s?: 1;
 };
 
 export type Collectie = {

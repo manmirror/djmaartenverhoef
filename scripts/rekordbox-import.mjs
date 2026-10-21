@@ -92,18 +92,32 @@ function schoonOp(titel, artiest) {
     .replace(/^\d{1,2}(?:_|\.\s+)(?=[A-Za-z])/, "")
     .trim();
   let a = artiest;
+  let gesplitst = false;
 
   // "Artiest - Titel" zonder artiestveld: splitsen, maar alleen bij precies
   // één streepje en niet bij mixtapes als "[SUMMER MIXTAPE] ... - CHILL".
+  // Soms staat het andersom ("Titel - Artiest"); daarom onthouden we dat het
+  // gesplitst is, zodat het koppelen beide kanten op kan proberen.
   if (!a && !/^[[_]/.test(t)) {
     const stukken = t.split(" - ");
-    if (stukken.length === 2 && stukken[0].trim() && stukken[1].trim()) {
+    // Niet splitsen als het streepje tussen haakjes staat:
+    // "Automatisch (Samen Kleuren Wij Wescalatie - Hardstyle Edit) V2".
+    const heel = (stuk) =>
+      (stuk.match(/[([]/g) ?? []).length === (stuk.match(/[)\]]/g) ?? []).length;
+    if (
+      stukken.length === 2 &&
+      stukken[0].trim() &&
+      stukken[1].trim() &&
+      heel(stukken[0]) &&
+      heel(stukken[1])
+    ) {
       a = stukken[0].trim();
       t = stukken[1].trim();
+      gesplitst = true;
     }
   }
 
-  return { titel: t, artiest: a };
+  return { titel: t, artiest: a, gesplitst };
 }
 
 function getal(waarde) {
@@ -141,7 +155,7 @@ while (positie !== -1) {
   // In <PLAYLISTS> staan verwijzingen zonder titel; die hebben we niet nodig.
   if (attributen.Name) {
     bekeken++;
-    const { titel, artiest } = schoonOp(
+    const { titel, artiest, gesplitst } = schoonOp(
       ontsnap(attributen.Name).trim(),
       ontsnap(attributen.Artist ?? "").trim()
     );
@@ -157,6 +171,8 @@ while (positie !== -1) {
         k: ontsnap(attributen.Tonality ?? "").trim() || null,
         g: ontsnap(attributen.Genre ?? "").trim() || null,
         y: getal(attributen.Year),
+        // Alleen aanwezig als titel en artiest uit één veld zijn gehaald.
+        ...(gesplitst ? { s: 1 } : {}),
       };
 
       const bestaand = gevonden.get(id);

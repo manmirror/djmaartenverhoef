@@ -103,22 +103,53 @@ type Rij = {
 
 // De index één keer per proces opbouwen.
 let index: Rij[] | null = null;
+let omgedraaid: Rij[] | null = null;
+
+function maakRij(track: CollectieTrack, nr: number): Rij {
+  const kern = kernVan(track.t);
+  return {
+    nr,
+    track,
+    kern,
+    kernTekst: kern.join(" "),
+    titel: woorden(track.t),
+    artiest: woorden(track.a),
+  };
+}
 
 function geefIndex(): Rij[] {
   if (!index) {
-    index = collectie.tracks.map((track, nr) => {
-      const kern = kernVan(track.t);
-      return {
-        nr,
-        track,
-        kern,
-        kernTekst: kern.join(" "),
-        titel: woorden(track.t),
-        artiest: woorden(track.a),
-      };
-    });
+    index = collectie.tracks.map(maakRij);
   }
   return index;
+}
+
+/**
+ * Nummers waarvan titel en artiest bij het inlezen uit één veld zijn gehaald,
+ * nog een keer, maar dan andersom. "Titel - Artiest" komt in DJ-pools ook voor,
+ * en dan wil het koppelen het nummer alsnog vinden — en goed om weergeven.
+ *
+ * Niet als het artiestdeel een artiest is die elders in de collectie voorkomt:
+ * dan klopt de volgorde, en anders zou "guus meeuwis" ineens een willekeurig
+ * nummer van hem opleveren.
+ */
+function geefOmgedraaid(): Rij[] {
+  if (!omgedraaid) {
+    const bekend = new Set<string>();
+    for (const track of collectie.tracks) {
+      if (track.s) continue;
+      for (const deel of track.a.split(/,|&|\s(?:x|ft\.?|feat\.?|vs\.?)\s/i)) {
+        const naam = normaliseer(deel);
+        if (naam) bekend.add(naam);
+      }
+    }
+    omgedraaid = collectie.tracks.flatMap((track, nr) =>
+      track.s && !bekend.has(normaliseer(track.a))
+        ? [maakRij({ ...track, t: track.a, a: track.t }, nr)]
+        : []
+    );
+  }
+  return omgedraaid;
 }
 
 export function collectieAantal(): number {
@@ -215,7 +246,7 @@ function zoekBeste(
   let beste: { rij: Rij; score: number } | null = null;
   const rijen = geefIndex();
 
-  for (const rij of rijen) {
+  for (const rij of [...rijen, ...geefOmgedraaid()]) {
     const score = beoordeel(rij, gevraagd, letterlijk);
     if (score === null) continue;
     if (!beste || isBeter(rij, score, beste.rij, beste.score)) {
