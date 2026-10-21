@@ -2,37 +2,35 @@
 
 export type VerzoekStatus = "nieuw" | "gedraaid" | "overgeslagen";
 
-export type Verzoek = {
-  id: string;
-  /** De slug van het feest waar dit verzoekje bij hoort. */
-  feest: string;
+/** Het nummer uit de collectie dat bij een verzoekje gevonden is. */
+export type Match = {
   titel: string;
-  /** Leeg als de bezoeker alleen een titel invulde. */
   artiest: string;
-  /** Naam van de bezoeker; leeg als hij die niet invulde. */
-  van: string;
-  /** Uit de rekordbox-collectie, als het nummer daarin te vinden was. */
   bpm: number | null;
   toon: string | null;
   genre: string | null;
   jaar: number | null;
-  /** True als dit nummer in de collectie van Maarten staat. */
-  inCollectie: boolean;
+  /** Hoeveel versies van dit nummer er in de collectie staan, deze meegeteld. */
+  versies: number;
+  /** De titel klopt, maar de gast vroeg om een andere artiest (een cover, bv.). */
+  andereArtiest: boolean;
+};
+
+export type Verzoek = {
+  id: string;
+  /** De slug van het feest waar dit verzoekje bij hoort. */
+  feest: string;
+  /** Zoals de gast het intypte. */
+  titel: string;
+  /** Zoals de gast het intypte; leeg als hij alleen een titel invulde. */
+  artiest: string;
+  /** Naam van de gast; leeg als hij die niet invulde. */
+  van: string;
+  /** Het nummer uit de collectie, of null als we het niet konden vinden. */
+  match: Match | null;
   status: VerzoekStatus;
   /** Tijdstip van binnenkomst, in milliseconden sinds 1970. */
   tijd: number;
-};
-
-/** Eén regel in de jaarlijst: hoe vaak een nummer gevraagd is. */
-export type TopNummer = {
-  titel: string;
-  artiest: string;
-  bpm: number | null;
-  aantal: number;
-  /** Hoe vaak het ook echt gedraaid is. */
-  gedraaid: number;
-  /** Op hoeveel verschillende feesten het gevraagd is. */
-  feesten: number;
 };
 
 /** Eén nummer uit rekordbox. Korte sleutels: de collectie kan groot zijn. */
@@ -58,12 +56,15 @@ export type Collectie = {
   tracks: CollectieTrack[];
 };
 
-/** Wat de zoekhulp in het formulier terugkrijgt. */
-export type Suggestie = {
+
+/** Eén regel in de jaarlijst: hoe vaak een nummer gevraagd is. */
+export type TopNummer = {
   titel: string;
   artiest: string;
   bpm: number | null;
-  toon: string | null;
-  genre: string | null;
-  jaar: number | null;
+  aantal: number;
+  /** Hoe vaak het ook echt gedraaid is. */
+  gedraaid: number;
+  /** Op hoeveel verschillende feesten het gevraagd is. */
+  feesten: number;
 };

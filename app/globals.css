@@ -457,8 +457,7 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 .vz-intro{margin:0 0 28px; font-size:16px; line-height:1.6; color:var(--muted);}
 
 .vz-form{display:flex; flex-direction:column; gap:16px;}
-/* position:relative, zodat de suggestielijst onder het juiste veld hangt. */
-.vz-veld{position:relative; display:flex; flex-direction:column; gap:7px;}
+.vz-veld{display:flex; flex-direction:column; gap:7px;}
 .vz-label{
   font-size:12px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase;
   color:var(--muted);
@@ -470,36 +469,6 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 }
 .vz-form input::placeholder{color:var(--muted);}
 .vz-form input:focus{outline:none; border-color:var(--violet);}
-
-/* --- suggesties uit de collectie --- */
-.vz-dropdown{
-  position:absolute; top:100%; left:0; right:0; z-index:5;
-  margin-top:6px; overflow:hidden;
-  background:#191324; border:1px solid var(--line); border-radius:16px;
-  box-shadow:0 24px 60px rgba(0,0,0,.55);
-}
-.vz-sug-hint{
-  display:block; padding:10px 14px 4px;
-  font-size:11px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase;
-  color:var(--muted);
-}
-.vz-suggesties{
-  margin:0; padding:4px 6px 6px; list-style:none;
-  max-height:min(42vh,300px); overflow-y:auto;
-}
-.vz-suggestie{
-  display:grid; grid-template-columns:1fr auto; gap:2px 12px; align-items:baseline;
-  width:100%; padding:11px 13px; border:none; border-radius:11px;
-  background:transparent; color:inherit; font-family:inherit; text-align:left;
-  cursor:pointer;
-}
-.vz-suggestie.aan{background:rgba(139,92,246,.22);}
-.vz-sug-titel{font-size:15px; font-weight:700; line-height:1.3;}
-.vz-sug-artiest{grid-column:1; font-size:13px; color:var(--muted);}
-.vz-sug-bpm{
-  grid-column:2; grid-row:1 / span 2;
-  font-size:12px; font-weight:800; color:var(--muted); white-space:nowrap;
-}
 
 .vz-honeypot{
   position:absolute; left:-9999px; width:1px; height:1px;
@@ -577,6 +546,7 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 .bt-rij.bt-overgeslagen{border-style:dashed;}
 .bt-titel{font-size:16px; font-weight:800; line-height:1.3; letter-spacing:-0.01em;}
 .bt-artiest{margin-top:2px; font-size:14px; color:var(--muted);}
+.bt-gevraagd{margin-top:4px; font-size:12px; font-style:italic; color:var(--muted);}
 .bt-meta{display:flex; flex-wrap:wrap; gap:10px; margin-top:7px; font-size:11px; color:var(--muted);}
 .bt-meta span{letter-spacing:0.04em;}
 .bt-van{color:var(--ink);}

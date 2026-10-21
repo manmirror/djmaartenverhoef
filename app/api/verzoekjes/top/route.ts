@@ -1,5 +1,5 @@
 import { codeAntwoord, controleerCode } from "@/app/verzoekjes/code";
-import { normaliseer } from "@/app/verzoekjes/collectie";
+import { kenmerk } from "@/app/verzoekjes/collectie";
 import { alleFeesten, jaarVan } from "@/app/verzoekjes/feesten";
 import { leesMeerdere } from "@/app/verzoekjes/store";
 import type { TopNummer } from "@/app/verzoekjes/types";
@@ -26,29 +26,30 @@ export async function GET(request: Request) {
   const lijsten = await leesMeerdere(agenda.map((feest) => feest.slug));
 
   // Per nummer optellen. Verschillende schrijfwijzes van dezelfde plaat
-  // belanden onder dezelfde noemer.
+  // belanden via de match onder dezelfde noemer.
   type Teller = TopNummer & { feestSlugs: Set<string> };
   const tellers = new Map<string, Teller>();
 
   for (const verzoeken of lijsten.values()) {
     for (const verzoek of verzoeken) {
-      const kenmerk = `${normaliseer(verzoek.titel)}|${normaliseer(verzoek.artiest)}`;
-      let teller = tellers.get(kenmerk);
+      const sleutel = kenmerk(verzoek);
+      let teller = tellers.get(sleutel);
       if (!teller) {
+        // Met een match het nummer zoals het in de collectie heet; dan staan
+        // "dancing qeen" en "Dancing Queen" als één regel in de lijst.
         teller = {
-          titel: verzoek.titel,
-          artiest: verzoek.artiest,
-          bpm: verzoek.bpm,
+          titel: verzoek.match?.titel ?? verzoek.titel,
+          artiest: verzoek.match?.artiest ?? verzoek.artiest,
+          bpm: verzoek.match?.bpm ?? null,
           aantal: 0,
           gedraaid: 0,
           feesten: 0,
           feestSlugs: new Set(),
         };
-        tellers.set(kenmerk, teller);
+        tellers.set(sleutel, teller);
       }
       teller.aantal += 1;
       if (verzoek.status === "gedraaid") teller.gedraaid += 1;
-      if (teller.bpm === null && verzoek.bpm !== null) teller.bpm = verzoek.bpm;
       teller.feestSlugs.add(verzoek.feest);
     }
   }

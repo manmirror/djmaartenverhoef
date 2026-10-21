@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { Resend } from "resend";
 
-import { normaliseer, zoekGegevens } from "@/app/verzoekjes/collectie";
+import { kenmerk, vindInCollectie } from "@/app/verzoekjes/collectie";
 import { datumVoluit, isOpen, vindFeest } from "@/app/verzoekjes/feesten";
 import {
   geefIp,
@@ -68,28 +68,37 @@ export async function POST(request: Request) {
     return Response.json({ error: "te-vaak" }, { status: 429 });
   }
 
-  // Staat het nummer in de rekordbox-collectie, dan weten we de bpm erbij.
-  const gevonden = zoekGegevens(titel, artiest);
+  // Achter de schermen koppelen aan de rekordbox-collectie. Wat de gast typte
+  // bewaren we ongewijzigd; de match staat ernaast.
+  const treffer = vindInCollectie(titel, artiest);
 
   const verzoek: Verzoek = {
     id: randomUUID(),
     feest: feest.slug,
-    titel: gevonden?.t ?? titel,
-    artiest: gevonden?.a ?? artiest,
+    titel,
+    artiest,
     van,
-    bpm: gevonden?.b ?? null,
-    toon: gevonden?.k ?? null,
-    genre: gevonden?.g ?? null,
-    jaar: gevonden?.y ?? null,
-    inCollectie: gevonden !== null,
+    match: treffer
+      ? {
+          titel: treffer.track.t,
+          artiest: treffer.track.a,
+          bpm: treffer.track.b,
+          toon: treffer.track.k,
+          genre: treffer.track.g,
+          jaar: treffer.track.y,
+          versies: treffer.versies,
+          andereArtiest: treffer.andereArtiest,
+        }
+      : null,
     status: "nieuw",
     tijd: Date.now(),
   };
 
-  const kenmerk = `${normaliseer(verzoek.titel)}|${normaliseer(verzoek.artiest)}`;
+  // "dancing queen" en "ABBA - Dancing Queen" zijn hetzelfde verzoekje.
+  const dit = kenmerk(verzoek);
   const resultaat = await voegVerzoekToe(verzoek, (ander) => {
     if (verzoek.tijd - ander.tijd > DUBBEL_VENSTER_MS) return false;
-    return `${normaliseer(ander.titel)}|${normaliseer(ander.artiest)}` === kenmerk;
+    return kenmerk(ander) === dit;
   });
 
   if (resultaat === "vol") {
@@ -123,14 +132,20 @@ async function mailDoor(verzoek: Verzoek, feestnaam: string) {
   const from = process.env.CALLBACK_FROM || "Website <formulier@djmaartenverhoef.nl>";
   const to = process.env.VERZOEKJES_TO || process.env.CALLBACK_TO || siteContent.email;
 
+  const { match } = verzoek;
   const regels = [
     `${verzoek.titel}${verzoek.artiest ? ` — ${verzoek.artiest}` : ""}`,
     "",
     `Feest: ${feestnaam}`,
     verzoek.van ? `Aangevraagd door: ${verzoek.van}` : "Aangevraagd door: (niet ingevuld)",
-    verzoek.bpm !== null ? `BPM: ${verzoek.bpm}` : "BPM: niet gevonden in de collectie",
-    verzoek.toon ? `Toonaard: ${verzoek.toon}` : null,
-    verzoek.genre ? `Genre: ${verzoek.genre}` : null,
+    "",
+    match
+      ? `In je collectie: ${match.titel}${match.artiest ? ` — ${match.artiest}` : ""}`
+      : "Niet gevonden in je collectie",
+    match?.andereArtiest ? "Let op: andere artiest dan gevraagd" : null,
+    match?.bpm != null ? `BPM: ${Math.round(match.bpm)}` : null,
+    match?.toon ? `Toonaard: ${match.toon}` : null,
+    match && match.versies > 1 ? `Versies in je collectie: ${match.versies}` : null,
     "",
     "Verstuurd via djmaartenverhoef.nl/verzoekjes",
   ].filter((regel) => regel !== null);

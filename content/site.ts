@@ -251,7 +251,6 @@ export const siteContent = {
     dubbelTekst: "Iemand was je voor. Hij staat in de booth, dus hij is gezien.",
     nogEen: "Nog een verzoekje",
     foutTekst: "Dat lukte niet. Probeer het nog een keer.",
-    suggestieHint: "Uit de collectie van Maarten",
     voetTekst: "Geen verzoekje maar een feest te boeken?",
     voetLink: "Bekijk de site",
 

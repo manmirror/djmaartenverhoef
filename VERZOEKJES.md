@@ -117,8 +117,9 @@ bij elkaar opgeteld, het vaakst gevraagde nummer bovenaan. Per nummer zie je
 hoe vaak het gevraagd is, hoe vaak je het echt gedraaid hebt en op hoeveel
 verschillende feesten. Met *Alles bij elkaar* tel je alle jaren op.
 
-Verschillende schrijfwijzes van hetzelfde nummer tellen als één. Kiest een gast
-het nummer uit de suggesties, dan staat het er altijd precies goed in.
+Verschillende schrijfwijzes van hetzelfde nummer tellen als één: "dancing
+qeen" en "ABBA - Dancing Queen" worden allebei aan hetzelfde nummer uit je
+collectie gekoppeld, en staan dus als één regel in de lijst.
 
 ---
 
@@ -145,15 +146,33 @@ Titels uit DJ-pools worden voorzichtig opgeschoond: een tracknummer ervoor
 terwijl het artiestveld leeg is ("Artiest - Titel"), dan wordt dat gesplitst.
 Mixtapes en titels met meerdere streepjes blijven zoals ze zijn.
 
-- Terwijl een gast typt, stelt het formulier nummers uit jóuw collectie voor.
-- Typt iemand zelf een titel, dan zoeken we die alsnog op — ook zonder
-  "- Radio Edit" erachter. Alleen bij een eenduidige match nemen we de bpm
-  over; liever geen bpm dan de bpm van een ander nummer.
-- Wat we niet vinden komt binnen met `? bpm` en *niet in collectie*.
+### Hoe een verzoekje aan je collectie wordt gekoppeld
+
+Gasten zien je collectie niet; ze typen zelf wat ze willen horen. Achter de
+schermen zoeken we het bijbehorende nummer op:
+
+- **Tikfouten** in langere woorden mogen: "dancing qeen" vindt Dancing Queen.
+- **Artiest en titel door elkaar** mag: "abba dancing queen" in het titelvak,
+  of titel en artiest omgedraaid.
+- **Versies** tellen niet mee: "levels" vindt "Levels - Radio Edit".
+- **Losse woorden** als "graag", "van" of "remix" worden genegeerd.
+- Elk woord van de titel moet kloppen, en er mag geen woord overblijven dat
+  nergens bij hoort. Zo wordt "always on my mind" níet gekoppeld aan "On My
+  Mind" van een andere artiest. Liever geen match dan een verkeerde.
+- Staan er meerdere versies van een nummer in je collectie, dan kiezen we het
+  oudste, meestal het origineel. In de booth zie je hoeveel versies je hebt.
+- Vraagt iemand om een artiest die je niet hebt, maar heb je de titel wel van
+  een ander, dan krijg je die met het label *andere artiest dan gevraagd* —
+  "hey baby / dj otzi" geeft dan jouw Hey Baby van The Cooldown Café.
+- Niets gevonden: dan komt het binnen met `? bpm` en *niet in collectie*.
+
+In de booth staat het gevonden nummer groot, met wat de gast typte er klein
+onder als dat afwijkt. Wat de gast typte wordt altijd ongewijzigd bewaard.
 
 > **Let op:** deze repository is openbaar. Je agenda (namen en datums) en je
-> collectie (titels, artiesten, bpm) zijn daarmee voor iedereen leesbaar.
-> Wil je dat liever niet, zet de repository dan op privé.
+> collectie (titels, artiesten, bpm) zijn daarmee voor iedereen leesbaar via
+> GitHub — niet via de site zelf. Wil je dat liever niet, zet de repository
+> dan op privé.
 
 ---
 

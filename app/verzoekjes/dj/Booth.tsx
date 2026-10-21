@@ -383,15 +383,27 @@ export default function Booth() {
   );
 }
 
+/** Kleine letters, zonder accenten en leestekens: om teksten te vergelijken. */
+function plat(waarde: string): string {
+  return waarde
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
 /** Nummers zonder bpm achteraan, zodat de bpm-sortering bruikbaar blijft. */
 function sorteer(verzoeken: Verzoek[], sortering: Sortering): Verzoek[] {
   const gesorteerd = [...verzoeken];
   if (sortering === "bpm") {
     gesorteerd.sort((a, b) => {
-      if (a.bpm === null && b.bpm === null) return b.tijd - a.tijd;
-      if (a.bpm === null) return 1;
-      if (b.bpm === null) return -1;
-      return a.bpm - b.bpm;
+      const bpmA = a.match?.bpm ?? null;
+      const bpmB = b.match?.bpm ?? null;
+      if (bpmA === null && bpmB === null) return b.tijd - a.tijd;
+      if (bpmA === null) return 1;
+      if (bpmB === null) return -1;
+      return bpmA - bpmB;
     });
   } else {
     gesorteerd.sort((a, b) => b.tijd - a.tijd);
@@ -416,15 +428,32 @@ function Rij({
     minute: "2-digit",
   });
 
+  const { match } = verzoek;
+  const gevraagd = [verzoek.titel, verzoek.artiest].filter(Boolean).join(" — ");
+  // Wat de gast typte alleen tonen als het afwijkt van wat we vonden.
+  const toonGevraagd =
+    match !== null &&
+    plat(`${verzoek.titel} ${verzoek.artiest}`) !== plat(`${match.titel} ${match.artiest}`) &&
+    plat(verzoek.titel) !== plat(match.titel);
+
   return (
     <li className={`bt-rij bt-${verzoek.status}`}>
       <div className="bt-rij-tekst">
-        <div className="bt-titel">{verzoek.titel}</div>
-        {verzoek.artiest && <div className="bt-artiest">{verzoek.artiest}</div>}
+        <div className="bt-titel">{match ? match.titel : verzoek.titel}</div>
+        {(match ? match.artiest : verzoek.artiest) && (
+          <div className="bt-artiest">{match ? match.artiest : verzoek.artiest}</div>
+        )}
+        {toonGevraagd && <div className="bt-gevraagd">gevraagd: “{gevraagd}”</div>}
         <div className="bt-meta">
           <span className="bt-tijd">{klok}</span>
           {verzoek.van && <span className="bt-van">van {verzoek.van}</span>}
-          {!verzoek.inCollectie && <span className="bt-niet">niet in collectie</span>}
+          {!match && <span className="bt-niet">niet in collectie</span>}
+          {match?.andereArtiest && (
+            <span className="bt-niet" title={`Gevraagd: ${gevraagd}`}>
+              andere artiest dan gevraagd
+            </span>
+          )}
+          {match && match.versies > 1 && <span>{match.versies} versies</span>}
           <button
             type="button"
             className="bt-weg"
@@ -437,9 +466,9 @@ function Rij({
       </div>
 
       <div className="bt-cijfers">
-        {verzoek.bpm !== null ? (
+        {match?.bpm != null ? (
           <span className="bt-bpm">
-            {Math.round(verzoek.bpm)}
+            {Math.round(match.bpm)}
             <small>bpm</small>
           </span>
         ) : (
@@ -447,7 +476,7 @@ function Rij({
             ?<small>bpm</small>
           </span>
         )}
-        {verzoek.toon && <span className="bt-toon">{verzoek.toon}</span>}
+        {match?.toon && <span className="bt-toon">{match.toon}</span>}
       </div>
 
       <div className="bt-acties">
