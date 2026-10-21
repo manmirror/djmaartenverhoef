@@ -26,12 +26,24 @@ function kern(waarde: string): string {
   return normaliseer(waarde.replace(/[([{][^)\]}]*[)\]}]/g, " "));
 }
 
+/**
+ * Zonder de versie-aanduiding die rekordbox achter een streepje zet:
+ * "Levels - Radio Edit" wordt "levels". Zo vindt iemand die gewoon "Levels"
+ * intypt het nummer alsnog. Alleen een kort staartje, anders halen we per
+ * ongeluk de helft van een echte titel weg.
+ */
+function zonderVersie(waarde: string): string {
+  return kern(waarde.replace(/\s+-\s+[^-]{1,30}$/, " "));
+}
+
 type Rij = {
   track: CollectieTrack;
   /** genormaliseerde titel */
   nt: string;
   /** titel zonder haakjes */
   kt: string;
+  /** titel zonder haakjes én zonder "- Radio Edit" en dergelijke */
+  vt: string;
   /** genormaliseerde artiest */
   na: string;
   /** artiest + titel, voor het zoekveld */
@@ -46,7 +58,14 @@ function geefIndex(): Rij[] {
     index = collectie.tracks.map((track) => {
       const nt = normaliseer(track.t);
       const na = normaliseer(track.a);
-      return { track, nt, kt: kern(track.t), na, alles: `${na} ${nt}`.trim() };
+      return {
+        track,
+        nt,
+        kt: kern(track.t),
+        vt: zonderVersie(track.t),
+        na,
+        alles: `${na} ${nt}`.trim(),
+      };
     });
   }
   return index;
@@ -128,6 +147,11 @@ export function zoekGegevens(titel: string, artiest: string): CollectieTrack | n
   if (kandidaten.length === 0) {
     const kt = kern(titel);
     if (kt) kandidaten = rijen.filter((rij) => rij.kt === kt);
+  }
+  // Laatste poging: de bezoeker typte "Levels", de collectie kent het als
+  // "Levels - Radio Edit". Alleen als hij zelf geen versie noemde.
+  if (kandidaten.length === 0 && !/\s-\s/.test(titel)) {
+    kandidaten = rijen.filter((rij) => rij.vt === nt);
   }
   if (kandidaten.length === 0) return null;
 
