@@ -9,6 +9,9 @@
 //   voor een link naar SoundCloud/Spotify).
 
 export const siteContent = {
+  // Het adres waar de site op staat. Komt onder meer in de QR-codes terecht.
+  siteUrl: "https://djmaartenverhoef.nl",
+
   eyebrow: "DJ · Uithoorn e.o. · sinds 1994",
   // Groot woordmerk bovenaan: linkerhelft en rechterhelft.
   heroTitleLine1: "DJ MAARTEN",
@@ -251,6 +254,22 @@ export const siteContent = {
     suggestieHint: "Uit de collectie van Maarten",
     voetTekst: "Geen verzoekje maar een feest te boeken?",
     voetLink: "Bekijk de site",
+
+    // Boven de kop, met de naam van het feest erachter.
+    voorFeest: "Verzoekjes voor",
+    // Als iemand de code scant voordat het feest begonnen is. {datum} wordt
+    // vervangen door de datum van het feest.
+    tevroegKop: "Nog even geduld",
+    tevroegTekst:
+      "Dit feest is op {datum}. Vanaf die middag kun je hier je nummer aanvragen.",
+    // Als het feest voorbij is.
+    voorbijKop: "Dit feest is geweest",
+    voorbijTekst: "Bedankt voor het dansen! De lijst is gesloten.",
+    // Als iemand op /verzoekjes komt terwijl er geen feest aan de gang is.
+    geenFeestKop: "Geen feest op dit moment",
+    geenFeestTekst:
+      "Er draait nu nergens een feest waar je een verzoekje voor kunt sturen.",
+    geenFeestVolgende: "Het eerstvolgende feest is op {datum}.",
 
     // De printbare poster met de QR-code.
     posterKop: "Verzoekje?",

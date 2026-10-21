@@ -1,25 +1,26 @@
-// Waar de verzoekjes van een avond blijven staan.
+// Waar de verzoekjes blijven staan. Elk feest heeft zijn eigen lijst, en die
+// lijsten blijven bewaard — daar komt de jaarlijst later uit.
 //
 // Zodra er een Upstash Redis aan het project hangt (via de Vercel Marketplace),
-// gaat alles daarheen: dan ziet de booth precies wat de bezoekers insturen, ook
-// als Vercel het verzoek op een andere server afhandelt.
-//
-// Zonder die opslag vallen we terug op het geheugen van de server. Dat is
-// genoeg om lokaal te proberen, maar op Vercel heeft elke server zijn eigen
-// geheugen — daarom mailt de api-route in dat geval elk verzoekje door, zodat
+// gaat alles daarheen. Zonder die opslag vallen we terug op het geheugen van de
+// server; dat is genoeg om lokaal te proberen, maar op Vercel heeft elke server
+// zijn eigen geheugen. De api-route mailt verzoekjes in dat geval door, zodat
 // er niets verdwijnt. Zie VERZOEKJES.md.
 
 import { Redis } from "@upstash/redis";
 
 import type { Verzoek, VerzoekStatus } from "./types";
 
-const LIJST = "verzoekjes:lijst";
-/** Zoveel verzoekjes houdt de lijst vast; daarna is hij vol tot je hem wist. */
-const MAX_VERZOEKJES = 300;
+const VOORVOEGSEL = "verzoekjes:feest:";
+/** Zoveel verzoekjes past er per feest op de lijst. */
+const MAX_PER_FEEST = 300;
 
 /** Rem per ip-adres. Ruim, want op een feest zit iedereen op dezelfde wifi. */
 const REM_VENSTER_SEC = 10 * 60;
 const REM_MAX = 30;
+
+/** Hoe lang een handmatig opengezet feest open blijft. */
+const FORCEER_SEC = 12 * 60 * 60;
 
 let client: Redis | null | undefined;
 
@@ -35,7 +36,7 @@ function geefClient(): Redis | null {
     client = url && token ? new Redis({ url, token }) : null;
     if (!client) {
       console.warn(
-        "Geen Redis gevonden voor de verzoekjes; de lijst blijft alleen in het geheugen staan."
+        "Geen Redis gevonden voor de verzoekjes; de lijsten blijven alleen in het geheugen staan."
       );
     }
   }
@@ -46,9 +47,32 @@ export function opslagActief(): boolean {
   return geefClient() !== null;
 }
 
+function sleutel(feest: string): string {
+  return `${VOORVOEGSEL}${feest}`;
+}
+
 // ---- terugval: het geheugen van deze server ----
-const geheugen = new Map<string, Verzoek>();
-const geheugenRem = new Map<string, number[]>();
+// Op globalThis, omdat Next dit bestand los inlaadt voor de pagina's en voor de
+// api-routes. Anders ziet de feestpagina niet dat de booth hem heeft opengezet.
+type Geheugen = {
+  lijsten: Map<string, Map<string, Verzoek>>;
+  open: Map<string, number>;
+  rem: Map<string, number[]>;
+};
+const gedeeld = globalThis as typeof globalThis & { __verzoekjes?: Geheugen };
+gedeeld.__verzoekjes ??= { lijsten: new Map(), open: new Map(), rem: new Map() };
+const geheugen = gedeeld.__verzoekjes.lijsten;
+const geheugenOpen = gedeeld.__verzoekjes.open;
+const geheugenRem = gedeeld.__verzoekjes.rem;
+
+function geheugenLijst(feest: string): Map<string, Verzoek> {
+  let lijst = geheugen.get(feest);
+  if (!lijst) {
+    lijst = new Map();
+    geheugen.set(feest, lijst);
+  }
+  return lijst;
+}
 
 /** Upstash geeft json terug als object; een losse string lezen we zelf uit. */
 function alsVerzoek(waarde: unknown): Verzoek | null {
@@ -62,68 +86,121 @@ function alsVerzoek(waarde: unknown): Verzoek | null {
   return waarde && typeof waarde === "object" ? (waarde as Verzoek) : null;
 }
 
-export async function leesVerzoeken(): Promise<Verzoek[]> {
-  const redis = geefClient();
-  const alles = redis
-    ? Object.values((await redis.hgetall<Record<string, unknown>>(LIJST)) ?? {})
-    : [...geheugen.values()];
-
-  return alles
+function opTijd(ruw: unknown[]): Verzoek[] {
+  return ruw
     .map(alsVerzoek)
     .filter((verzoek): verzoek is Verzoek => verzoek !== null)
     .sort((a, b) => b.tijd - a.tijd);
 }
 
+export async function leesVerzoeken(feest: string): Promise<Verzoek[]> {
+  const redis = geefClient();
+  if (!redis) return opTijd([...geheugenLijst(feest).values()]);
+
+  const alles = await redis.hgetall<Record<string, unknown>>(sleutel(feest));
+  return opTijd(Object.values(alles ?? {}));
+}
+
+/** De lijsten van meerdere feesten in één keer, voor de jaarlijst. */
+export async function leesMeerdere(
+  feesten: string[]
+): Promise<Map<string, Verzoek[]>> {
+  const uitkomst = new Map<string, Verzoek[]>();
+  if (feesten.length === 0) return uitkomst;
+
+  const redis = geefClient();
+  if (!redis) {
+    for (const feest of feesten) {
+      uitkomst.set(feest, opTijd([...geheugenLijst(feest).values()]));
+    }
+    return uitkomst;
+  }
+
+  // Eén ronde naar Upstash in plaats van één per feest.
+  const pijp = redis.pipeline();
+  for (const feest of feesten) pijp.hgetall(sleutel(feest));
+  const antwoorden = (await pijp.exec()) as (Record<string, unknown> | null)[];
+
+  feesten.forEach((feest, nummer) => {
+    uitkomst.set(feest, opTijd(Object.values(antwoorden[nummer] ?? {})));
+  });
+  return uitkomst;
+}
+
 export type ToevoegResultaat = "toegevoegd" | "stond-er-al" | "vol";
 
 /**
- * Zet een verzoekje op de lijst. Staat hetzelfde nummer er al op als `nieuw`,
- * dan laten we het daarbij — anders staat dezelfde plaat er tien keer tussen.
+ * Zet een verzoekje op de lijst van zijn feest. Staat hetzelfde nummer er al
+ * op als `nieuw`, dan laten we het daarbij — anders staat dezelfde plaat er
+ * tien keer tussen.
  */
 export async function voegVerzoekToe(
   verzoek: Verzoek,
   zelfdeAls: (ander: Verzoek) => boolean
 ): Promise<ToevoegResultaat> {
-  const bestaand = await leesVerzoeken();
+  const bestaand = await leesVerzoeken(verzoek.feest);
   if (bestaand.some((ander) => ander.status === "nieuw" && zelfdeAls(ander))) {
     return "stond-er-al";
   }
-  if (bestaand.length >= MAX_VERZOEKJES) return "vol";
+  if (bestaand.length >= MAX_PER_FEEST) return "vol";
 
   const redis = geefClient();
   if (redis) {
-    await redis.hset(LIJST, { [verzoek.id]: JSON.stringify(verzoek) });
+    await redis.hset(sleutel(verzoek.feest), {
+      [verzoek.id]: JSON.stringify(verzoek),
+    });
   } else {
-    geheugen.set(verzoek.id, verzoek);
+    geheugenLijst(verzoek.feest).set(verzoek.id, verzoek);
   }
   return "toegevoegd";
 }
 
 export async function zetStatus(
+  feest: string,
   id: string,
   status: VerzoekStatus
 ): Promise<boolean> {
   const redis = geefClient();
   if (!redis) {
-    const verzoek = geheugen.get(id);
+    const lijst = geheugenLijst(feest);
+    const verzoek = lijst.get(id);
     if (!verzoek) return false;
-    geheugen.set(id, { ...verzoek, status });
+    lijst.set(id, { ...verzoek, status });
     return true;
   }
 
-  const huidig = alsVerzoek(await redis.hget(LIJST, id));
+  const huidig = alsVerzoek(await redis.hget(sleutel(feest), id));
   if (!huidig) return false;
-  await redis.hset(LIJST, { [id]: JSON.stringify({ ...huidig, status }) });
+  await redis.hset(sleutel(feest), { [id]: JSON.stringify({ ...huidig, status }) });
   return true;
 }
 
-export async function wisVerzoeken(): Promise<void> {
+/** Eén verzoekje weghalen, bijvoorbeeld als er onzin tussen staat. */
+export async function verwijderVerzoek(feest: string, id: string): Promise<boolean> {
+  const redis = geefClient();
+  if (!redis) return geheugenLijst(feest).delete(id);
+  return (await redis.hdel(sleutel(feest), id)) > 0;
+}
+
+/**
+ * Een feest met de hand openzetten, voor als de agenda niet klopt en de gasten
+ * er al zijn. Vervalt vanzelf.
+ */
+export async function zetOpen(feest: string): Promise<void> {
   const redis = geefClient();
   if (redis) {
-    await redis.del(LIJST);
+    await redis.set(`verzoekjes:open:${feest}`, "1", { ex: FORCEER_SEC });
   } else {
-    geheugen.clear();
+    geheugenOpen.set(feest, Date.now() + FORCEER_SEC * 1000);
   }
+}
+
+export async function isHandmatigOpen(feest: string): Promise<boolean> {
+  const redis = geefClient();
+  if (redis) return (await redis.exists(`verzoekjes:open:${feest}`)) > 0;
+
+  const tot = geheugenOpen.get(feest);
+  return tot !== undefined && tot > Date.now();
 }
 
 /**
@@ -131,20 +208,20 @@ export async function wisVerzoeken(): Promise<void> {
  * enthousiaste gast: op een feest delen alle telefoons hetzelfde ip-adres.
  */
 export async function teVaak(ip: string, soort: string, max = REM_MAX): Promise<boolean> {
-  const sleutel = `verzoekjes:rem:${soort}:${ip}`;
+  const rem = `verzoekjes:rem:${soort}:${ip}`;
   const redis = geefClient();
 
   if (redis) {
-    const aantal = await redis.incr(sleutel);
-    if (aantal === 1) await redis.expire(sleutel, REM_VENSTER_SEC);
+    const aantal = await redis.incr(rem);
+    if (aantal === 1) await redis.expire(rem, REM_VENSTER_SEC);
     return aantal > max;
   }
 
   const nu = Date.now();
   const venster = REM_VENSTER_SEC * 1000;
-  const tijden = (geheugenRem.get(sleutel) ?? []).filter((t) => nu - t < venster);
+  const tijden = (geheugenRem.get(rem) ?? []).filter((t) => nu - t < venster);
   tijden.push(nu);
-  geheugenRem.set(sleutel, tijden);
+  geheugenRem.set(rem, tijden);
   if (geheugenRem.size > 500) {
     for (const [key, times] of geheugenRem) {
       if (times.every((t) => nu - t >= venster)) geheugenRem.delete(key);

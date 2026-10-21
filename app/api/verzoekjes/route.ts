@@ -3,8 +3,10 @@ import { randomUUID } from "node:crypto";
 import { Resend } from "resend";
 
 import { normaliseer, zoekGegevens } from "@/app/verzoekjes/collectie";
+import { datumVoluit, isOpen, vindFeest } from "@/app/verzoekjes/feesten";
 import {
   geefIp,
+  isHandmatigOpen,
   opslagActief,
   teVaak,
   voegVerzoekToe,
@@ -23,6 +25,7 @@ const DUBBEL_VENSTER_MS = 2 * 60 * 60 * 1000;
 
 export async function POST(request: Request) {
   let body: {
+    feest?: string;
     titel?: string;
     artiest?: string;
     van?: string;
@@ -37,6 +40,20 @@ export async function POST(request: Request) {
   // Honeypot: onzichtbaar voor bezoekers, dus alleen bots vullen dit in.
   if (body.bedrijfsnaam) {
     return Response.json({ ok: true, resultaat: "toegevoegd" });
+  }
+
+  const feest = vindFeest((body.feest ?? "").trim());
+  if (!feest) {
+    return Response.json({ error: "onbekend-feest" }, { status: 400 });
+  }
+
+  // Buiten de avond van het feest nemen we niets aan, tenzij het feest in de
+  // booth met de hand is opengezet.
+  if (!isOpen(feest) && !(await isHandmatigOpen(feest.slug))) {
+    return Response.json(
+      { error: "gesloten", datum: datumVoluit(feest) },
+      { status: 403 }
+    );
   }
 
   const titel = (body.titel ?? "").trim().replace(/\s+/g, " ").slice(0, MAX_TITEL);
@@ -56,6 +73,7 @@ export async function POST(request: Request) {
 
   const verzoek: Verzoek = {
     id: randomUUID(),
+    feest: feest.slug,
     titel: gevonden?.t ?? titel,
     artiest: gevonden?.a ?? artiest,
     van,
@@ -68,10 +86,10 @@ export async function POST(request: Request) {
     tijd: Date.now(),
   };
 
-  const sleutel = `${normaliseer(verzoek.titel)}|${normaliseer(verzoek.artiest)}`;
+  const kenmerk = `${normaliseer(verzoek.titel)}|${normaliseer(verzoek.artiest)}`;
   const resultaat = await voegVerzoekToe(verzoek, (ander) => {
     if (verzoek.tijd - ander.tijd > DUBBEL_VENSTER_MS) return false;
-    return `${normaliseer(ander.titel)}|${normaliseer(ander.artiest)}` === sleutel;
+    return `${normaliseer(ander.titel)}|${normaliseer(ander.artiest)}` === kenmerk;
   });
 
   if (resultaat === "vol") {
@@ -81,7 +99,7 @@ export async function POST(request: Request) {
   // Zonder gedeelde opslag staat de lijst alleen in het geheugen van deze
   // server; dan mailen we het verzoekje door zodat het niet verdwijnt.
   if (resultaat === "toegevoegd" && (!opslagActief() || process.env.VERZOEKJES_MAIL === "1")) {
-    await mailDoor(verzoek);
+    await mailDoor(verzoek, feest.naam);
   }
 
   return Response.json({ ok: true, resultaat });
@@ -95,7 +113,7 @@ export async function GET() {
   return Response.json({ opslag: opslagActief() });
 }
 
-async function mailDoor(verzoek: Verzoek) {
+async function mailDoor(verzoek: Verzoek, feestnaam: string) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.error("RESEND_API_KEY ontbreekt; verzoekje niet doorgemaild.");
@@ -108,6 +126,7 @@ async function mailDoor(verzoek: Verzoek) {
   const regels = [
     `${verzoek.titel}${verzoek.artiest ? ` — ${verzoek.artiest}` : ""}`,
     "",
+    `Feest: ${feestnaam}`,
     verzoek.van ? `Aangevraagd door: ${verzoek.van}` : "Aangevraagd door: (niet ingevuld)",
     verzoek.bpm !== null ? `BPM: ${verzoek.bpm}` : "BPM: niet gevonden in de collectie",
     verzoek.toon ? `Toonaard: ${verzoek.toon}` : null,
@@ -120,7 +139,7 @@ async function mailDoor(verzoek: Verzoek) {
     from,
     to,
     replyTo: siteContent.email,
-    subject: `Verzoekje: ${verzoek.titel}`,
+    subject: `Verzoekje (${feestnaam}): ${verzoek.titel}`,
     text: regels.join("\n"),
   });
 

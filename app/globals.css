@@ -684,3 +684,103 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 @media (prefers-reduced-motion: reduce){
   .vz-knop:hover:not(:disabled){transform:none;}
 }
+
+/* --- per feest: naam boven het formulier --- */
+.vz-feest{
+  margin:0 0 14px; font-size:13px; line-height:1.5; color:var(--muted);
+}
+.vz-feest strong{color:var(--ink); font-weight:800;}
+.vz-feest-datum{
+  display:block; margin-top:2px;
+  font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+}
+
+/* --- booth: tabbladen, feestkeuze en jaarlijst --- */
+.bt-tabs{display:flex; gap:6px; margin:20px 0 4px; padding:4px; background:var(--bg-soft); border-radius:999px;}
+.bt-tabs button{
+  flex:1; background:none; border:none; border-radius:999px; padding:10px 16px;
+  font-size:13px; font-weight:800; font-family:inherit; color:var(--muted); cursor:pointer;
+}
+.bt-tabs button.aan{background:linear-gradient(90deg,var(--pink),var(--violet)); color:#fff;}
+
+.bt-feest{
+  display:flex; align-items:flex-end; justify-content:space-between; gap:14px;
+  flex-wrap:wrap; margin:18px 0 4px;
+}
+.bt-feest label{display:flex; flex-direction:column; gap:6px; flex:1; min-width:220px;}
+.bt-feest label > span{
+  font-size:11px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--muted);
+}
+.bt-feest select{
+  width:100%;
+  background:var(--bg-soft); border:1px solid var(--line); border-radius:14px;
+  padding:13px 16px; font-size:15px; font-weight:700; color:var(--ink);
+  font-family:inherit; appearance:none;
+}
+.bt-feest select:focus{outline:none; border-color:var(--violet);}
+.bt-open{
+  display:flex; align-items:center; gap:9px; padding-bottom:13px;
+  font-size:12px; font-weight:800; letter-spacing:0.02em; color:var(--muted);
+}
+.bt-stip{
+  width:9px; height:9px; border-radius:50%;
+  background:var(--muted); box-shadow:0 0 0 3px rgba(243,238,252,.07);
+}
+.bt-stip.aan{background:#36d399; box-shadow:0 0 0 3px rgba(54,211,153,.18);}
+
+.bt-weg{
+  background:none; border:none; padding:0;
+  font-size:11px; font-family:inherit; color:var(--muted);
+  text-decoration:underline; cursor:pointer;
+}
+.bt-weg:hover:not(:disabled){color:var(--pink);}
+.bt-weg:disabled{opacity:.5; cursor:default;}
+
+.bt-top-tel{margin:0 0 13px; font-size:12px; color:var(--muted);}
+.bt-toplijst{list-style:none; margin:18px 0 0; padding:0; display:flex; flex-direction:column; gap:8px;}
+.bt-toplijst li{
+  display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center;
+  padding:13px 18px;
+  background:var(--bg-soft); border:1px solid var(--line); border-radius:16px;
+}
+.bt-plek{
+  font-size:15px; font-weight:900; color:var(--muted);
+  font-variant-numeric:tabular-nums; min-width:22px;
+}
+.bt-toplijst .bt-titel,
+.bt-toplijst .bt-artiest{display:block;}
+.bt-toplijst .bt-meta{display:flex;}
+.bt-aantal{
+  display:flex; align-items:baseline; gap:2px;
+  font-size:20px; font-weight:900; letter-spacing:-0.02em;
+  font-variant-numeric:tabular-nums;
+}
+.bt-aantal small{font-size:11px; font-weight:800; color:var(--muted);}
+
+/* --- overzicht van alle QR-posters --- */
+.qro{max-width:640px; margin:0 auto; padding:40px 24px 70px;}
+.qro h1{margin:0; font-size:32px; letter-spacing:-0.02em;}
+.qro-intro{margin:8px 0 28px; font-size:15px; line-height:1.6; color:var(--muted);}
+.qro-lijst{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px;}
+.qro-lijst a{
+  display:flex; align-items:center; gap:18px; padding:14px 18px;
+  background:var(--bg-soft); border:1px solid var(--line); border-radius:18px;
+  transition:border-color .2s ease;
+}
+.qro-lijst a:hover{border-color:var(--violet);}
+.qro-lijst img{
+  width:72px; height:72px; flex:none;
+  background:#fff; border-radius:10px; padding:5px;
+}
+.qro-lijst strong{display:block; font-size:16px; letter-spacing:-0.01em;}
+.qro-lijst small{display:block; margin-top:3px; font-size:12px; color:var(--muted);}
+.qro-leeg{margin-top:24px; font-size:14px; color:var(--muted);}
+
+.qr-datum{
+  margin:4px 0 0;
+  font-size:13px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted);
+}
+@media print{
+  .qr-datum{color:#333; font-size:13pt; letter-spacing:0.08em;}
+}

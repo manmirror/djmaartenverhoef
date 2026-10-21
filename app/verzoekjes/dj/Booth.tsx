@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 
-import type { Verzoek, VerzoekStatus } from "../types";
+import type { FeestInfo } from "../feesten";
+import type { TopNummer, Verzoek, VerzoekStatus } from "../types";
 
 const CODE_HEADER = "x-verzoekjes-code";
 const SLEUTEL = "verzoekjes-code";
@@ -39,8 +40,22 @@ function abonneer(luisteraar: () => void) {
   };
 }
 
-type Lijst = { verzoeken: Verzoek[]; opslag: boolean; collectie: number };
+type Lijst = {
+  feest: (FeestInfo & { handmatig: boolean }) | null;
+  verzoeken: Verzoek[];
+  agenda: FeestInfo[];
+  opslag: boolean;
+  collectie: number;
+};
+type Jaarlijst = {
+  jaar: number | null;
+  jaren: number[];
+  feesten: number;
+  totaal: number;
+  top: TopNummer[];
+};
 type Sortering = "tijd" | "bpm";
+type Weergave = "lijst" | "top";
 
 export default function Booth() {
   // Op de server weten we de code niet; vandaar de lege derde waarde.
@@ -48,12 +63,18 @@ export default function Booth() {
 
   const [lijst, setLijst] = useState<Lijst | null>(null);
   const [fout, setFout] = useState<string | null>(null);
+  const [gekozenFeest, setGekozenFeest] = useState<string | null>(null);
+  const [weergave, setWeergave] = useState<Weergave>("lijst");
   const [sortering, setSortering] = useState<Sortering>("tijd");
   const [toonAf, setToonAf] = useState(false);
   const [bezigMet, setBezigMet] = useState<string | null>(null);
+  const [top, setTop] = useState<Jaarlijst | null>(null);
 
-  const haal = useCallback(async (metCode: string) => {
-    const antwoord = await fetch("/api/verzoekjes/lijst", {
+  const haal = useCallback(async (metCode: string, feest: string | null) => {
+    const adres = feest
+      ? `/api/verzoekjes/lijst?feest=${encodeURIComponent(feest)}`
+      : "/api/verzoekjes/lijst";
+    const antwoord = await fetch(adres, {
       headers: { [CODE_HEADER]: metCode },
       cache: "no-store",
     });
@@ -83,12 +104,12 @@ export default function Booth() {
   }, []);
 
   useEffect(() => {
-    if (!code) return;
+    if (!code || weergave !== "lijst") return;
 
     let actief = true;
     async function vernieuw() {
       try {
-        await haal(code);
+        await haal(code, gekozenFeest);
       } catch {
         if (actief) setFout("Geen verbinding. De lijst probeert het straks opnieuw.");
       }
@@ -103,9 +124,20 @@ export default function Booth() {
       actief = false;
       clearInterval(tik);
     };
-  }, [code, haal]);
+  }, [code, gekozenFeest, haal, weergave]);
+
+  const feest = lijst?.feest ?? null;
+
+  async function stuur(pad: string, inhoud: object) {
+    return fetch(`/api/verzoekjes/${pad}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", [CODE_HEADER]: code },
+      body: JSON.stringify(inhoud),
+    });
+  }
 
   async function stuurStatus(id: string, status: VerzoekStatus) {
+    if (!feest) return;
     setBezigMet(id);
     // Meteen bijwerken in beeld; de volgende ronde haalt de echte stand op.
     setLijst((vorig) =>
@@ -119,12 +151,8 @@ export default function Booth() {
         : vorig
     );
     try {
-      await fetch("/api/verzoekjes/status", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", [CODE_HEADER]: code },
-        body: JSON.stringify({ id, status }),
-      });
-      await haal(code);
+      await stuur("status", { feest: feest.slug, id, status });
+      await haal(code, gekozenFeest);
     } catch {
       setFout("Kon dat niet opslaan. Probeer het nog eens.");
     } finally {
@@ -132,19 +160,59 @@ export default function Booth() {
     }
   }
 
-  async function wisAlles() {
-    if (!confirm("De hele lijst leegmaken? Dit kan niet terug.")) return;
+  async function verwijder(verzoek: Verzoek) {
+    if (!feest) return;
+    if (!confirm(`"${verzoek.titel}" weghalen? Dit kan niet terug.`)) return;
+    setBezigMet(verzoek.id);
     try {
-      await fetch("/api/verzoekjes/status", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", [CODE_HEADER]: code },
-        body: JSON.stringify({ wis: true }),
-      });
-      await haal(code);
+      await stuur("status", { feest: feest.slug, id: verzoek.id, verwijder: true });
+      await haal(code, gekozenFeest);
     } catch {
-      setFout("Kon de lijst niet leegmaken.");
+      setFout("Kon dat niet weghalen.");
+    } finally {
+      setBezigMet(null);
     }
   }
+
+  async function zetOpen() {
+    if (!feest) return;
+    try {
+      await stuur("open", { feest: feest.slug });
+      await haal(code, gekozenFeest);
+    } catch {
+      setFout("Kon het feest niet openzetten.");
+    }
+  }
+
+  const haalTop = useCallback(
+    async (jaar: number | null) => {
+      const adres = jaar === null ? "/api/verzoekjes/top" : `/api/verzoekjes/top?jaar=${jaar}`;
+      try {
+        const antwoord = await fetch(adres, {
+          headers: { [CODE_HEADER]: code },
+          cache: "no-store",
+        });
+        if (!antwoord.ok) {
+          setFout(`Kon de jaarlijst niet ophalen (${antwoord.status}).`);
+          return;
+        }
+        setTop((await antwoord.json()) as Jaarlijst);
+        setFout(null);
+      } catch {
+        setFout("Kon de jaarlijst niet ophalen.");
+      }
+    },
+    [code]
+  );
+
+  useEffect(() => {
+    if (!code || weergave !== "top") return;
+
+    async function laad() {
+      await haalTop(new Date().getFullYear());
+    }
+    laad();
+  }, [code, haalTop, weergave]);
 
   if (!code) {
     return <CodeHek fout={fout} />;
@@ -163,8 +231,9 @@ export default function Booth() {
         <div>
           <h1>Booth</h1>
           <p>
-            {nieuw.length} open
-            {afgehandeld.length > 0 && ` · ${afgehandeld.length} afgehandeld`}
+            {weergave === "lijst"
+              ? `${nieuw.length} open${afgehandeld.length > 0 ? ` · ${afgehandeld.length} afgehandeld` : ""}`
+              : "Vaakst gevraagd"}
             {lijst && lijst.collectie > 0 &&
               ` · ${lijst.collectie.toLocaleString("nl-NL")} nummers in de collectie`}
           </p>
@@ -174,74 +243,139 @@ export default function Booth() {
         </button>
       </header>
 
+      <div className="bt-tabs">
+        <button
+          type="button"
+          className={weergave === "lijst" ? "aan" : undefined}
+          onClick={() => setWeergave("lijst")}
+        >
+          Verzoekjes
+        </button>
+        <button
+          type="button"
+          className={weergave === "top" ? "aan" : undefined}
+          onClick={() => setWeergave("top")}
+        >
+          Jaarlijst
+        </button>
+      </div>
+
       {lijst && !lijst.opslag && (
         <p className="bt-waarschuwing">
-          Er hangt nog geen gedeelde opslag aan het project, dus deze lijst is niet
-          betrouwbaar. Verzoekjes worden nu per mail doorgestuurd. Zie VERZOEKJES.md.
+          Er hangt nog geen gedeelde opslag aan het project, dus deze lijsten zijn
+          niet betrouwbaar en worden niet bewaard. Verzoekjes gaan nu per mail.
+          Zie VERZOEKJES.md.
         </p>
       )}
 
       {fout && <p className="bt-waarschuwing">{fout}</p>}
 
-      <div className="bt-balk">
-        <div className="bt-sorteer">
-          <button
-            type="button"
-            className={sortering === "tijd" ? "aan" : undefined}
-            onClick={() => setSortering("tijd")}
-          >
-            Nieuwste eerst
-          </button>
-          <button
-            type="button"
-            className={sortering === "bpm" ? "aan" : undefined}
-            onClick={() => setSortering("bpm")}
-          >
-            Op bpm
-          </button>
-        </div>
-        <button type="button" className="bt-mini" onClick={wisAlles}>
-          Lijst wissen
-        </button>
-      </div>
-
-      {!lijst && <p className="bt-leeg">Laden…</p>}
-
-      {lijst && nieuw.length === 0 && (
-        <p className="bt-leeg">Nog geen open verzoekjes.</p>
-      )}
-
-      <ul className="bt-lijst">
-        {nieuw.map((verzoek) => (
-          <Rij
-            key={verzoek.id}
-            verzoek={verzoek}
-            bezig={bezigMet === verzoek.id}
-            onStatus={stuurStatus}
-          />
-        ))}
-      </ul>
-
-      {afgehandeld.length > 0 && (
+      {weergave === "top" ? (
+        <Jaaroverzicht data={top} opHalen={haalTop} />
+      ) : (
         <>
-          <button
-            type="button"
-            className="bt-klap"
-            onClick={() => setToonAf((vorig) => !vorig)}
-          >
-            {toonAf ? "Verberg" : "Toon"} afgehandeld ({afgehandeld.length})
-          </button>
-          {toonAf && (
-            <ul className="bt-lijst bt-lijst-af">
-              {sorteer(afgehandeld, sortering).map((verzoek) => (
-                <Rij
-                  key={verzoek.id}
-                  verzoek={verzoek}
-                  bezig={bezigMet === verzoek.id}
-                  onStatus={stuurStatus}
-                />
-              ))}
-            </ul>
+          {lijst && lijst.agenda.length > 0 && (
+            <div className="bt-feest">
+              <label>
+                <span>Feest</span>
+                <select
+                  value={feest?.slug ?? ""}
+                  onChange={(event) => setGekozenFeest(event.target.value)}
+                >
+                  {lijst.agenda.map((ander) => (
+                    <option key={ander.slug} value={ander.slug}>
+                      {ander.naam} — {ander.kort}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              {feest && (
+                <div className="bt-open">
+                  <span className={feest.open ? "bt-stip aan" : "bt-stip"} />
+                  {feest.open
+                    ? feest.handmatig
+                      ? "handmatig open"
+                      : "open voor verzoekjes"
+                    : "gesloten"}
+                  {/* Zonder database weet niet elke server van deze knop, dus
+                      dan laten we hem weg in plaats van iets te beloven. */}
+                  {!feest.open && lijst.opslag && (
+                    <button type="button" className="bt-mini" onClick={zetOpen}>
+                      Zet nu open
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {lijst && lijst.agenda.length === 0 && (
+            <p className="bt-leeg">
+              Er staan nog geen feesten in de agenda (content/feesten.ts).
+            </p>
+          )}
+
+          <div className="bt-balk">
+            <div className="bt-sorteer">
+              <button
+                type="button"
+                className={sortering === "tijd" ? "aan" : undefined}
+                onClick={() => setSortering("tijd")}
+              >
+                Nieuwste eerst
+              </button>
+              <button
+                type="button"
+                className={sortering === "bpm" ? "aan" : undefined}
+                onClick={() => setSortering("bpm")}
+              >
+                Op bpm
+              </button>
+            </div>
+          </div>
+
+          {!lijst && <p className="bt-leeg">Laden…</p>}
+
+          {lijst && feest && nieuw.length === 0 && (
+            <p className="bt-leeg">Nog geen open verzoekjes voor dit feest.</p>
+          )}
+
+          <ul className="bt-lijst">
+            {nieuw.map((verzoek) => (
+              <Rij
+                key={verzoek.id}
+                verzoek={verzoek}
+                bezig={bezigMet === verzoek.id}
+                onStatus={stuurStatus}
+                onWeg={verwijder}
+              />
+            ))}
+          </ul>
+
+          {afgehandeld.length > 0 && (
+            <>
+              <button
+                type="button"
+                className="bt-klap"
+                onClick={() => setToonAf((vorig) => !vorig)}
+              >
+                {toonAf ? "Verberg" : "Toon"} afgehandeld ({afgehandeld.length})
+              </button>
+              {toonAf && (
+                <ul className="bt-lijst bt-lijst-af">
+                  {sorteer(afgehandeld, sortering).map((verzoek) => (
+                    <Rij
+                      key={verzoek.id}
+                      verzoek={verzoek}
+                      bezig={bezigMet === verzoek.id}
+                      onStatus={stuurStatus}
+                      onWeg={verwijder}
+                    />
+                  ))}
+                </ul>
+              )}
+            </>
           )}
         </>
       )}
@@ -269,12 +403,15 @@ function Rij({
   verzoek,
   bezig,
   onStatus,
+  onWeg,
 }: {
   verzoek: Verzoek;
   bezig: boolean;
   onStatus: (id: string, status: VerzoekStatus) => void;
+  onWeg: (verzoek: Verzoek) => void;
 }) {
   const klok = new Date(verzoek.tijd).toLocaleTimeString("nl-NL", {
+    timeZone: "Europe/Amsterdam",
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -288,6 +425,14 @@ function Rij({
           <span className="bt-tijd">{klok}</span>
           {verzoek.van && <span className="bt-van">van {verzoek.van}</span>}
           {!verzoek.inCollectie && <span className="bt-niet">niet in collectie</span>}
+          <button
+            type="button"
+            className="bt-weg"
+            disabled={bezig}
+            onClick={() => onWeg(verzoek)}
+          >
+            weghalen
+          </button>
         </div>
       </div>
 
@@ -340,6 +485,70 @@ function Rij({
   );
 }
 
+function Jaaroverzicht({
+  data,
+  opHalen,
+}: {
+  data: Jaarlijst | null;
+  opHalen: (jaar: number | null) => void;
+}) {
+  if (!data) return <p className="bt-leeg">Laden…</p>;
+
+  return (
+    <div className="bt-top">
+      <div className="bt-feest">
+        <label>
+          <span>Periode</span>
+          <select
+            value={data.jaar === null ? "alles" : String(data.jaar)}
+            onChange={(event) =>
+              opHalen(event.target.value === "alles" ? null : Number(event.target.value))
+            }
+          >
+            {data.jaren.map((jaar) => (
+              <option key={jaar} value={jaar}>
+                {jaar}
+              </option>
+            ))}
+            <option value="alles">Alles bij elkaar</option>
+          </select>
+        </label>
+        <p className="bt-top-tel">
+          {data.totaal.toLocaleString("nl-NL")} verzoekjes over {data.feesten}{" "}
+          {data.feesten === 1 ? "feest" : "feesten"}
+        </p>
+      </div>
+
+      {data.top.length === 0 ? (
+        <p className="bt-leeg">Nog geen verzoekjes in deze periode.</p>
+      ) : (
+        <ol className="bt-toplijst">
+          {data.top.map((nummer, plek) => (
+            <li key={`${nummer.titel}-${nummer.artiest}`}>
+              <span className="bt-plek">{plek + 1}</span>
+              <span className="bt-rij-tekst">
+                <span className="bt-titel">{nummer.titel}</span>
+                {nummer.artiest && <span className="bt-artiest">{nummer.artiest}</span>}
+                <span className="bt-meta">
+                  <span>{nummer.gedraaid}× gedraaid</span>
+                  <span>
+                    op {nummer.feesten} {nummer.feesten === 1 ? "feest" : "feesten"}
+                  </span>
+                  {nummer.bpm !== null && <span>{Math.round(nummer.bpm)} bpm</span>}
+                </span>
+              </span>
+              <span className="bt-aantal">
+                {nummer.aantal}
+                <small>×</small>
+              </span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+}
+
 function CodeHek({ fout }: { fout: string | null }) {
   const [waarde, setWaarde] = useState("");
 
@@ -352,7 +561,7 @@ function CodeHek({ fout }: { fout: string | null }) {
       }}
     >
       <h1>Booth</h1>
-      <p>Vul de code in om de verzoekjes van vanavond te zien.</p>
+      <p>Vul de code in om de verzoekjes te zien.</p>
       <input
         type="password"
         value={waarde}

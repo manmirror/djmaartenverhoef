@@ -1,53 +1,61 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { siteContent } from "@/content/site";
-
-import PrintKnop from "./PrintKnop";
+import { alleFeesten, datumVoluit } from "../feesten";
 
 export const metadata: Metadata = {
-  title: "QR-code verzoekjes — DJ Maarten Verhoef",
+  title: "QR-codes verzoekjes — DJ Maarten Verhoef",
   robots: { index: false, follow: false },
 };
 
-export default function QrPagina() {
-  const teksten = siteContent.verzoekjes;
+/** Overzicht van alle posters: één per feest, plus de algemene. */
+export default function QrOverzicht() {
+  const feesten = alleFeesten();
 
   return (
-    <main className="qr-pagina">
-      {/* Dit blok is de poster zelf: op papier blijft alleen dit over. */}
-      <div className="qr-poster">
-        <div className="qr-kop">{teksten.posterKop}</div>
-        <p className="qr-regel">{teksten.posterRegel}</p>
+    <main className="qro">
+      <h1>QR-codes</h1>
+      <p className="qro-intro">
+        Elk feest heeft zijn eigen code. Klik erop voor de poster, om te printen
+        of te downloaden.
+      </p>
 
-        <div className="qr-kaart">
-          {/* Donkere code op wit: zo lezen telefooncamera's hem het best. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/verzoekjes-qr.svg"
-            alt={`QR-code naar ${teksten.posterUrl}`}
-            width={520}
-            height={520}
-          />
-        </div>
+      <ul className="qro-lijst">
+        {feesten.map((feest) => (
+          <li key={feest.slug}>
+            <Link href={`/verzoekjes/qr/${feest.slug}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`/api/verzoekjes/qr/${feest.slug}`}
+                alt=""
+                width={120}
+                height={120}
+              />
+              <span>
+                <strong>{feest.naam}</strong>
+                <small>{datumVoluit(feest)}</small>
+              </span>
+            </Link>
+          </li>
+        ))}
 
-        <p className="qr-url">{teksten.posterUrl}</p>
-        <p className="qr-voet">{teksten.posterVoet}</p>
-      </div>
+        <li>
+          <Link href="/verzoekjes/qr/algemeen">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/api/verzoekjes/qr/algemeen" alt="" width={120} height={120} />
+            <span>
+              <strong>Algemene code</strong>
+              <small>wijst naar het feest dat op dat moment aan de gang is</small>
+            </span>
+          </Link>
+        </li>
+      </ul>
 
-      {/* Alles hieronder is voor het scherm; op papier valt het weg. */}
-      <div className="qr-acties">
-        <PrintKnop />
-        <a className="qr-knop qr-knop-zacht" href="/verzoekjes-qr.png" download>
-          Download PNG — om te delen
-        </a>
-        <a className="qr-knop qr-knop-zacht" href="/verzoekjes-qr.svg" download>
-          Download SVG — om te printen
-        </a>
-        <Link className="qr-terug" href="/verzoekjes">
-          Bekijk het formulier
-        </Link>
-      </div>
+      {feesten.length === 0 && (
+        <p className="qro-leeg">
+          Er staan nog geen feesten in de agenda. Zet ze in content/feesten.ts.
+        </p>
+      )}
     </main>
   );
 }

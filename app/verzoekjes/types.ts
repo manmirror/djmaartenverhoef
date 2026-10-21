@@ -4,6 +4,8 @@ export type VerzoekStatus = "nieuw" | "gedraaid" | "overgeslagen";
 
 export type Verzoek = {
   id: string;
+  /** De slug van het feest waar dit verzoekje bij hoort. */
+  feest: string;
   titel: string;
   /** Leeg als de bezoeker alleen een titel invulde. */
   artiest: string;
@@ -19,6 +21,18 @@ export type Verzoek = {
   status: VerzoekStatus;
   /** Tijdstip van binnenkomst, in milliseconden sinds 1970. */
   tijd: number;
+};
+
+/** Eén regel in de jaarlijst: hoe vaak een nummer gevraagd is. */
+export type TopNummer = {
+  titel: string;
+  artiest: string;
+  bpm: number | null;
+  aantal: number;
+  /** Hoe vaak het ook echt gedraaid is. */
+  gedraaid: number;
+  /** Op hoeveel verschillende feesten het gevraagd is. */
+  feesten: number;
 };
 
 /** Eén nummer uit rekordbox. Korte sleutels: de collectie kan groot zijn. */

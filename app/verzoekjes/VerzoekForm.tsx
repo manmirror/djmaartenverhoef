@@ -29,12 +29,21 @@ const REDENEN: Record<string, string> = {
   "geen-titel": "Vul even in welk nummer je wilt horen.",
   "te-vaak": "Je hebt er net al een paar gestuurd. Geef de dansvloer even de tijd.",
   vol: "De lijst van vanavond is vol. Loop even langs de booth.",
+  gesloten: "De lijst voor dit feest is inmiddels gesloten.",
+  "onbekend-feest": "Deze link hoort bij geen enkel feest. Scan de code opnieuw.",
 };
 
 /** Hoe lang we wachten met zoeken nadat er is getypt. */
 const TYPPAUZE_MS = 180;
 
-export default function VerzoekForm({ teksten }: { teksten: Teksten }) {
+export default function VerzoekForm({
+  feest,
+  teksten,
+}: {
+  /** De slug van het feest waar dit formulier bij hoort. */
+  feest: string;
+  teksten: Teksten;
+}) {
   const [status, setStatus] = useState<Status>("idle");
   const [reden, setReden] = useState<string | null>(null);
 
@@ -114,6 +123,7 @@ export default function VerzoekForm({ teksten }: { teksten: Teksten }) {
     const formulier = event.currentTarget;
     const data = new FormData(formulier);
     const payload = {
+      feest,
       titel: String(data.get("nummer") ?? ""),
       artiest: String(data.get("artiest") ?? ""),
       van: String(data.get("vanwie") ?? ""),

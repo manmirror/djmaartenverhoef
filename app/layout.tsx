@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Archivo_Black } from "next/font/google";
 import { BotIdClient } from "botid/client";
+import { siteContent } from "@/content/site";
+
 import "./globals.css";
 
 // Onzichtbare bot-controle op het terugbelformulier: bezoekers merken er niets
@@ -22,7 +24,7 @@ const displayFont = Archivo_Black({
   variable: "--font-display",
 });
 
-const siteUrl = "https://djmaartenverhoef.nl";
+const siteUrl = siteContent.siteUrl;
 const description =
   "DJ Maarten Verhoef — al ruim 30 jaar de dansvloer vol in en rond Uithoorn. Van cafés tot Koningsdag.";
 
