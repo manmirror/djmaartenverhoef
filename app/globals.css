@@ -424,3 +424,263 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 .wm-stop-3{stop-color:var(--orange);}
 .callback-error a{color:var(--ink); font-weight:700; text-decoration:underline;}
 .callback-code{color:var(--muted); font-weight:400;}
+
+/* ===================================================================
+   VERZOEKJES — /verzoekjes, /verzoekjes/dj en /verzoekjes/qr
+   =================================================================== */
+
+/* --- het formulier voor de gasten --- */
+.vz-pagina{
+  position:relative; overflow:hidden;
+  min-height:100dvh;
+  display:flex; align-items:center; justify-content:center;
+  padding:48px 24px;
+}
+.vz-blob{
+  position:absolute; border-radius:50%; filter:blur(90px); opacity:.5;
+  pointer-events:none;
+}
+.vz-blob-1{width:420px; height:420px; background:var(--pink); top:-140px; left:-120px;}
+.vz-blob-2{width:380px; height:380px; background:var(--violet); bottom:-150px; right:-110px;}
+.vz-inhoud{position:relative; z-index:1; width:100%; max-width:460px;}
+.vz-merk{
+  display:inline-block; margin-bottom:28px;
+  font-size:14px; font-weight:900; letter-spacing:-0.01em; color:var(--muted);
+}
+.vz-merk span{color:var(--pink);}
+.vz-kop{
+  margin:0 0 10px;
+  font-size:clamp(38px,11vw,54px); line-height:1; letter-spacing:-0.03em; font-weight:900;
+  background:linear-gradient(90deg,var(--pink),var(--violet),var(--orange));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.vz-intro{margin:0 0 28px; font-size:16px; line-height:1.6; color:var(--muted);}
+
+.vz-form{display:flex; flex-direction:column; gap:16px;}
+/* position:relative, zodat de suggestielijst onder het juiste veld hangt. */
+.vz-veld{position:relative; display:flex; flex-direction:column; gap:7px;}
+.vz-label{
+  font-size:12px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--muted);
+}
+.vz-form input{
+  width:100%; min-width:0;
+  background:var(--bg-soft); border:1px solid var(--line); border-radius:16px;
+  padding:16px 20px; font-size:16px; color:var(--ink); font-family:inherit;
+}
+.vz-form input::placeholder{color:var(--muted);}
+.vz-form input:focus{outline:none; border-color:var(--violet);}
+
+/* --- suggesties uit de collectie --- */
+.vz-dropdown{
+  position:absolute; top:100%; left:0; right:0; z-index:5;
+  margin-top:6px; overflow:hidden;
+  background:#191324; border:1px solid var(--line); border-radius:16px;
+  box-shadow:0 24px 60px rgba(0,0,0,.55);
+}
+.vz-sug-hint{
+  display:block; padding:10px 14px 4px;
+  font-size:11px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--muted);
+}
+.vz-suggesties{
+  margin:0; padding:4px 6px 6px; list-style:none;
+  max-height:min(42vh,300px); overflow-y:auto;
+}
+.vz-suggestie{
+  display:grid; grid-template-columns:1fr auto; gap:2px 12px; align-items:baseline;
+  width:100%; padding:11px 13px; border:none; border-radius:11px;
+  background:transparent; color:inherit; font-family:inherit; text-align:left;
+  cursor:pointer;
+}
+.vz-suggestie.aan{background:rgba(139,92,246,.22);}
+.vz-sug-titel{font-size:15px; font-weight:700; line-height:1.3;}
+.vz-sug-artiest{grid-column:1; font-size:13px; color:var(--muted);}
+.vz-sug-bpm{
+  grid-column:2; grid-row:1 / span 2;
+  font-size:12px; font-weight:800; color:var(--muted); white-space:nowrap;
+}
+
+.vz-honeypot{
+  position:absolute; left:-9999px; width:1px; height:1px;
+  opacity:0; pointer-events:none;
+}
+.vz-knop{
+  width:100%; margin-top:6px;
+  background:linear-gradient(90deg,var(--pink),var(--violet)); color:#fff;
+  border:none; border-radius:16px; padding:18px 22px;
+  font-size:17px; font-weight:800; font-family:inherit; cursor:pointer;
+  transition:transform .2s ease;
+}
+.vz-knop:hover:not(:disabled){transform:translateY(-2px);}
+.vz-knop:disabled{opacity:.6; cursor:default;}
+.vz-fout{margin:0; font-size:14px; line-height:1.5; color:var(--pink);}
+.vz-code{color:var(--muted); font-weight:400;}
+.vz-voet{margin:30px 0 0; font-size:13px; color:var(--muted);}
+.vz-voet a{color:var(--ink); font-weight:700; text-decoration:underline;}
+
+/* --- het bedankje na versturen --- */
+.vz-klaar{text-align:center; padding:12px 0 4px;}
+.vz-klaar-vink{
+  width:66px; height:66px; margin:0 auto 22px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:50%; color:#fff;
+  background:linear-gradient(135deg,var(--pink),var(--violet));
+}
+.vz-klaar-vink svg{width:32px; height:32px;}
+.vz-klaar h2{margin:0 0 10px; font-size:26px; letter-spacing:-0.02em;}
+.vz-klaar p{margin:0 0 26px; font-size:15px; line-height:1.6; color:var(--muted);}
+.vz-nogeen{
+  background:none; border:1px solid var(--line); border-radius:999px;
+  padding:13px 26px; font-size:14px; font-weight:800; font-family:inherit;
+  color:var(--ink); cursor:pointer; transition:border-color .2s ease;
+}
+.vz-nogeen:hover{border-color:var(--violet);}
+
+/* --- de boothpagina voor Maarten zelf --- */
+.bt-pagina{min-height:100dvh; padding:28px 18px 60px;}
+.bt{max-width:720px; margin:0 auto;}
+.bt-kop{display:flex; align-items:flex-start; justify-content:space-between; gap:16px;}
+.bt-kop h1{margin:0; font-size:30px; letter-spacing:-0.02em;}
+.bt-kop p{margin:5px 0 0; font-size:13px; color:var(--muted);}
+.bt-waarschuwing{
+  margin:18px 0 0; padding:13px 16px;
+  background:rgba(255,47,126,.12); border:1px solid rgba(255,47,126,.4);
+  border-radius:14px; font-size:13px; line-height:1.5; color:var(--ink);
+}
+.bt-balk{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  margin:22px 0 16px; flex-wrap:wrap;
+}
+.bt-sorteer{display:flex; gap:6px; padding:4px; background:var(--bg-soft); border-radius:999px;}
+.bt-sorteer button{
+  background:none; border:none; border-radius:999px; padding:9px 16px;
+  font-size:13px; font-weight:800; font-family:inherit; color:var(--muted); cursor:pointer;
+}
+.bt-sorteer button.aan{background:linear-gradient(90deg,var(--pink),var(--violet)); color:#fff;}
+.bt-mini{
+  background:none; border:1px solid var(--line); border-radius:999px;
+  padding:9px 16px; font-size:12px; font-weight:800; font-family:inherit;
+  color:var(--muted); cursor:pointer; transition:color .2s ease,border-color .2s ease;
+}
+.bt-mini:hover{color:var(--ink); border-color:var(--violet);}
+.bt-leeg{margin:30px 0; font-size:14px; color:var(--muted);}
+
+.bt-lijst{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;}
+.bt-lijst-af{margin-top:10px; opacity:.6;}
+.bt-rij{
+  display:grid; grid-template-columns:1fr auto auto; gap:14px; align-items:center;
+  padding:15px 18px;
+  background:var(--bg-soft); border:1px solid var(--line); border-radius:16px;
+}
+.bt-rij.bt-gedraaid{border-color:rgba(139,92,246,.45);}
+.bt-rij.bt-overgeslagen{border-style:dashed;}
+.bt-titel{font-size:16px; font-weight:800; line-height:1.3; letter-spacing:-0.01em;}
+.bt-artiest{margin-top:2px; font-size:14px; color:var(--muted);}
+.bt-meta{display:flex; flex-wrap:wrap; gap:10px; margin-top:7px; font-size:11px; color:var(--muted);}
+.bt-meta span{letter-spacing:0.04em;}
+.bt-van{color:var(--ink);}
+.bt-niet{color:var(--orange);}
+.bt-cijfers{display:flex; flex-direction:column; align-items:flex-end; gap:3px;}
+.bt-bpm{
+  display:flex; align-items:baseline; gap:3px;
+  font-size:22px; font-weight:900; letter-spacing:-0.02em;
+  font-variant-numeric:tabular-nums;
+}
+.bt-bpm small{font-size:10px; font-weight:800; color:var(--muted);}
+.bt-bpm-leeg{color:var(--muted);}
+.bt-toon{font-size:11px; font-weight:800; color:var(--violet); letter-spacing:0.04em;}
+.bt-acties{display:flex; flex-direction:column; gap:6px;}
+.bt-acties button{
+  border:none; border-radius:999px; padding:9px 15px;
+  font-size:12px; font-weight:800; font-family:inherit; cursor:pointer; white-space:nowrap;
+}
+.bt-acties button:disabled{opacity:.5; cursor:default;}
+.bt-ok{background:linear-gradient(90deg,var(--pink),var(--violet)); color:#fff;}
+.bt-nee{background:transparent; border:1px solid var(--line) !important; color:var(--muted);}
+.bt-klap{
+  margin-top:20px; background:none; border:none; padding:0;
+  font-size:13px; font-weight:800; font-family:inherit; color:var(--muted);
+  cursor:pointer; text-decoration:underline;
+}
+@media(max-width:560px){
+  .bt-rij{grid-template-columns:1fr auto;}
+  /* Op een telefoon de knoppen onder het nummer, over de volle breedte. */
+  .bt-acties{grid-column:1 / -1; flex-direction:row;}
+  .bt-acties button{flex:1;}
+}
+
+.bt-hek{
+  max-width:360px; margin:16vh auto 0;
+  display:flex; flex-direction:column; gap:14px;
+}
+.bt-hek h1{margin:0; font-size:30px; letter-spacing:-0.02em;}
+.bt-hek p{margin:0; font-size:14px; line-height:1.6; color:var(--muted);}
+.bt-hek input{
+  background:var(--bg-soft); border:1px solid var(--line); border-radius:16px;
+  padding:16px 20px; font-size:16px; color:var(--ink); font-family:inherit;
+}
+.bt-hek input:focus{outline:none; border-color:var(--violet);}
+.bt-hek button{
+  background:linear-gradient(90deg,var(--pink),var(--violet)); color:#fff;
+  border:none; border-radius:16px; padding:16px 22px;
+  font-size:16px; font-weight:800; font-family:inherit; cursor:pointer;
+}
+
+/* --- de poster met de QR-code --- */
+.qr-pagina{
+  min-height:100dvh; padding:44px 24px 60px;
+  display:flex; flex-direction:column; align-items:center; gap:38px;
+}
+.qr-poster{
+  width:100%; max-width:440px; text-align:center;
+}
+.qr-kop{
+  font-size:clamp(42px,13vw,64px); line-height:1; letter-spacing:-0.03em; font-weight:900;
+  background:linear-gradient(90deg,var(--pink),var(--violet),var(--orange));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.qr-regel{margin:14px 0 26px; font-size:17px; line-height:1.5; color:var(--muted);}
+/* De code staat altijd donker op wit; zo leest een telefooncamera hem het best. */
+.qr-kaart{
+  background:#fff; border-radius:24px; padding:18px;
+  display:flex; align-items:center; justify-content:center;
+}
+.qr-kaart img{display:block; width:100%; height:auto; max-width:420px;}
+.qr-url{
+  margin:24px 0 0; font-size:16px; font-weight:800; letter-spacing:-0.01em;
+}
+.qr-voet{
+  margin:8px 0 0;
+  font-size:12px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase;
+  color:var(--muted);
+}
+.qr-acties{display:flex; flex-direction:column; align-items:center; gap:12px; width:100%; max-width:320px;}
+.qr-knop{
+  width:100%; text-align:center;
+  background:linear-gradient(90deg,var(--pink),var(--violet)); color:#fff;
+  border:none; border-radius:16px; padding:16px 22px;
+  font-size:15px; font-weight:800; font-family:inherit; cursor:pointer;
+}
+.qr-knop-zacht{background:var(--bg-soft); border:1px solid var(--line); color:var(--ink);}
+.qr-terug{font-size:13px; color:var(--muted); text-decoration:underline;}
+
+@media print{
+  @page{size:A4 portrait; margin:16mm;}
+  /* Op papier alleen de poster, in zwart op wit: scheelt een hoop inkt. */
+  body{background:#fff; color:#000;}
+  /* A4 is 297mm hoog; met 16mm marge blijft er 265mm over om op te vullen. */
+  .qr-pagina{min-height:255mm; padding:0; justify-content:center; gap:0;}
+  .qr-acties{display:none;}
+  .qr-poster{max-width:none; margin:0 auto;}
+  .qr-kop{color:#000; background:none; -webkit-text-fill-color:#000; font-size:64pt;}
+  .qr-regel{color:#333; font-size:18pt; margin-bottom:12mm;}
+  .qr-kaart{padding:0; border-radius:0;}
+  .qr-kaart img{max-width:132mm;}
+  .qr-url{color:#000; font-size:17pt; margin-top:10mm;}
+  .qr-voet{color:#555;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .vz-knop:hover:not(:disabled){transform:none;}
+}

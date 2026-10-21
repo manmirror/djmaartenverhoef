@@ -226,6 +226,39 @@ export const siteContent = {
   contactText:
     "Geen formulier, geen omweg. App gewoon je datum en het type feest — je hoort binnen no time of Maarten beschikbaar is.",
 
+  // ---- VERZOEKJES (djmaartenverhoef.nl/verzoekjes) ----
+  // De pagina waar gasten tijdens een feest een nummer kunnen aanvragen.
+  // De QR-code die daarnaar wijst staat op djmaartenverhoef.nl/verzoekjes/qr.
+  verzoekjes: {
+    kop: "Verzoekje?",
+    intro:
+      "Welk nummer wil je horen? Vul het hieronder in — Maarten ziet het direct in de booth.",
+    titelLabel: "Welk nummer?",
+    titelPlaceholder: "Titel van het nummer",
+    artiestLabel: "Artiest — mag je leeg laten",
+    artiestPlaceholder: "Van wie is het nummer?",
+    vanLabel: "Jouw naam — mag je leeg laten",
+    vanPlaceholder: "Wie vraagt het aan?",
+    knop: "Stuur mijn verzoekje",
+    knopBezig: "Versturen…",
+    geluktKop: "Staat in de booth! 🎉",
+    geluktTekst:
+      "Of hij voorbijkomt beslist de dansvloer — maar Maarten heeft je verzoekje gezien.",
+    dubbelKop: "Die staat er al op! 👌",
+    dubbelTekst: "Iemand was je voor. Hij staat in de booth, dus hij is gezien.",
+    nogEen: "Nog een verzoekje",
+    foutTekst: "Dat lukte niet. Probeer het nog een keer.",
+    suggestieHint: "Uit de collectie van Maarten",
+    voetTekst: "Geen verzoekje maar een feest te boeken?",
+    voetLink: "Bekijk de site",
+
+    // De printbare poster met de QR-code.
+    posterKop: "Verzoekje?",
+    posterRegel: "Scan de code en vraag je nummer aan",
+    posterUrl: "djmaartenverhoef.nl/verzoekjes",
+    posterVoet: "DJ Maarten Verhoef",
+  },
+
   // ---- FOOTER ----
   footerName: "DJ Maarten Verhoef",
   footerLinks: [

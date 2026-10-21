@@ -5,6 +5,12 @@ import "./globals.css";
 
 // Onzichtbare bot-controle op het terugbelformulier: bezoekers merken er niets
 // van, bots worden op de server geweigerd.
+//
+// Het verzoekjesformulier staat hier bewust niet bij. De bot-controle hangt aan
+// een script van Vercel; laadt dat niet — adblocker, haperende gast-wifi op een
+// zaal — dan komt het verzoek niet eens de deur uit. Op een feest is dat erger
+// dan af en toe een rare regel in de lijst, en daar staan de honeypot, de rem
+// per ip en de knop "Lijst wissen" al voor.
 const protectedRoutes = [{ path: "/api/terugbellen", method: "POST" }];
 
 // Echt zwaar display-lettertype voor het woordmerk; Arial en Helvetica houden
