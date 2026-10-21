@@ -176,6 +176,35 @@ export function zetMatch(feest: string, id: string, match: Match | null) {
   return werkBij(feest, id, { match });
 }
 
+/**
+ * De eigen volgorde uit de booth opslaan: `ids` van boven naar beneden. Alleen
+ * wat echt van plek verandert wordt opnieuw weggeschreven, in één keer.
+ */
+export async function zetVolgorde(feest: string, ids: string[]): Promise<void> {
+  const plek = new Map(ids.map((id, nummer) => [id, nummer]));
+  const redis = geefOpslag();
+
+  if (!redis) {
+    const lijst = geheugenLijst(feest);
+    for (const [id, verzoek] of lijst) {
+      const positie = plek.get(id);
+      if (positie !== undefined) lijst.set(id, { ...verzoek, positie });
+    }
+    return;
+  }
+
+  const alles = (await redis.hgetall(sleutel(feest))) ?? {};
+  const velden: Record<string, string> = {};
+  for (const [id, ruw] of Object.entries(alles)) {
+    const verzoek = alsVerzoek(ruw);
+    const positie = plek.get(id);
+    if (verzoek && positie !== undefined && verzoek.positie !== positie) {
+      velden[id] = JSON.stringify({ ...verzoek, positie });
+    }
+  }
+  if (Object.keys(velden).length > 0) await redis.hset(sleutel(feest), velden);
+}
+
 /** Eén verzoekje weghalen, bijvoorbeeld als er onzin tussen staat. */
 export async function verwijderVerzoek(feest: string, id: string): Promise<boolean> {
   const redis = geefOpslag();

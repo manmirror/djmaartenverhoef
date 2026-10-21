@@ -6,9 +6,12 @@ import type { FeestInfo } from "../feesten";
 import type { TopNummer, Verzoek, VerzoekStatus, Zoekresultaat } from "../types";
 
 import Koppelen from "./Koppelen";
+import SleepLijst, { type Greep } from "./SleepLijst";
 
 const CODE_HEADER = "x-verzoekjes-code";
 const SLEUTEL = "verzoekjes-code";
+/** De gekozen sortering, per apparaat onthouden. */
+const SORTERING_SLEUTEL = "verzoekjes-sortering";
 /** Hoe vaak de lijst zichzelf ververst zolang de pagina open staat. */
 const VERVERS_MS = 8000;
 
@@ -59,7 +62,17 @@ type Jaarlijst = {
 };
 /** Eén feest in het archief, met tellingen. */
 type ArchiefFeest = FeestInfo & { aantal: number; gekoppeld: number; gedraaid: number };
-type Sortering = "tijd" | "bpm";
+type Sortering = "tijd" | "bpm" | "eigen";
+
+function leesSortering(): Sortering {
+  if (typeof window === "undefined") return "tijd";
+  try {
+    const opgeslagen = localStorage.getItem(SORTERING_SLEUTEL);
+    return opgeslagen === "bpm" || opgeslagen === "eigen" ? opgeslagen : "tijd";
+  } catch {
+    return "tijd";
+  }
+}
 type Weergave = "lijst" | "archief" | "top";
 
 export default function Booth() {
@@ -70,7 +83,18 @@ export default function Booth() {
   const [fout, setFout] = useState<string | null>(null);
   const [gekozenFeest, setGekozenFeest] = useState<string | null>(null);
   const [weergave, setWeergave] = useState<Weergave>("lijst");
-  const [sortering, setSortering] = useState<Sortering>("tijd");
+  // De booth tekent pas iets met de sortering na het invullen van de code, dus
+  // dat de server hier "tijd" ziet en de browser iets anders, botst niet.
+  const [sortering, setSorteringState] = useState<Sortering>(leesSortering);
+
+  function setSortering(nieuw: Sortering) {
+    setSorteringState(nieuw);
+    try {
+      localStorage.setItem(SORTERING_SLEUTEL, nieuw);
+    } catch {
+      // Geen opslag in deze browser: dan geldt de keuze alleen nu.
+    }
+  }
   const [toonAf, setToonAf] = useState(false);
   const [bezigMet, setBezigMet] = useState<string | null>(null);
   const [top, setTop] = useState<Jaarlijst | null>(null);
@@ -223,6 +247,45 @@ export default function Booth() {
     }
   }
 
+  /**
+   * Slaat een nieuwe eigen volgorde op. `deel` is de versleepte lijst, die maar
+   * een deel van het feest kan zijn (alleen de open verzoekjes, bijvoorbeeld):
+   * de rest blijft op zijn plek staan.
+   */
+  async function slaVolgordeOp(deel: string[]) {
+    if (!feest || !lijst) return;
+    const heel = sorteer(lijst.verzoeken, "eigen").map((verzoek) => verzoek.id);
+    const inDeel = new Set(deel);
+    const plekken = heel.flatMap((id, plek) => (inDeel.has(id) ? [plek] : []));
+    const nieuw = [...heel];
+    if (plekken.length === deel.length) {
+      plekken.forEach((plek, nummer) => {
+        nieuw[plek] = deel[nummer];
+      });
+    }
+    const positie = new Map(nieuw.map((id, nummer) => [id, nummer]));
+
+    // Meteen tonen; anders springt de rij even terug tot de server antwoordt.
+    setLijst((vorig) =>
+      vorig
+        ? {
+            ...vorig,
+            verzoeken: vorig.verzoeken.map((verzoek) => ({
+              ...verzoek,
+              positie: positie.get(verzoek.id) ?? verzoek.positie,
+            })),
+          }
+        : vorig
+    );
+    try {
+      const antwoord = await stuur("volgorde", { feest: feest.slug, ids: nieuw });
+      if (!antwoord.ok) setFout(`De volgorde is niet opgeslagen (${antwoord.status}).`);
+      await haal(code, actiefFeest);
+    } catch {
+      setFout("De volgorde is niet opgeslagen. Probeer het nog eens.");
+    }
+  }
+
   async function zetOpen() {
     if (!feest) return;
     try {
@@ -303,10 +366,12 @@ export default function Booth() {
     return <CodeHek fout={fout} />;
   }
 
-  const rij = (verzoek: Verzoek) => (
+  const rij = (verzoek: Verzoek, greep?: Greep, sleept = false) => (
     <Rij
       key={verzoek.id}
       verzoek={verzoek}
+      greep={greep}
+      sleept={sleept}
       bezig={bezigMet === verzoek.id}
       onStatus={stuurStatus}
       onWeg={verwijder}
@@ -316,6 +381,18 @@ export default function Booth() {
       koppel={(keuze) => koppel(verzoek.id, keuze)}
     />
   );
+
+  const lijstVan = (verzoeken: Verzoek[], klasse = "bt-lijst") =>
+    sortering === "eigen" ? (
+      <SleepLijst
+        verzoeken={verzoeken}
+        className={klasse}
+        rij={rij}
+        onVolgorde={slaVolgordeOp}
+      />
+    ) : (
+      <ul className={klasse}>{verzoeken.map((verzoek) => rij(verzoek))}</ul>
+    );
 
   const sorteerKnoppen = (
     <div className="bt-balk">
@@ -334,7 +411,17 @@ export default function Booth() {
         >
           Op bpm
         </button>
+        <button
+          type="button"
+          className={sortering === "eigen" ? "aan" : undefined}
+          onClick={() => setSortering("eigen")}
+        >
+          Eigen volgorde
+        </button>
       </div>
+      {sortering === "eigen" && (
+        <span className="bt-sleeptip">Sleep aan ⋮⋮ om de volgorde te veranderen</span>
+      )}
     </div>
   );
 
@@ -441,7 +528,7 @@ export default function Booth() {
                 {alles.length === 0 ? (
                   <p className="bt-leeg">Bij dit feest zijn geen verzoekjes binnengekomen.</p>
                 ) : (
-                  <ul className="bt-lijst">{sorteer(alles, sortering).map(rij)}</ul>
+                  lijstVan(sorteer(alles, sortering))
                 )}
               </>
             )}
@@ -500,7 +587,7 @@ export default function Booth() {
             <p className="bt-leeg">Nog geen open verzoekjes voor dit feest.</p>
           )}
 
-          <ul className="bt-lijst">{nieuw.map(rij)}</ul>
+          {lijstVan(nieuw)}
 
           {afgehandeld.length > 0 && (
             <>
@@ -512,9 +599,7 @@ export default function Booth() {
                 {toonAf ? "Verberg" : "Toon"} afgehandeld ({afgehandeld.length})
               </button>
               {toonAf && (
-                <ul className="bt-lijst bt-lijst-af">
-                  {sorteer(afgehandeld, sortering).map(rij)}
-                </ul>
+                lijstVan(sorteer(afgehandeld, sortering), "bt-lijst bt-lijst-af")
               )}
             </>
           )}
@@ -546,6 +631,15 @@ function sorteer(verzoeken: Verzoek[], sortering: Sortering): Verzoek[] {
       if (bpmB === null) return -1;
       return bpmA - bpmB;
     });
+  } else if (sortering === "eigen") {
+    // Versleepte verzoekjes op hun plek; nieuwe, nog niet versleepte achteraan,
+    // in volgorde van binnenkomst. Zo werkt het als een wachtrij.
+    gesorteerd.sort((a, b) => {
+      const plekA = a.positie ?? Infinity;
+      const plekB = b.positie ?? Infinity;
+      if (plekA !== plekB) return plekA - plekB;
+      return a.tijd - b.tijd;
+    });
   } else {
     gesorteerd.sort((a, b) => b.tijd - a.tijd);
   }
@@ -561,8 +655,12 @@ function Rij({
   onKoppelOpen,
   zoek,
   koppel,
+  greep,
+  sleept,
 }: {
   verzoek: Verzoek;
+  greep?: Greep;
+  sleept: boolean;
   bezig: boolean;
   onStatus: (id: string, status: VerzoekStatus) => void;
   onWeg: (verzoek: Verzoek) => void;
@@ -587,7 +685,24 @@ function Rij({
       (verzoek.artiest !== "" && !plat(match.artiest).includes(plat(verzoek.artiest))));
 
   return (
-    <li className={`bt-rij bt-${verzoek.status}`}>
+    <li
+      data-id={verzoek.id}
+      className={`bt-rij bt-${verzoek.status}${greep ? " bt-rij-sleep" : ""}${
+        sleept ? " bt-sleept" : ""
+      }`}
+    >
+      {greep && (
+        <button
+          type="button"
+          className="bt-greep"
+          aria-label={`Versleep ${verzoek.match?.titel ?? verzoek.titel}`}
+          title="Slepen, of met de pijltjestoetsen verplaatsen"
+          onPointerDown={greep.onPointerDown}
+          onKeyDown={greep.onKeyDown}
+        >
+          ⋮⋮
+        </button>
+      )}
       <div className="bt-rij-tekst">
         <div className="bt-titel">{match ? match.titel : verzoek.titel}</div>
         {(match ? match.artiest : verzoek.artiest) && (

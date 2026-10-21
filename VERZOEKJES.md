@@ -119,7 +119,11 @@ voor gedeployd te worden.
 3. Per verzoekje: **Gedraaid** of **Overslaan**. Wat je afvinkt verdwijnt uit
    de open lijst en staat onder *Toon afgehandeld*. Rommel haal je weg met
    *weghalen*.
-4. **Op bpm** sorteert op tempo in plaats van op tijd.
+4. **Op bpm** sorteert op tempo in plaats van op tijd. **Eigen volgorde** maakt
+   er een wachtrij van: sleep een verzoekje aan ⋮⋮ naar boven als je het als
+   volgende wilt draaien (op een telefoon met je vinger, op een laptop met de
+   muis of de pijltjestoetsen). Nieuwe verzoekjes komen onderaan. De volgorde
+   wordt bewaard, en welke sortering je kiest onthoudt elk apparaat zelf.
 5. Na afloop hoef je niets te doen: de lijst blijft bewaard en het volgende
    feest begint met een eigen, lege lijst.
 

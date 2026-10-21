@@ -830,3 +830,29 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 .bt-archiefkop{margin:14px 0 4px;}
 .bt-archiefkop h2{margin:0; font-size:24px; letter-spacing:-0.02em;}
 .bt-archiefkop p{margin:4px 0 0; font-size:13px; color:var(--muted);}
+
+/* --- booth: eigen volgorde slepen --- */
+.bt-sleeptip{font-size:12px; color:var(--muted);}
+.bt-rij-sleep{grid-template-columns:auto 1fr auto auto;}
+.bt-greep{
+  align-self:stretch; display:flex; align-items:center; justify-content:center;
+  width:30px; margin:-6px 0 -6px -8px; padding:0;
+  background:none; border:none; border-radius:8px;
+  font-size:18px; font-weight:900; letter-spacing:-0.15em; line-height:1;
+  color:var(--muted); cursor:grab;
+  /* Anders scrolt de pagina mee in plaats van dat de rij verschuift. */
+  touch-action:none; user-select:none; -webkit-user-select:none;
+}
+.bt-greep:hover,.bt-greep:focus-visible{color:var(--ink); background:rgba(139,92,246,.15); outline:none;}
+.bt-sleept{
+  position:relative; z-index:2;
+  border-color:var(--violet); box-shadow:0 18px 40px rgba(0,0,0,.5);
+  background:#1d1630;
+}
+.bt-sleept .bt-greep{cursor:grabbing; color:var(--ink);}
+@media(max-width:560px){
+  .bt-rij-sleep{grid-template-columns:auto 1fr auto;}
+  .bt-rij-sleep .bt-greep{grid-row:1 / span 2;}
+  .bt-rij-sleep .bt-acties{grid-column:2 / -1;}
+}
+

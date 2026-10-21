@@ -44,6 +44,11 @@ export type Verzoek = {
   status: VerzoekStatus;
   /** Tijdstip van binnenkomst, in milliseconden sinds 1970. */
   tijd: number;
+  /**
+   * Plek in de eigen volgorde die de DJ in de booth sleept; 0 is bovenaan.
+   * Ontbreekt bij verzoekjes die nog niet versleept zijn.
+   */
+  positie?: number;
 };
 
 /** Eén nummer uit rekordbox. Korte sleutels: de collectie kan groot zijn. */
