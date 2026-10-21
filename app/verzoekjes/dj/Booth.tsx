@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 
 import type { FeestInfo } from "../feesten";
-import type { TopNummer, Verzoek, VerzoekStatus } from "../types";
+import type { TopNummer, Verzoek, VerzoekStatus, Zoekresultaat } from "../types";
+
+import Koppelen from "./Koppelen";
 
 const CODE_HEADER = "x-verzoekjes-code";
 const SLEUTEL = "verzoekjes-code";
@@ -69,6 +71,8 @@ export default function Booth() {
   const [toonAf, setToonAf] = useState(false);
   const [bezigMet, setBezigMet] = useState<string | null>(null);
   const [top, setTop] = useState<Jaarlijst | null>(null);
+  /** Het verzoekje waarvan het koppelpaneel open staat. */
+  const [koppelId, setKoppelId] = useState<string | null>(null);
 
   const haal = useCallback(async (metCode: string, feest: string | null) => {
     const adres = feest
@@ -171,6 +175,40 @@ export default function Booth() {
       setFout("Kon dat niet weghalen.");
     } finally {
       setBezigMet(null);
+    }
+  }
+
+  const zoek = useCallback(
+    async (vraag: string): Promise<Zoekresultaat[]> => {
+      if (!vraag.trim()) return [];
+      const antwoord = await fetch(
+        `/api/verzoekjes/zoek?q=${encodeURIComponent(vraag)}`,
+        { headers: { [CODE_HEADER]: code }, cache: "no-store" }
+      );
+      if (!antwoord.ok) throw new Error(`zoeken: ${antwoord.status}`);
+      return ((await antwoord.json()) as { resultaten: Zoekresultaat[] }).resultaten;
+    },
+    [code]
+  );
+
+  /** Koppelt een verzoekje aan een ander nummer; geeft een foutmelding terug als het misging. */
+  async function koppel(id: string, keuze: Zoekresultaat | null): Promise<string | null> {
+    if (!feest) return "Geen feest gekozen.";
+    try {
+      const antwoord = await stuur("status", {
+        feest: feest.slug,
+        id,
+        koppel: keuze ? { nr: keuze.nr, titel: keuze.titel, artiest: keuze.artiest } : null,
+      });
+      if (antwoord.status === 409) {
+        return "Je collectie is intussen vernieuwd. Zoek nog een keer.";
+      }
+      if (!antwoord.ok) return `Koppelen lukte niet (${antwoord.status}).`;
+      setKoppelId(null);
+      await haal(code, gekozenFeest);
+      return null;
+    } catch {
+      return "Geen verbinding. Probeer het nog eens.";
     }
   }
 
@@ -349,6 +387,12 @@ export default function Booth() {
                 bezig={bezigMet === verzoek.id}
                 onStatus={stuurStatus}
                 onWeg={verwijder}
+                koppelOpen={koppelId === verzoek.id}
+                onKoppelOpen={() =>
+                  setKoppelId((vorig) => (vorig === verzoek.id ? null : verzoek.id))
+                }
+                zoek={zoek}
+                koppel={(keuze) => koppel(verzoek.id, keuze)}
               />
             ))}
           </ul>
@@ -371,6 +415,12 @@ export default function Booth() {
                       bezig={bezigMet === verzoek.id}
                       onStatus={stuurStatus}
                       onWeg={verwijder}
+                      koppelOpen={koppelId === verzoek.id}
+                      onKoppelOpen={() =>
+                        setKoppelId((vorig) => (vorig === verzoek.id ? null : verzoek.id))
+                      }
+                      zoek={zoek}
+                      koppel={(keuze) => koppel(verzoek.id, keuze)}
                     />
                   ))}
                 </ul>
@@ -416,11 +466,19 @@ function Rij({
   bezig,
   onStatus,
   onWeg,
+  koppelOpen,
+  onKoppelOpen,
+  zoek,
+  koppel,
 }: {
   verzoek: Verzoek;
   bezig: boolean;
   onStatus: (id: string, status: VerzoekStatus) => void;
   onWeg: (verzoek: Verzoek) => void;
+  koppelOpen: boolean;
+  onKoppelOpen: () => void;
+  zoek: (vraag: string) => Promise<Zoekresultaat[]>;
+  koppel: (keuze: Zoekresultaat | null) => Promise<string | null>;
 }) {
   const klok = new Date(verzoek.tijd).toLocaleTimeString("nl-NL", {
     timeZone: "Europe/Amsterdam",
@@ -430,11 +488,12 @@ function Rij({
 
   const { match } = verzoek;
   const gevraagd = [verzoek.titel, verzoek.artiest].filter(Boolean).join(" — ");
-  // Wat de gast typte alleen tonen als het afwijkt van wat we vonden.
+  // Wat de gast typte alleen tonen als het afwijkt van wat we vonden: een
+  // andere titel, of een artiest die niet in die van de match voorkomt.
   const toonGevraagd =
     match !== null &&
-    plat(`${verzoek.titel} ${verzoek.artiest}`) !== plat(`${match.titel} ${match.artiest}`) &&
-    plat(verzoek.titel) !== plat(match.titel);
+    (plat(verzoek.titel) !== plat(match.titel) ||
+      (verzoek.artiest !== "" && !plat(match.artiest).includes(plat(verzoek.artiest))));
 
   return (
     <li className={`bt-rij bt-${verzoek.status}`}>
@@ -454,6 +513,10 @@ function Rij({
             </span>
           )}
           {match && match.versies > 1 && <span>{match.versies} versies</span>}
+          {match?.handmatig && <span className="bt-hand">handmatig gekoppeld</span>}
+          <button type="button" className="bt-weg" disabled={bezig} onClick={onKoppelOpen}>
+            {match ? "match aanpassen" : "zelf koppelen"}
+          </button>
           <button
             type="button"
             className="bt-weg"
@@ -510,6 +573,9 @@ function Rij({
           </button>
         )}
       </div>
+      {koppelOpen && (
+        <Koppelen verzoek={verzoek} zoek={zoek} koppel={koppel} sluit={onKoppelOpen} />
+      )}
     </li>
   );
 }

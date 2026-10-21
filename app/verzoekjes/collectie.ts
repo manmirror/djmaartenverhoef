@@ -9,7 +9,7 @@
 
 import ruweCollectie from "@/content/collection.json";
 
-import type { CollectieTrack, Collectie, Verzoek } from "./types";
+import type { CollectieTrack, Collectie, Match, Verzoek, Zoekresultaat } from "./types";
 
 const collectie = ruweCollectie as Collectie;
 
@@ -91,6 +91,8 @@ function afstand(a: string, b: string, plafond: number): number {
 }
 
 type Rij = {
+  /** Plek in de collectie. */
+  nr: number;
   track: CollectieTrack;
   kern: string[];
   /** De kern als één tekst, om versies van hetzelfde nummer te herkennen. */
@@ -104,9 +106,10 @@ let index: Rij[] | null = null;
 
 function geefIndex(): Rij[] {
   if (!index) {
-    index = collectie.tracks.map((track) => {
+    index = collectie.tracks.map((track, nr) => {
       const kern = kernVan(track.t);
       return {
+        nr,
         track,
         kern,
         kernTekst: kern.join(" "),
@@ -233,6 +236,85 @@ function isBeter(rij: Rij, score: number, ander: Rij, anderScore: number): boole
   const anderJaar = ander.track.y ?? Infinity;
   if (jaar !== anderJaar) return jaar < anderJaar;
   return rij.track.t.length < ander.track.t.length;
+}
+
+/** Hoeveel versies van dit nummer er in de collectie staan, deze meegeteld. */
+function versiesVan(track: CollectieTrack): number {
+  const kern = kernVan(track.t).join(" ");
+  return geefIndex().filter((rij) => rij.kernTekst === kern).length;
+}
+
+/** Een nummer uit de collectie als match bij een verzoekje. */
+export function naarMatch(
+  track: CollectieTrack,
+  opties: { andereArtiest?: boolean; handmatig?: boolean; versies?: number } = {}
+): Match {
+  return {
+    titel: track.t,
+    artiest: track.a,
+    bpm: track.b,
+    toon: track.k,
+    genre: track.g,
+    jaar: track.y,
+    versies: opties.versies ?? versiesVan(track),
+    andereArtiest: opties.andereArtiest ?? false,
+    ...(opties.handmatig ? { handmatig: true } : {}),
+  };
+}
+
+/** Het nummer op plek `nr`, om een keuze uit de booth te controleren. */
+export function trackOp(nr: number): CollectieTrack | null {
+  return Number.isInteger(nr) ? (collectie.tracks[nr] ?? null) : null;
+}
+
+/** Woord uit de zoekvraag dat op een woord uit de collectie lijkt, of ermee begint. */
+function zoektermPast(term: string, woord: string): boolean {
+  return (term.length >= 2 && woord.startsWith(term)) || lijktOp(term, woord);
+}
+
+/**
+ * De zoekfunctie in de booth, voor het met de hand koppelen. Ruimer dan het
+ * automatische koppelen: een half woord is genoeg ("dancing qu"), want hier
+ * kiest de DJ zelf uit wat er terugkomt.
+ */
+export function zoekInCollectie(vraag: string, limiet = 12): Zoekresultaat[] {
+  const termen = woorden(vraag);
+  if (termen.length === 0) return [];
+
+  const treffers: { rij: Rij; score: number }[] = [];
+  for (const rij of geefIndex()) {
+    let inTitel = 0;
+    let inArtiest = 0;
+    let past = true;
+    for (const term of termen) {
+      if (rij.titel.some((woord) => zoektermPast(term, woord))) inTitel++;
+      else if (rij.artiest.some((woord) => zoektermPast(term, woord))) inArtiest++;
+      else if (VULWOORDEN.has(term) || VERSIEWOORDEN.has(term)) continue;
+      else {
+        past = false;
+        break;
+      }
+    }
+    if (!past || inTitel + inArtiest === 0) continue;
+
+    // Titels die precies de kern zijn, zonder extra's, zo hoog mogelijk.
+    const extra = Math.max(0, rij.titel.length - inTitel);
+    treffers.push({ rij, score: inTitel * 2 + inArtiest - extra * 0.1 });
+  }
+
+  treffers.sort((a, b) => {
+    if (Math.abs(a.score - b.score) > 0.01) return b.score - a.score;
+    return (a.rij.track.y ?? Infinity) - (b.rij.track.y ?? Infinity);
+  });
+
+  return treffers.slice(0, limiet).map(({ rij }) => ({
+    nr: rij.nr,
+    titel: rij.track.t,
+    artiest: rij.track.a,
+    bpm: rij.track.b,
+    toon: rij.track.k,
+    jaar: rij.track.y,
+  }));
 }
 
 /**

@@ -9,7 +9,7 @@
 
 import { Redis } from "@upstash/redis";
 
-import type { Verzoek, VerzoekStatus } from "./types";
+import type { Match, Verzoek, VerzoekStatus } from "./types";
 
 const VOORVOEGSEL = "verzoekjes:feest:";
 /** Zoveel verzoekjes past er per feest op de lijst. */
@@ -155,24 +155,36 @@ export async function voegVerzoekToe(
   return "toegevoegd";
 }
 
-export async function zetStatus(
+/** Past één verzoekje aan; false als het niet (meer) bestaat. */
+async function werkBij(
   feest: string,
   id: string,
-  status: VerzoekStatus
+  wijziging: Partial<Pick<Verzoek, "status" | "match">>
 ): Promise<boolean> {
   const redis = geefClient();
   if (!redis) {
     const lijst = geheugenLijst(feest);
     const verzoek = lijst.get(id);
     if (!verzoek) return false;
-    lijst.set(id, { ...verzoek, status });
+    lijst.set(id, { ...verzoek, ...wijziging });
     return true;
   }
 
   const huidig = alsVerzoek(await redis.hget(sleutel(feest), id));
   if (!huidig) return false;
-  await redis.hset(sleutel(feest), { [id]: JSON.stringify({ ...huidig, status }) });
+  await redis.hset(sleutel(feest), {
+    [id]: JSON.stringify({ ...huidig, ...wijziging }),
+  });
   return true;
+}
+
+export function zetStatus(feest: string, id: string, status: VerzoekStatus) {
+  return werkBij(feest, id, { status });
+}
+
+/** Een andere match kiezen, of met `null` de match weghalen. */
+export function zetMatch(feest: string, id: string, match: Match | null) {
+  return werkBij(feest, id, { match });
 }
 
 /** Eén verzoekje weghalen, bijvoorbeeld als er onzin tussen staat. */

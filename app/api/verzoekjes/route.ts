@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { Resend } from "resend";
 
-import { kenmerk, vindInCollectie } from "@/app/verzoekjes/collectie";
+import { kenmerk, naarMatch, vindInCollectie } from "@/app/verzoekjes/collectie";
 import { datumVoluit, isOpen, vindFeest } from "@/app/verzoekjes/feesten";
 import {
   geefIp,
@@ -79,16 +79,10 @@ export async function POST(request: Request) {
     artiest,
     van,
     match: treffer
-      ? {
-          titel: treffer.track.t,
-          artiest: treffer.track.a,
-          bpm: treffer.track.b,
-          toon: treffer.track.k,
-          genre: treffer.track.g,
-          jaar: treffer.track.y,
+      ? naarMatch(treffer.track, {
           versies: treffer.versies,
           andereArtiest: treffer.andereArtiest,
-        }
+        })
       : null,
     status: "nieuw",
     tijd: Date.now(),

@@ -754,3 +754,49 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 @media print{
   .qr-datum{color:#333; font-size:13pt; letter-spacing:0.08em;}
 }
+
+/* --- booth: zelf een match kiezen --- */
+.bt-hand{color:var(--violet);}
+.bt-koppel{
+  grid-column:1 / -1;
+  display:flex; flex-direction:column; gap:10px;
+  margin-top:4px; padding:14px;
+  background:rgba(139,92,246,.08); border:1px solid rgba(139,92,246,.3); border-radius:14px;
+}
+.bt-koppel-kop{
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  font-size:11px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--muted);
+}
+.bt-koppel input{
+  width:100%; min-width:0;
+  background:var(--bg); border:1px solid var(--line); border-radius:12px;
+  padding:12px 14px; font-size:16px; color:var(--ink); font-family:inherit;
+}
+.bt-koppel input:focus{outline:none; border-color:var(--violet);}
+.bt-koppel-lijst{
+  list-style:none; margin:0; padding:0;
+  display:flex; flex-direction:column; gap:4px;
+  max-height:340px; overflow-y:auto;
+}
+.bt-koppel-lijst button{
+  display:grid; grid-template-columns:1fr auto; gap:1px 12px; align-items:baseline;
+  width:100%; padding:10px 12px; border:1px solid transparent; border-radius:10px;
+  background:transparent; color:inherit; font-family:inherit; text-align:left; cursor:pointer;
+}
+.bt-koppel-lijst button:hover:not(:disabled){background:rgba(139,92,246,.18);}
+.bt-koppel-lijst button.aan{border-color:var(--violet);}
+.bt-koppel-lijst button:disabled{opacity:.5; cursor:default;}
+.bt-koppel-titel{font-size:14px; font-weight:800;}
+.bt-koppel-artiest{grid-column:1; font-size:12px; color:var(--muted);}
+.bt-koppel-cijfers{
+  grid-column:2; grid-row:1 / span 2; align-self:center;
+  font-size:11px; font-weight:800; color:var(--muted); white-space:nowrap;
+}
+.bt-koppel-leeg{margin:4px 0; font-size:13px; color:var(--muted);}
+.bt-koppel-los{align-self:flex-start;}
+.bt-koppel-fout{margin:0; font-size:13px; color:var(--pink);}
+@media(max-width:560px){
+  .bt-koppel-lijst button{grid-template-columns:1fr;}
+  .bt-koppel-cijfers{grid-column:1; grid-row:auto;}
+}

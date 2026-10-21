@@ -14,6 +14,19 @@ export type Match = {
   versies: number;
   /** De titel klopt, maar de gast vroeg om een andere artiest (een cover, bv.). */
   andereArtiest: boolean;
+  /** In de booth met de hand gekoppeld in plaats van automatisch gevonden. */
+  handmatig?: boolean;
+};
+
+/** Eén nummer uit de zoekfunctie in de booth. */
+export type Zoekresultaat = {
+  /** Plek in de collectie; daarmee koppelt de booth het nummer. */
+  nr: number;
+  titel: string;
+  artiest: string;
+  bpm: number | null;
+  toon: string | null;
+  jaar: number | null;
 };
 
 export type Verzoek = {
