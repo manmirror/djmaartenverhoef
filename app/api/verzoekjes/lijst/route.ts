@@ -8,7 +8,12 @@ import {
   vindFeest,
 } from "@/app/verzoekjes/feesten";
 import { leesOudeVerzoekjesIn } from "@/app/verzoekjes/import";
-import { isHandmatigOpen, leesVerzoeken, opslagActief } from "@/app/verzoekjes/store";
+import {
+  isHandmatigOpen,
+  leesVerzoeken,
+  opslagActief,
+  opslagInfo,
+} from "@/app/verzoekjes/store";
 
 export const runtime = "nodejs";
 
@@ -32,6 +37,7 @@ export async function GET(request: Request) {
       verzoeken: [],
       agenda,
       opslag: opslagActief(),
+      opslagInfo: opslagInfo(),
       collectie: collectieAantal(),
     });
   }
@@ -44,6 +50,7 @@ export async function GET(request: Request) {
     verzoeken: await leesVerzoeken(feest.slug),
     agenda,
     opslag: opslagActief(),
+    opslagInfo: opslagInfo(),
     collectie: collectieAantal(),
   });
 }

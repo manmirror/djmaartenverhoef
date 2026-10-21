@@ -47,6 +47,7 @@ type Lijst = {
   verzoeken: Verzoek[];
   agenda: FeestInfo[];
   opslag: boolean;
+  opslagInfo: { soort: "upstash" | "redis" | null; namen: string[] };
   collectie: number;
 };
 type Jaarlijst = {
@@ -390,9 +391,21 @@ export default function Booth() {
 
       {lijst && !lijst.opslag && (
         <p className="bt-waarschuwing">
-          Er hangt nog geen gedeelde opslag aan het project, dus deze lijsten zijn
-          niet betrouwbaar en worden niet bewaard. Verzoekjes gaan nu per mail.
-          Zie VERZOEKJES.md.
+          De site vindt geen database, dus deze lijsten worden niet bewaard en zijn
+          niet betrouwbaar. Verzoekjes gaan nu per mail. Zie VERZOEKJES.md.
+          <br />
+          {lijst.opslagInfo.namen.length > 0 ? (
+            <>
+              Wel gevonden, maar niet bruikbaar:{" "}
+              <code>{lijst.opslagInfo.namen.join(", ")}</code>
+            </>
+          ) : (
+            <>
+              Er staat geen enkele database-variabele in deze omgeving. Staat de
+              koppeling in Vercel aan voor Production, en is er daarna opnieuw
+              gedeployd?
+            </>
+          )}
         </p>
       )}
 

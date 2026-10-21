@@ -1,14 +1,13 @@
 // Waar de verzoekjes blijven staan. Elk feest heeft zijn eigen lijst, en die
 // lijsten blijven bewaard — daar komt de jaarlijst later uit.
 //
-// Zodra er een Upstash Redis aan het project hangt (via de Vercel Marketplace),
-// gaat alles daarheen. Zonder die opslag vallen we terug op het geheugen van de
-// server; dat is genoeg om lokaal te proberen, maar op Vercel heeft elke server
-// zijn eigen geheugen. De api-route mailt verzoekjes in dat geval door, zodat
-// er niets verdwijnt. Zie VERZOEKJES.md.
+// Zodra er een Redis aan het project hangt (zie redis.ts), gaat alles daarheen.
+// Zonder die opslag vallen we terug op het geheugen van de server; dat is genoeg
+// om lokaal te proberen, maar op Vercel heeft elke server zijn eigen geheugen.
+// De api-route mailt verzoekjes in dat geval door, zodat er niets verdwijnt.
+// Zie VERZOEKJES.md.
 
-import { Redis } from "@upstash/redis";
-
+import { databaseNamen, geefOpslag } from "./redis";
 import type { Match, Verzoek, VerzoekStatus } from "./types";
 
 const VOORVOEGSEL = "verzoekjes:feest:";
@@ -22,29 +21,14 @@ const REM_MAX = 30;
 /** Hoe lang een handmatig opengezet feest open blijft. */
 const FORCEER_SEC = 12 * 60 * 60;
 
-let client: Redis | null | undefined;
-
-/**
- * De Vercel-integratie van Upstash zet `KV_*` in de omgeving, Upstash zelf
- * `UPSTASH_REDIS_*`. We accepteren beide, zodat het werkt hoe je het ook koppelt.
- */
-function geefClient(): Redis | null {
-  if (client === undefined) {
-    const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-    const token =
-      process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-    client = url && token ? new Redis({ url, token }) : null;
-    if (!client) {
-      console.warn(
-        "Geen Redis gevonden voor de verzoekjes; de lijsten blijven alleen in het geheugen staan."
-      );
-    }
-  }
-  return client;
+export function opslagActief(): boolean {
+  return geefOpslag() !== null;
 }
 
-export function opslagActief(): boolean {
-  return geefClient() !== null;
+/** Voor de booth: welke database er hangt, of welke namen er wél zijn. */
+export function opslagInfo(): { soort: "upstash" | "redis" | null; namen: string[] } {
+  const opslag = geefOpslag();
+  return { soort: opslag?.soort ?? null, namen: opslag ? [] : databaseNamen() };
 }
 
 function sleutel(feest: string): string {
@@ -101,10 +85,10 @@ function opTijd(ruw: unknown[]): Verzoek[] {
 }
 
 export async function leesVerzoeken(feest: string): Promise<Verzoek[]> {
-  const redis = geefClient();
+  const redis = geefOpslag();
   if (!redis) return opTijd([...geheugenLijst(feest).values()]);
 
-  const alles = await redis.hgetall<Record<string, unknown>>(sleutel(feest));
+  const alles = await redis.hgetall(sleutel(feest));
   return opTijd(Object.values(alles ?? {}));
 }
 
@@ -115,7 +99,7 @@ export async function leesMeerdere(
   const uitkomst = new Map<string, Verzoek[]>();
   if (feesten.length === 0) return uitkomst;
 
-  const redis = geefClient();
+  const redis = geefOpslag();
   if (!redis) {
     for (const feest of feesten) {
       uitkomst.set(feest, opTijd([...geheugenLijst(feest).values()]));
@@ -123,10 +107,8 @@ export async function leesMeerdere(
     return uitkomst;
   }
 
-  // Eén ronde naar Upstash in plaats van één per feest.
-  const pijp = redis.pipeline();
-  for (const feest of feesten) pijp.hgetall(sleutel(feest));
-  const antwoorden = (await pijp.exec()) as (Record<string, unknown> | null)[];
+  // Eén ronde naar de database in plaats van één per feest.
+  const antwoorden = await redis.hgetallVeel(feesten.map(sleutel));
 
   feesten.forEach((feest, nummer) => {
     uitkomst.set(feest, opTijd(Object.values(antwoorden[nummer] ?? {})));
@@ -151,7 +133,7 @@ export async function voegVerzoekToe(
   }
   if (bestaand.length >= MAX_PER_FEEST) return "vol";
 
-  const redis = geefClient();
+  const redis = geefOpslag();
   if (redis) {
     await redis.hset(sleutel(verzoek.feest), {
       [verzoek.id]: JSON.stringify(verzoek),
@@ -168,7 +150,7 @@ async function werkBij(
   id: string,
   wijziging: Partial<Pick<Verzoek, "status" | "match">>
 ): Promise<boolean> {
-  const redis = geefClient();
+  const redis = geefOpslag();
   if (!redis) {
     const lijst = geheugenLijst(feest);
     const verzoek = lijst.get(id);
@@ -196,7 +178,7 @@ export function zetMatch(feest: string, id: string, match: Match | null) {
 
 /** Eén verzoekje weghalen, bijvoorbeeld als er onzin tussen staat. */
 export async function verwijderVerzoek(feest: string, id: string): Promise<boolean> {
-  const redis = geefClient();
+  const redis = geefOpslag();
   if (!redis) return geheugenLijst(feest).delete(id);
   return (await redis.hdel(sleutel(feest), id)) > 0;
 }
@@ -205,14 +187,14 @@ export async function verwijderVerzoek(feest: string, id: string): Promise<boole
 
 /** Hoeveel regels van dit feest al eens zijn ingelezen. */
 export async function importStand(feest: string): Promise<number> {
-  const redis = geefClient();
+  const redis = geefOpslag();
   if (!redis) return geheugenImport.get(feest) ?? 0;
   return Number((await redis.get(`verzoekjes:import:${feest}`)) ?? 0);
 }
 
 export async function zetImportStand(feest: string, regels: number): Promise<void> {
-  const redis = geefClient();
-  if (redis) await redis.set(`verzoekjes:import:${feest}`, regels);
+  const redis = geefOpslag();
+  if (redis) await redis.set(`verzoekjes:import:${feest}`, String(regels));
   else geheugenImport.set(feest, regels);
 }
 
@@ -222,7 +204,7 @@ export async function zetImportStand(feest: string, regels: number): Promise<voi
  * tegelijk in, dan komt elke regel er toch maar één keer in.
  */
 export async function voegToeAlsNieuw(verzoek: Verzoek): Promise<void> {
-  const redis = geefClient();
+  const redis = geefOpslag();
   if (redis) {
     await redis.hsetnx(sleutel(verzoek.feest), verzoek.id, JSON.stringify(verzoek));
     return;
@@ -236,17 +218,17 @@ export async function voegToeAlsNieuw(verzoek: Verzoek): Promise<void> {
  * er al zijn. Vervalt vanzelf.
  */
 export async function zetOpen(feest: string): Promise<void> {
-  const redis = geefClient();
+  const redis = geefOpslag();
   if (redis) {
-    await redis.set(`verzoekjes:open:${feest}`, "1", { ex: FORCEER_SEC });
+    await redis.set(`verzoekjes:open:${feest}`, "1", FORCEER_SEC);
   } else {
     geheugenOpen.set(feest, Date.now() + FORCEER_SEC * 1000);
   }
 }
 
 export async function isHandmatigOpen(feest: string): Promise<boolean> {
-  const redis = geefClient();
-  if (redis) return (await redis.exists(`verzoekjes:open:${feest}`)) > 0;
+  const redis = geefOpslag();
+  if (redis) return redis.exists(`verzoekjes:open:${feest}`);
 
   const tot = geheugenOpen.get(feest);
   return tot !== undefined && tot > Date.now();
@@ -258,7 +240,7 @@ export async function isHandmatigOpen(feest: string): Promise<boolean> {
  */
 export async function teVaak(ip: string, soort: string, max = REM_MAX): Promise<boolean> {
   const rem = `verzoekjes:rem:${soort}:${ip}`;
-  const redis = geefClient();
+  const redis = geefOpslag();
 
   if (redis) {
     const aantal = await redis.incr(rem);

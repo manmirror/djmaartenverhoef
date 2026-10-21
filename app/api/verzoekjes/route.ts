@@ -8,6 +8,7 @@ import {
   geefIp,
   isHandmatigOpen,
   opslagActief,
+  opslagInfo,
   teVaak,
   voegVerzoekToe,
 } from "@/app/verzoekjes/store";
@@ -113,7 +114,7 @@ export async function POST(request: Request) {
  * zonder de lijst zelf: die haalt de boothpagina op, mét code.
  */
 export async function GET() {
-  return Response.json({ opslag: opslagActief() });
+  return Response.json({ opslag: opslagActief(), soort: opslagInfo().soort });
 }
 
 async function mailDoor(verzoek: Verzoek, feestnaam: string) {
