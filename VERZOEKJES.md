@@ -71,6 +71,7 @@ De feesten staan in `content/feesten.ts`. Per feest één regel:
   plaats: "Uithoorn",              // optioneel, komt naast de datum op de poster
   vanafUur: 12,                    // optioneel, standaard 12
   totUur: 6,                       // optioneel, standaard 6 (de ochtend erna)
+  test: true,                      // optioneel: telt niet mee in de jaarlijst
 },
 ```
 

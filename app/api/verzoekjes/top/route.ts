@@ -20,8 +20,9 @@ export async function GET(request: Request) {
   const gevraagd = new URL(request.url).searchParams.get("jaar");
   const jaar = gevraagd ? Number(gevraagd) : null;
 
+  // Testfeesten tellen niet mee: anders staan je proefverzoekjes tussen de echte.
   const agenda = alleFeesten().filter(
-    (feest) => jaar === null || jaarVan(feest) === jaar
+    (feest) => !feest.test && (jaar === null || jaarVan(feest) === jaar)
   );
   const lijsten = await leesMeerdere(agenda.map((feest) => feest.slug));
 
@@ -63,7 +64,9 @@ export async function GET(request: Request) {
 
   return Response.json({
     jaar,
-    jaren: [...new Set(alleFeesten().map(jaarVan))].sort((a, b) => b - a),
+    jaren: [...new Set(alleFeesten().filter((feest) => !feest.test).map(jaarVan))].sort(
+      (a, b) => b - a
+    ),
     feesten: agenda.length,
     totaal,
     top,

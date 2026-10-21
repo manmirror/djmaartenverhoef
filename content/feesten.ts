@@ -15,6 +15,8 @@
 //   plaats    optioneel, komt klein onder de naam op de poster.
 //   vanafUur  vanaf welk uur gasten verzoekjes mogen sturen (standaard 12).
 //   totUur    tot welk uur de ochtend erna (standaard 6).
+//   test      op true: werkt als elk ander feest, maar telt niet mee in de
+//             jaarlijst. Voor het uitproberen.
 //
 // Buiten dat venster neemt het formulier niets aan — zo kan niemand volgende
 // week nog iets in de lijst van vorige week zetten. Loopt het anders dan
@@ -27,9 +29,17 @@ export type Feest = {
   plaats?: string;
   vanafUur?: number;
   totUur?: number;
+  test?: boolean;
 };
 
 export const feesten: Feest[] = [
+  {
+    slug: "test-feestje",
+    naam: "Maarten's Test Feestje",
+    datum: "2026-10-21",
+    plaats: "Thuis, Uithoorn",
+    test: true,
+  },
   {
     slug: "bo-chantal-en-mitchel",
     naam: "Bo Chantal & Mitchel",

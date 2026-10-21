@@ -323,6 +323,7 @@ export default function Booth() {
                   {lijst.agenda.map((ander) => (
                     <option key={ander.slug} value={ander.slug}>
                       {ander.naam} — {ander.kort}
+                      {ander.test ? " (test, telt niet mee)" : ""}
                     </option>
                   ))}
                 </select>

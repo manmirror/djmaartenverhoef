@@ -138,6 +138,8 @@ export type FeestInfo = {
   voluit: string;
   /** Of het venster nu openstaat volgens de agenda. */
   open: boolean;
+  /** Proeffeest; telt niet mee in de jaarlijst. */
+  test: boolean;
 };
 
 export function naarInfo(feest: Feest, nu = Date.now()): FeestInfo {
@@ -149,5 +151,6 @@ export function naarInfo(feest: Feest, nu = Date.now()): FeestInfo {
     kort: datumKort(feest),
     voluit: datumVoluit(feest),
     open: isOpen(feest, nu),
+    test: feest.test === true,
   };
 }
