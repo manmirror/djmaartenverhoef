@@ -144,6 +144,10 @@ export const siteContent = {
     url: "",
   },
 
+  // Het media-blok met sfeerbeelden. Op false is het blok weg, net als de
+  // links ernaar bovenin en onderin; de inhoud hieronder blijft bewaard, dus
+  // op true staat alles weer terug.
+  toonMedia: false,
   mediaHeading: "Media",
   mediaSubtext: "Sfeerbeelden van optredens door de jaren heen.",
   mediaItems: [

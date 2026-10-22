@@ -38,7 +38,7 @@ export default function Home() {
           <div className="navlinks">
             <a href="#home">Home</a>
             <a href="#over">Over</a>
-            <a href="#media">Media</a>
+            {settings.toonMedia && <a href="#media">Media</a>}
             <a href="#muziek">Muziek</a>
             <a href="#contact">Contact</a>
           </div>
@@ -283,30 +283,32 @@ export default function Home() {
         </section>
       )}
 
-      <section className="media" id="media">
-        <div className="wrap">
-          <div className="sec-head">
-            <h2>{settings.mediaHeading}</h2>
-            <p>{settings.mediaSubtext}</p>
+      {settings.toonMedia && (
+        <section className="media" id="media">
+          <div className="wrap">
+            <div className="sec-head">
+              <h2>{settings.mediaHeading}</h2>
+              <p>{settings.mediaSubtext}</p>
+            </div>
+            <div className="media-grid">
+              {settings.mediaItems.map((item, i) => {
+                const background = item.image
+                  ? `url(${item.image}) center / cover`
+                  : `linear-gradient(160deg, ${item.gradientFrom}, ${item.gradientTo})`;
+                return (
+                  <div
+                    key={i}
+                    className={`media-item${item.tall ? " tall" : ""}`}
+                    style={{ background }}
+                  >
+                    {item.label}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <div className="media-grid">
-            {settings.mediaItems.map((item, i) => {
-              const background = item.image
-                ? `url(${item.image}) center / cover`
-                : `linear-gradient(160deg, ${item.gradientFrom}, ${item.gradientTo})`;
-              return (
-                <div
-                  key={i}
-                  className={`media-item${item.tall ? " tall" : ""}`}
-                  style={{ background }}
-                >
-                  {item.label}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="muziek" id="muziek">
         <div className="wrap">
@@ -374,11 +376,13 @@ export default function Home() {
           <div className="foot-col">
             <div className="foot-name">{settings.footerName}</div>
             <div className="foot-links">
-              {settings.footerLinks.map((link) => (
-                <a key={link.href} href={link.href}>
-                  {link.label}
-                </a>
-              ))}
+              {settings.footerLinks
+                .filter((link) => settings.toonMedia || link.href !== "#media")
+                .map((link) => (
+                  <a key={link.href} href={link.href}>
+                    {link.label}
+                  </a>
+                ))}
               <a href={`mailto:${settings.email}`}>{settings.email}</a>
             </div>
           </div>
