@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 import type { FeestInfo } from "../feesten";
 import type { Stand } from "../store";
@@ -8,6 +14,7 @@ import type { TopNummer, Verzoek, VerzoekStatus, Zoekresultaat } from "../types"
 
 import Koppelen from "./Koppelen";
 import SleepLijst, { type Greep } from "./SleepLijst";
+import { THEMA_ATTRIBUUT, THEMA_SLEUTEL } from "./thema";
 
 const CODE_HEADER = "x-verzoekjes-code";
 const SLEUTEL = "verzoekjes-code";
@@ -48,6 +55,38 @@ function abonneer(luisteraar: () => void) {
 
 /** Hoe een feest er nu voor staat: de schakelaar en of het verzoekjes aanneemt. */
 type Openstand = { stand: Stand; open: boolean; aanTot: number | null };
+
+// ---- licht of donker ----
+// Het attribuut op <html> is de waarheid: dat zet het script in de pagina al
+// bij het laden, en de knop zet het om.
+type Thema = "donker" | "licht";
+const themaLuisteraars = new Set<() => void>();
+
+function leesThema(): Thema {
+  return document.documentElement.getAttribute(THEMA_ATTRIBUUT) === "licht" ? "licht" : "donker";
+}
+
+function pasThemaToe(thema: Thema) {
+  if (thema === "licht") document.documentElement.setAttribute(THEMA_ATTRIBUUT, "licht");
+  else document.documentElement.removeAttribute(THEMA_ATTRIBUUT);
+  for (const luisteraar of themaLuisteraars) luisteraar();
+}
+
+function kiesThema(thema: Thema) {
+  pasThemaToe(thema);
+  try {
+    localStorage.setItem(THEMA_SLEUTEL, thema);
+  } catch {
+    // Geen opslag in deze browser: dan geldt de keuze tot je de pagina sluit.
+  }
+}
+
+function abonneerThema(luisteraar: () => void) {
+  themaLuisteraars.add(luisteraar);
+  return () => {
+    themaLuisteraars.delete(luisteraar);
+  };
+}
 
 type Lijst = {
   feest:
@@ -90,6 +129,20 @@ type Weergave = "lijst" | "archief" | "top";
 export default function Booth() {
   // Op de server weten we de code niet; vandaar de lege derde waarde.
   const code = useSyncExternalStore(abonneer, leesCode, () => "");
+  const thema = useSyncExternalStore(abonneerThema, leesThema, (): Thema => "donker");
+
+  // Het script in de pagina zet de lichte weergave al bij het laden. Tijdens
+  // ontwikkelen haalt React dat attribuut bij het opnieuw opbouwen weer weg;
+  // hier zetten we het terug, nog voor het tekenen. En verlaat je de booth,
+  // dan gaat het eraf, zodat de rest van de site er niets van merkt.
+  useLayoutEffect(() => {
+    try {
+      if (localStorage.getItem(THEMA_SLEUTEL) === "licht") pasThemaToe("licht");
+    } catch {
+      // Geen opslag: dan blijft het donker.
+    }
+    return () => document.documentElement.removeAttribute(THEMA_ATTRIBUUT);
+  }, []);
 
   const [lijst, setLijst] = useState<Lijst | null>(null);
   const [fout, setFout] = useState<string | null>(null);
@@ -476,9 +529,19 @@ export default function Booth() {
               ` · ${lijst.collectie.toLocaleString("nl-NL")} nummers in de collectie`}
           </p>
         </div>
-        <button type="button" className="bt-mini" onClick={() => bewaarCode("")}>
-          Vergrendel
-        </button>
+        <div className="bt-kop-knoppen">
+          <button
+            type="button"
+            className="bt-mini"
+            aria-pressed={thema === "licht"}
+            onClick={() => kiesThema(thema === "licht" ? "donker" : "licht")}
+          >
+            {thema === "licht" ? "Donker" : "Licht"}
+          </button>
+          <button type="button" className="bt-mini" onClick={() => bewaarCode("")}>
+            Vergrendel
+          </button>
+        </div>
       </header>
 
       <div className="bt-tabs">

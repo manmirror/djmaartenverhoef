@@ -48,7 +48,9 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="nl" className={displayFont.variable}>
+    // suppressHydrationWarning: de boothpagina zet vóór het laden van React een
+    // attribuut op <html> voor de lichte weergave.
+    <html lang="nl" className={displayFont.variable} suppressHydrationWarning>
       <head>
         <BotIdClient protect={protectedRoutes} />
       </head>

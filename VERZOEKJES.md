@@ -145,6 +145,14 @@ lijst van dit feest zetten.
 Er is met opzet geen knop meer om een hele lijst te wissen: samen vormen die
 lijsten het archief.
 
+### Licht of donker
+
+Rechtsboven in de booth staat een knop **Licht** / **Donker**. De lichte
+weergave is beter leesbaar in een lichte zaal of buiten; alle tekst haalt daar
+minstens het contrast dat voor leesbaarheid wordt aangeraden (4,5:1). Elk
+apparaat onthoudt zelf wat je kiest. Het geldt alleen voor de booth: de
+pagina's voor gasten, de posters en de sticker blijven zoals ze zijn.
+
 ---
 
 ## 3a. De sticker

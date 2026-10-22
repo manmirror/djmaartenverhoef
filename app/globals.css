@@ -507,7 +507,63 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 .vz-nogeen:hover{border-color:var(--violet);}
 
 /* --- de boothpagina voor Maarten zelf --- */
-.bt-pagina{min-height:100dvh; padding:28px 18px 60px;}
+.bt-pagina{
+  min-height:100dvh; padding:28px 18px 60px;
+  background:var(--bg); color:var(--ink);
+  color-scheme:dark;
+  /* De kleuren van de booth. Donker is hoe het altijd was; de lichte versie
+     hieronder vervangt ze alleen binnen de booth, de rest van de site blijft. */
+  --bt-verloop:linear-gradient(90deg,var(--pink),var(--violet));
+  --bt-accent:var(--violet);
+  --bt-accent-tekst:var(--violet);
+  --bt-let-op:var(--orange);
+  --bt-fout:var(--pink);
+  --bt-groen:#36d399;
+  --bt-groen-gloed:rgba(54,211,153,.18);
+  --bt-stip-gloed:rgba(243,238,252,.07);
+  --bt-tint:rgba(139,92,246,.08);
+  --bt-tint-rand:rgba(139,92,246,.3);
+  --bt-tint-sterk:rgba(139,92,246,.18);
+  --bt-gedraaid-rand:rgba(139,92,246,.45);
+  --bt-waarschuwing:rgba(255,47,126,.12);
+  --bt-waarschuwing-rand:rgba(255,47,126,.4);
+  --bt-opgetild:#1d1630;
+  --bt-schaduw:0 18px 40px rgba(0,0,0,.5);
+  --bt-afgehandeld:.6;
+}
+/* Lichte versie, aan te zetten met de knop in de kop van de booth. Het
+   attribuut staat op <html>, zodat het al gezet is voordat de pagina tekent:
+   geen donkere flits. Tekst haalt hier overal minstens 4,5:1 contrast; daarom
+   zijn roze, paars en oranje als tekst donkerder dan op de rest van de site. */
+html[data-booth-thema="licht"] .bt-pagina{
+  color-scheme:light;
+  --bg:#f5f3f8;
+  --bg-soft:#ffffff;
+  --ink:#17121f;
+  --muted:#574d66;
+  --line:rgba(23,18,31,.15);
+  --bt-verloop:linear-gradient(90deg,#c8155a,#6d28d9);
+  --bt-accent:#6d28d9;
+  --bt-accent-tekst:#6d28d9;
+  --bt-let-op:#a8480a;
+  --bt-fout:#be123c;
+  --bt-groen:#14935e;
+  --bt-groen-gloed:rgba(20,147,94,.2);
+  --bt-stip-gloed:rgba(23,18,31,.07);
+  --bt-tint:rgba(109,40,217,.06);
+  --bt-tint-rand:rgba(109,40,217,.28);
+  --bt-tint-sterk:rgba(109,40,217,.12);
+  --bt-gedraaid-rand:rgba(109,40,217,.45);
+  --bt-waarschuwing:#fdeaf1;
+  --bt-waarschuwing-rand:#f0a2bf;
+  --bt-opgetild:#ffffff;
+  --bt-schaduw:0 14px 34px rgba(23,18,31,.18);
+  --bt-afgehandeld:.9;
+}
+/* Ook de achtergrond om de booth heen, anders zie je bij doorscrollen donker. */
+html[data-booth-thema="licht"]:has(.bt-pagina),
+html[data-booth-thema="licht"]:has(.bt-pagina) body{background:#f5f3f8;}
+.bt-kop-knoppen{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
 .bt{max-width:720px; margin:0 auto;}
 /* Een <header>, dus de plakkende menubalk van de site uitzetten: die schoof
    anders halfdoorzichtig over de lijst. */
@@ -519,7 +575,7 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 .bt-kop p{margin:5px 0 0; font-size:13px; color:var(--muted);}
 .bt-waarschuwing{
   margin:18px 0 0; padding:13px 16px;
-  background:rgba(255,47,126,.12); border:1px solid rgba(255,47,126,.4);
+  background:var(--bt-waarschuwing); border:1px solid var(--bt-waarschuwing-rand);
   border-radius:14px; font-size:13px; line-height:1.5; color:var(--ink);
 }
 .bt-balk{
@@ -531,23 +587,23 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
   background:none; border:none; border-radius:999px; padding:9px 16px;
   font-size:13px; font-weight:800; font-family:inherit; color:var(--muted); cursor:pointer;
 }
-.bt-sorteer button.aan{background:linear-gradient(90deg,var(--pink),var(--violet)); color:#fff;}
+.bt-sorteer button.aan{background:var(--bt-verloop); color:#fff;}
 .bt-mini{
   background:none; border:1px solid var(--line); border-radius:999px;
   padding:9px 16px; font-size:12px; font-weight:800; font-family:inherit;
   color:var(--muted); cursor:pointer; transition:color .2s ease,border-color .2s ease;
 }
-.bt-mini:hover{color:var(--ink); border-color:var(--violet);}
+.bt-mini:hover{color:var(--ink); border-color:var(--bt-accent);}
 .bt-leeg{margin:30px 0; font-size:14px; color:var(--muted);}
 
 .bt-lijst{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;}
-.bt-lijst-af{margin-top:10px; opacity:.6;}
+.bt-lijst-af{margin-top:10px; opacity:var(--bt-afgehandeld);}
 .bt-rij{
   display:grid; grid-template-columns:1fr auto auto; gap:14px; align-items:center;
   padding:15px 18px;
   background:var(--bg-soft); border:1px solid var(--line); border-radius:16px;
 }
-.bt-rij.bt-gedraaid{border-color:rgba(139,92,246,.45);}
+.bt-rij.bt-gedraaid{border-color:var(--bt-gedraaid-rand);}
 .bt-rij.bt-overgeslagen{border-style:dashed;}
 .bt-titel{font-size:16px; font-weight:800; line-height:1.3; letter-spacing:-0.01em;}
 .bt-artiest{margin-top:2px; font-size:14px; color:var(--muted);}
@@ -555,7 +611,7 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 .bt-meta{display:flex; flex-wrap:wrap; gap:10px; margin-top:7px; font-size:11px; color:var(--muted);}
 .bt-meta span{letter-spacing:0.04em;}
 .bt-van{color:var(--ink);}
-.bt-niet{color:var(--orange);}
+.bt-niet{color:var(--bt-let-op);}
 .bt-cijfers{display:flex; flex-direction:column; align-items:flex-end; gap:3px;}
 .bt-bpm{
   display:flex; align-items:baseline; gap:3px;
@@ -564,14 +620,14 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 }
 .bt-bpm small{font-size:10px; font-weight:800; color:var(--muted);}
 .bt-bpm-leeg{color:var(--muted);}
-.bt-toon{font-size:11px; font-weight:800; color:var(--violet); letter-spacing:0.04em;}
+.bt-toon{font-size:11px; font-weight:800; color:var(--bt-accent-tekst); letter-spacing:0.04em;}
 .bt-acties{display:flex; flex-direction:column; gap:6px;}
 .bt-acties button{
   border:none; border-radius:999px; padding:9px 15px;
   font-size:12px; font-weight:800; font-family:inherit; cursor:pointer; white-space:nowrap;
 }
 .bt-acties button:disabled{opacity:.5; cursor:default;}
-.bt-ok{background:linear-gradient(90deg,var(--pink),var(--violet)); color:#fff;}
+.bt-ok{background:var(--bt-verloop); color:#fff;}
 .bt-nee{background:transparent; border:1px solid var(--line) !important; color:var(--muted);}
 .bt-klap{
   margin-top:20px; background:none; border:none; padding:0;
@@ -595,9 +651,9 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
   background:var(--bg-soft); border:1px solid var(--line); border-radius:16px;
   padding:16px 20px; font-size:16px; color:var(--ink); font-family:inherit;
 }
-.bt-hek input:focus{outline:none; border-color:var(--violet);}
+.bt-hek input:focus{outline:none; border-color:var(--bt-accent);}
 .bt-hek button{
-  background:linear-gradient(90deg,var(--pink),var(--violet)); color:#fff;
+  background:var(--bt-verloop); color:#fff;
   border:none; border-radius:16px; padding:16px 22px;
   font-size:16px; font-weight:800; font-family:inherit; cursor:pointer;
 }
@@ -676,7 +732,7 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
   flex:1; background:none; border:none; border-radius:999px; padding:10px 16px;
   font-size:13px; font-weight:800; font-family:inherit; color:var(--muted); cursor:pointer;
 }
-.bt-tabs button.aan{background:linear-gradient(90deg,var(--pink),var(--violet)); color:#fff;}
+.bt-tabs button.aan{background:var(--bt-verloop); color:#fff;}
 
 .bt-feest{
   display:flex; align-items:flex-end; justify-content:space-between; gap:14px;
@@ -693,7 +749,7 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
   padding:13px 16px; font-size:15px; font-weight:700; color:var(--ink);
   font-family:inherit; appearance:none;
 }
-.bt-feest select:focus{outline:none; border-color:var(--violet);}
+.bt-feest select:focus{outline:none; border-color:var(--bt-accent);}
 /* --- booth: aan/uit-schakelaar per feest --- */
 .bt-schakelaar{
   display:flex; flex-direction:column; gap:10px;
@@ -706,7 +762,7 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
   font-size:14px; font-weight:800; font-family:inherit; color:var(--muted); cursor:pointer;
 }
 .bt-stand button:disabled{cursor:default; opacity:.7;}
-.bt-stand button.aan{color:#fff; background:linear-gradient(90deg,var(--pink),var(--violet));}
+.bt-stand button.aan{color:#fff; background:var(--bt-verloop);}
 /* Aan en Uit in een kleur die je vanaf de draaitafel in één oogopslag ziet. */
 .bt-stand button.aan.bt-stand-aan{background:#36d399; color:#06281b;}
 .bt-stand button.aan.bt-stand-uit{background:#d6195f; color:#fff;}
@@ -716,16 +772,16 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 .bt-stand-qr strong{color:var(--ink);}
 .bt-stip{
   width:9px; height:9px; border-radius:50%;
-  background:var(--muted); box-shadow:0 0 0 3px rgba(243,238,252,.07);
+  background:var(--muted); box-shadow:0 0 0 3px var(--bt-stip-gloed);
 }
-.bt-stip.aan{background:#36d399; box-shadow:0 0 0 3px rgba(54,211,153,.18);}
+.bt-stip.aan{background:var(--bt-groen); box-shadow:0 0 0 3px var(--bt-groen-gloed);}
 
 .bt-weg{
   background:none; border:none; padding:0;
   font-size:11px; font-family:inherit; color:var(--muted);
   text-decoration:underline; cursor:pointer;
 }
-.bt-weg:hover:not(:disabled){color:var(--pink);}
+.bt-weg:hover:not(:disabled){color:var(--bt-fout);}
 .bt-weg:disabled{opacity:.5; cursor:default;}
 
 .bt-top-tel{margin:0 0 13px; font-size:12px; color:var(--muted);}
@@ -777,12 +833,12 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 }
 
 /* --- booth: zelf een match kiezen --- */
-.bt-hand{color:var(--violet);}
+.bt-hand{color:var(--bt-accent-tekst);}
 .bt-koppel{
   grid-column:1 / -1;
   display:flex; flex-direction:column; gap:10px;
   margin-top:4px; padding:14px;
-  background:rgba(139,92,246,.08); border:1px solid rgba(139,92,246,.3); border-radius:14px;
+  background:var(--bt-tint); border:1px solid var(--bt-tint-rand); border-radius:14px;
 }
 .bt-koppel-kop{
   display:flex; justify-content:space-between; align-items:center; gap:12px;
@@ -794,7 +850,7 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
   background:var(--bg); border:1px solid var(--line); border-radius:12px;
   padding:12px 14px; font-size:16px; color:var(--ink); font-family:inherit;
 }
-.bt-koppel input:focus{outline:none; border-color:var(--violet);}
+.bt-koppel input:focus{outline:none; border-color:var(--bt-accent);}
 .bt-koppel-lijst{
   list-style:none; margin:0; padding:0;
   display:flex; flex-direction:column; gap:4px;
@@ -805,8 +861,8 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
   width:100%; padding:10px 12px; border:1px solid transparent; border-radius:10px;
   background:transparent; color:inherit; font-family:inherit; text-align:left; cursor:pointer;
 }
-.bt-koppel-lijst button:hover:not(:disabled){background:rgba(139,92,246,.18);}
-.bt-koppel-lijst button.aan{border-color:var(--violet);}
+.bt-koppel-lijst button:hover:not(:disabled){background:var(--bt-tint-sterk);}
+.bt-koppel-lijst button.aan{border-color:var(--bt-accent);}
 .bt-koppel-lijst button:disabled{opacity:.5; cursor:default;}
 .bt-koppel-titel{font-size:14px; font-weight:800;}
 .bt-koppel-artiest{grid-column:1; font-size:12px; color:var(--muted);}
@@ -816,7 +872,7 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
 }
 .bt-koppel-leeg{margin:4px 0; font-size:13px; color:var(--muted);}
 .bt-koppel-los{align-self:flex-start;}
-.bt-koppel-fout{margin:0; font-size:13px; color:var(--pink);}
+.bt-koppel-fout{margin:0; font-size:13px; color:var(--bt-fout);}
 @media(max-width:560px){
   .bt-koppel-lijst button{grid-template-columns:1fr;}
   .bt-koppel-cijfers{grid-column:1; grid-row:auto;}
@@ -830,7 +886,7 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
   background:var(--bg-soft); border:1px solid var(--line); border-radius:16px;
   color:inherit; font-family:inherit; cursor:pointer; transition:border-color .2s ease;
 }
-.bt-archief button:hover{border-color:var(--violet);}
+.bt-archief button:hover{border-color:var(--bt-accent);}
 .bt-archief-tekst{display:flex; flex-direction:column;}
 .bt-archief-tekst .bt-titel{display:flex; align-items:center; gap:8px;}
 .bt-archief-test{
@@ -859,11 +915,11 @@ footer{padding:60px 0 0; border-top:1px solid var(--line); overflow:hidden;}
   /* Anders scrolt de pagina mee in plaats van dat de rij verschuift. */
   touch-action:none; user-select:none; -webkit-user-select:none;
 }
-.bt-greep:hover,.bt-greep:focus-visible{color:var(--ink); background:rgba(139,92,246,.15); outline:none;}
+.bt-greep:hover,.bt-greep:focus-visible{color:var(--ink); background:var(--bt-tint-sterk); outline:none;}
 .bt-sleept{
   position:relative; z-index:2;
-  border-color:var(--violet); box-shadow:0 18px 40px rgba(0,0,0,.5);
-  background:#1d1630;
+  border-color:var(--bt-accent); box-shadow:var(--bt-schaduw);
+  background:var(--bt-opgetild);
 }
 .bt-sleept .bt-greep{cursor:grabbing; color:var(--ink);}
 @media(max-width:560px){
