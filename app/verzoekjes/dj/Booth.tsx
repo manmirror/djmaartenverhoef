@@ -13,6 +13,7 @@ import type { Stand } from "../store";
 import type { TopNummer, Verzoek, VerzoekStatus, Zoekresultaat } from "../types";
 
 import Koppelen from "./Koppelen";
+import Materiaal from "./Materiaal";
 import SleepLijst, { type Greep } from "./SleepLijst";
 import { THEMA_ATTRIBUUT, THEMA_SLEUTEL } from "./thema";
 
@@ -681,6 +682,7 @@ export default function Booth() {
                 Je vaste QR-code en de sticker wijzen nu naar:{" "}
                 <strong>{lijst.algemeen?.naam ?? "geen enkel feest"}</strong>
               </p>
+              <Materiaal feest={feest} />
             </div>
           )}
 

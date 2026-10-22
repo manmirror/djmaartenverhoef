@@ -998,3 +998,23 @@ html[data-booth-thema="licht"]:has(.bt-pagina) body{background:#f5f3f8;}
   .st-acties{display:none;}
   .st-vel{width:var(--vel); height:var(--vel);}
 }
+
+/* --- booth: posters, QR-codes en link per feest --- */
+.bt-materiaal{border-top:1px solid var(--line); padding-top:10px;}
+.bt-materiaal summary{
+  cursor:pointer; font-size:13px; font-weight:800; color:var(--ink);
+  list-style-position:inside;
+}
+.bt-materiaal[open] summary{margin-bottom:12px;}
+.bt-materiaal-groep{display:flex; flex-direction:column; gap:8px; margin-bottom:14px;}
+.bt-materiaal-kop{
+  font-size:11px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--muted);
+}
+.bt-materiaal-knoppen{display:flex; flex-wrap:wrap; gap:8px;}
+.bt-materiaal-knoppen .bt-mini{text-decoration:none; display:inline-block;}
+.bt-materiaal-link{display:flex; flex-direction:column; gap:8px;}
+.bt-materiaal-link code{
+  font-size:12px; color:var(--ink); word-break:break-all;
+  background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 10px;
+}

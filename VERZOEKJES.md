@@ -145,6 +145,13 @@ lijst van dit feest zetten.
 Er is met opzet geen knop meer om een hele lijst te wissen: samen vormen die
 lijsten het archief.
 
+### Posters, QR-codes en link
+
+Onder de schakelaar staat een inklapbaar blok **Posters, QR-codes en link** met
+alles voor het gekozen feest: de A4-poster, de QR-code als PNG en SVG, en de
+link voor de gasten met een knop om hem te kopiëren of via WhatsApp te delen.
+Daaronder de sticker en de algemene QR-code, die voor elk feest werken.
+
 ### Licht of donker
 
 Rechtsboven in de booth staat een knop **Licht** / **Donker**. De lichte
