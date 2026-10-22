@@ -12,7 +12,7 @@ eind van het jaar zien wat er het vaakst gevraagd is.
 | `/verzoekjes/qr/<slug>` | de poster van één feest: printen, of downloaden als PNG/SVG |
 | `/verzoekjes/sticker` | een sticker van 20 × 20 cm met de algemene code, voor op de laptop |
 | `/verzoekjes/dj` | jouw booth (achter een code): de lijst per feest en de jaarlijst |
-| `/verzoekjes` | algemeen adres: wijst vanzelf naar het feest dat op dat moment bezig is |
+| `/verzoekjes` | algemeen adres, ook op de sticker: wijst naar het feest dat in de booth op Aan staat, of anders naar het feest dat volgens de agenda bezig is |
 
 Deze pagina's staan niet in het menu van de site en Google laat ze links
 liggen.
@@ -38,8 +38,7 @@ booth niet alles wat de gasten insturen.
 4. Deploy opnieuw.
 
 Zolang dit er niet is, waarschuwt de booth erover, wordt **elk verzoekje per
-mail doorgestuurd** zodat er niets verdwijnt, en ontbreekt de knop *Zet nu
-open*.
+mail doorgestuurd** zodat er niets verdwijnt, en ontbreekt de aan/uit-schakelaar.
 
 ### De code voor de booth — verplicht
 
@@ -99,16 +98,31 @@ jaarlijst.
 - Regels die je later **onderaan** toevoegt, komen er de volgende keer bij.
 - Een regel die al is ingelezen, verander je in de booth, niet in dit bestand.
 
-### Wanneer staat een feest open?
+### Wanneer staat een feest open? De aan/uit-schakelaar
 
-Van de middag van de feestdag (12:00) tot de ochtend erna (06:00), in
-Nederlandse tijd. Daarbuiten zegt de pagina *Nog even geduld* of *Dit feest is
+In de booth heeft elk feest een schakelaar met drie standen:
+
+| Stand | Wat er gebeurt |
+| --- | --- |
+| **Automatisch** | Open volgens de agenda: van de middag van de feestdag (12:00) tot de ochtend erna (06:00), Nederlandse tijd. Dit is de standaard. |
+| **Aan** | Open, ook buiten de agendatijden. De algemene QR-code en de sticker wijzen dan naar dit feest. |
+| **Uit** | Dicht, ook binnen de agendatijden. Gasten zien *Even geen verzoekjes*. |
+
+- Er kan maar één feest tegelijk op **Aan** staan. Zet je een ander feest aan,
+  dan vraagt de booth het even en gaat het vorige terug naar Automatisch.
+- **Aan** gaat na 24 uur vanzelf terug naar Automatisch, zodat een vergeten
+  schakelaar niet dagen openstaat terwijl de sticker overal hangt. De booth
+  laat zien tot wanneer hij aan staat.
+- Onder de schakelaar staat altijd naar welk feest je vaste QR-code en de
+  sticker op dat moment wijzen.
+- Zo gebruik je steeds dezelfde code: zet het feest van vanavond op **Aan**
+  en de sticker op je laptop wijst ernaartoe.
+- De schakelaar werkt alleen met een database. Zonder database laat de booth
+  hem weg en werkt alles volgens de agenda.
+
+Buiten de open tijden zegt de feestpagina *Nog even geduld* of *Dit feest is
 geweest*, en neemt hij niets aan — zo kan niemand volgende maand nog iets in de
 lijst van dit feest zetten.
-
-Klopt het een keer niet — een feest dat eerder begint of uitloopt — dan zet je
-het in de booth met **Zet nu open** voor twaalf uur open. Daar hoeft niets
-voor gedeployd te worden.
 
 ---
 

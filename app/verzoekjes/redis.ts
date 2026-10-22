@@ -25,6 +25,7 @@ export type Opslag = {
   hsetnx(sleutel: string, veld: string, waarde: string): Promise<void>;
   hdel(sleutel: string, veld: string): Promise<number>;
   get(sleutel: string): Promise<unknown>;
+  del(sleutel: string): Promise<void>;
   set(sleutel: string, waarde: string, verloopSec?: number): Promise<void>;
   exists(sleutel: string): Promise<boolean>;
   incr(sleutel: string): Promise<number>;
@@ -89,6 +90,9 @@ function maakUpstash(url: string, token: string): Opslag {
     },
     hdel: (sleutel, veld) => redis.hdel(sleutel, veld),
     get: (sleutel) => redis.get(sleutel),
+    async del(sleutel) {
+      await redis.del(sleutel);
+    },
     async set(sleutel, waarde, verloopSec) {
       if (verloopSec) await redis.set(sleutel, waarde, { ex: verloopSec });
       else await redis.set(sleutel, waarde);
@@ -135,6 +139,9 @@ function maakRedis(url: string): Opslag {
     },
     hdel: async (sleutel, veld) => (await klaar()).hDel(sleutel, veld),
     get: async (sleutel) => (await klaar()).get(sleutel),
+    async del(sleutel) {
+      await (await klaar()).del(sleutel);
+    },
     async set(sleutel, waarde, verloopSec) {
       const c = await klaar();
       if (verloopSec) {

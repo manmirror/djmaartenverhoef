@@ -28,7 +28,7 @@
 //
 // Buiten dat venster neemt het formulier niets aan — zo kan niemand volgende
 // week nog iets in de lijst van vorige week zetten. Loopt het anders dan
-// gepland, dan kun je het feest in de booth met één knop alsnog openen.
+// gepland, dan zet je het feest in de booth op Aan of Uit.
 
 export type Feest = {
   slug: string;

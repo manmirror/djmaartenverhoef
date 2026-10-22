@@ -4,7 +4,7 @@ import { connection } from "next/server";
 
 import VerzoekPagina from "../../VerzoekPagina";
 import { alleFeesten, vindFeest } from "../../feesten";
-import { isHandmatigOpen } from "../../store";
+import { openstand } from "../../schakelaar";
 
 /** De pagina's van alle bekende feesten vooraf klaarzetten. */
 export function generateStaticParams() {
@@ -32,6 +32,6 @@ export default async function FeestPagina(props: PageProps<"/verzoekjes/f/[slug]
   await connection();
 
   return (
-    <VerzoekPagina feest={feest} handmatigOpen={await isHandmatigOpen(feest.slug)} />
+    <VerzoekPagina feest={feest} stand={(await openstand(feest)).stand} />
   );
 }

@@ -261,6 +261,9 @@ export const siteContent = {
     tevroegKop: "Nog even geduld",
     tevroegTekst:
       "Dit feest is op {datum}. Vanaf die middag kun je hier je nummer aanvragen.",
+    // Als Maarten de verzoekjes in de booth op Uit heeft gezet.
+    uitKop: "Even geen verzoekjes",
+    uitTekst: "Er staan nu geen verzoekjes open. Probeer het straks nog eens.",
     // Als het feest voorbij is.
     voorbijKop: "Dit feest is geweest",
     voorbijTekst: "Bedankt voor het dansen! De lijst is gesloten.",

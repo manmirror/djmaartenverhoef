@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 
 import type { FeestInfo } from "../feesten";
+import type { Stand } from "../store";
 import type { TopNummer, Verzoek, VerzoekStatus, Zoekresultaat } from "../types";
 
 import Koppelen from "./Koppelen";
@@ -45,10 +46,21 @@ function abonneer(luisteraar: () => void) {
   };
 }
 
+/** Hoe een feest er nu voor staat: de schakelaar en of het verzoekjes aanneemt. */
+type Openstand = { stand: Stand; open: boolean; aanTot: number | null };
+
 type Lijst = {
-  feest: (FeestInfo & { handmatig: boolean }) | null;
+  feest:
+    | (FeestInfo &
+        Openstand & {
+          venster: { van: number; tot: number };
+          fase: "voor" | "tijdens" | "na";
+        })
+    | null;
   verzoeken: Verzoek[];
-  agenda: FeestInfo[];
+  agenda: (FeestInfo & Openstand)[];
+  /** Het feest waar de sticker en de algemene QR-code nu naartoe wijzen. */
+  algemeen: { slug: string; naam: string } | null;
   opslag: boolean;
   opslagInfo: { soort: "upstash" | "redis" | null; namen: string[] };
   collectie: number;
@@ -101,6 +113,7 @@ export default function Booth() {
   /** Het verzoekje waarvan het koppelpaneel open staat. */
   const [koppelId, setKoppelId] = useState<string | null>(null);
   const [archief, setArchief] = useState<ArchiefFeest[] | null>(null);
+  const [standBezig, setStandBezig] = useState(false);
   /** Het feest dat in het archief openstaat; null is het overzicht. */
   const [archiefFeest, setArchiefFeest] = useState<string | null>(null);
 
@@ -286,13 +299,29 @@ export default function Booth() {
     }
   }
 
-  async function zetOpen() {
-    if (!feest) return;
+  async function zetStand(stand: Stand) {
+    if (!feest || !lijst || feest.stand === stand) return;
+
+    // Er kan maar één feest tegelijk aan staan. Even zeggen welk feest daardoor
+    // terug naar Automatisch gaat, zodat dat geen verrassing is.
+    const anderAan = lijst.agenda.find((ander) => ander.stand === "aan" && ander.slug !== feest.slug);
+    if (
+      stand === "aan" &&
+      anderAan &&
+      !confirm(`${anderAan.naam} staat nu aan. Die gaat dan terug naar Automatisch. Doorgaan?`)
+    ) {
+      return;
+    }
+
+    setStandBezig(true);
     try {
-      await stuur("open", { feest: feest.slug });
+      const antwoord = await stuur("stand", { feest: feest.slug, stand });
+      if (!antwoord.ok) setFout(`De schakelaar is niet omgezet (${antwoord.status}).`);
       await haal(code, actiefFeest);
     } catch {
-      setFout("Kon het feest niet openzetten.");
+      setFout("De schakelaar is niet omgezet. Probeer het nog eens.");
+    } finally {
+      setStandBezig(false);
     }
   }
 
@@ -547,29 +576,48 @@ export default function Booth() {
                   {lijst.agenda.map((ander) => (
                     <option key={ander.slug} value={ander.slug}>
                       {ander.naam} — {ander.kort}
+                      {ander.stand === "aan" ? " · AAN" : ander.stand === "uit" ? " · uit" : ""}
                       {ander.test ? " (test, telt niet mee)" : ""}
                     </option>
                   ))}
                 </select>
               </label>
+            </div>
+          )}
 
-              {feest && (
-                <div className="bt-open">
-                  <span className={feest.open ? "bt-stip aan" : "bt-stip"} />
-                  {feest.open
-                    ? feest.handmatig
-                      ? "handmatig open"
-                      : "open voor verzoekjes"
-                    : "gesloten"}
-                  {/* Zonder database weet niet elke server van deze knop, dus
-                      dan laten we hem weg in plaats van iets te beloven. */}
-                  {!feest.open && lijst.opslag && (
-                    <button type="button" className="bt-mini" onClick={zetOpen}>
-                      Zet nu open
+          {lijst && feest && (
+            <div className="bt-schakelaar">
+              {lijst.opslag && (
+                <div className="bt-stand" role="radiogroup" aria-label="Verzoekjes voor dit feest">
+                  {STANDEN.map(([waarde, label]) => (
+                    <button
+                      key={waarde}
+                      type="button"
+                      role="radio"
+                      aria-checked={feest.stand === waarde}
+                      className={feest.stand === waarde ? `aan bt-stand-${waarde}` : undefined}
+                      disabled={standBezig}
+                      onClick={() => zetStand(waarde)}
+                    >
+                      {label}
                     </button>
-                  )}
+                  ))}
                 </div>
               )}
+              <p className="bt-stand-uitleg">
+                <span className={feest.open ? "bt-stip aan" : "bt-stip"} />
+                <span>{standUitleg(feest)}</span>
+              </p>
+              {!lijst.opslag && (
+                <p className="bt-stand-uitleg">
+                  De aan/uit-schakelaar werkt pas als de database gekoppeld is: zonder
+                  database zou hij maar op één server staan.
+                </p>
+              )}
+              <p className="bt-stand-qr">
+                Je vaste QR-code en de sticker wijzen nu naar:{" "}
+                <strong>{lijst.algemeen?.naam ?? "geen enkel feest"}</strong>
+              </p>
             </div>
           )}
 
@@ -607,6 +655,43 @@ export default function Booth() {
       )}
     </div>
   );
+}
+
+const STANDEN: [Stand, string][] = [
+  ["automatisch", "Automatisch"],
+  ["aan", "Aan"],
+  ["uit", "Uit"],
+];
+
+/** "do 22 okt 02:15", altijd in Nederlandse tijd. */
+function tijdLabel(ms: number): string {
+  return new Date(ms).toLocaleString("nl-NL", {
+    timeZone: "Europe/Amsterdam",
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/** Eén zin bij de schakelaar: wat de stand nu betekent. */
+function standUitleg(feest: NonNullable<Lijst["feest"]>): string {
+  if (feest.stand === "aan") {
+    return feest.aanTot
+      ? `Aan tot ${tijdLabel(feest.aanTot)}. Daarna gaat hij vanzelf terug naar Automatisch.`
+      : "Aan.";
+  }
+  if (feest.stand === "uit") {
+    return "Uit: dit feest neemt geen verzoekjes aan, ook niet tijdens het feest.";
+  }
+  if (feest.fase === "tijdens") {
+    return `Automatisch: open volgens de agenda, tot ${tijdLabel(feest.venster.tot)}.`;
+  }
+  if (feest.fase === "voor") {
+    return `Automatisch: gaat open op ${tijdLabel(feest.venster.van)}.`;
+  }
+  return "Automatisch: gesloten, het feest is voorbij.";
 }
 
 /** Kleine letters, zonder accenten en leestekens: om teksten te vergelijken. */

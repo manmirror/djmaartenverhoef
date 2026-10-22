@@ -3,10 +3,10 @@ import { randomUUID } from "node:crypto";
 import { Resend } from "resend";
 
 import { kenmerk, naarMatch, vindInCollectie } from "@/app/verzoekjes/collectie";
-import { datumVoluit, isOpen, vindFeest } from "@/app/verzoekjes/feesten";
+import { datumVoluit, vindFeest } from "@/app/verzoekjes/feesten";
+import { openstand } from "@/app/verzoekjes/schakelaar";
 import {
   geefIp,
-  isHandmatigOpen,
   opslagActief,
   opslagInfo,
   teVaak,
@@ -48,9 +48,9 @@ export async function POST(request: Request) {
     return Response.json({ error: "onbekend-feest" }, { status: 400 });
   }
 
-  // Buiten de avond van het feest nemen we niets aan, tenzij het feest in de
-  // booth met de hand is opengezet.
-  if (!isOpen(feest) && !(await isHandmatigOpen(feest.slug))) {
+  // Buiten de avond van het feest nemen we niets aan, tenzij het in de booth
+  // op Aan staat. Staat het op Uit, dan ook binnen de avond niet.
+  if (!(await openstand(feest)).open) {
     return Response.json(
       { error: "gesloten", datum: datumVoluit(feest) },
       { status: 403 }

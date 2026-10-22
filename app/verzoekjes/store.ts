@@ -18,8 +18,10 @@ const MAX_PER_FEEST = 300;
 const REM_VENSTER_SEC = 10 * 60;
 const REM_MAX = 30;
 
-/** Hoe lang een handmatig opengezet feest open blijft. */
-const FORCEER_SEC = 12 * 60 * 60;
+/** Hoe lang een feest op Aan blijft voordat het vanzelf terug naar Automatisch gaat. */
+const AAN_SEC = 24 * 60 * 60;
+const AAN_SLEUTEL = "verzoekjes:aan";
+const UIT_SLEUTEL = "verzoekjes:uit";
 
 export function opslagActief(): boolean {
   return geefOpslag() !== null;
@@ -40,19 +42,19 @@ function sleutel(feest: string): string {
 // api-routes. Anders ziet de feestpagina niet dat de booth hem heeft opengezet.
 type Geheugen = {
   lijsten: Map<string, Map<string, Verzoek>>;
-  open: Map<string, number>;
+  schakelaar: { aan: { feest: string; tot: number } | null; uit: Set<string> };
   rem: Map<string, number[]>;
   import: Map<string, number>;
 };
 const gedeeld = globalThis as typeof globalThis & { __verzoekjes?: Geheugen };
 gedeeld.__verzoekjes ??= {
   lijsten: new Map(),
-  open: new Map(),
+  schakelaar: { aan: null, uit: new Set() },
   rem: new Map(),
   import: new Map(),
 };
 const geheugen = gedeeld.__verzoekjes.lijsten;
-const geheugenOpen = gedeeld.__verzoekjes.open;
+const geheugenSchakelaar = gedeeld.__verzoekjes.schakelaar;
 const geheugenRem = gedeeld.__verzoekjes.rem;
 const geheugenImport = gedeeld.__verzoekjes.import;
 
@@ -242,25 +244,84 @@ export async function voegToeAlsNieuw(verzoek: Verzoek): Promise<void> {
   if (!lijst.has(verzoek.id)) lijst.set(verzoek.id, verzoek);
 }
 
-/**
- * Een feest met de hand openzetten, voor als de agenda niet klopt en de gasten
- * er al zijn. Vervalt vanzelf.
- */
-export async function zetOpen(feest: string): Promise<void> {
-  const redis = geefOpslag();
-  if (redis) {
-    await redis.set(`verzoekjes:open:${feest}`, "1", FORCEER_SEC);
-  } else {
-    geheugenOpen.set(feest, Date.now() + FORCEER_SEC * 1000);
+// ---- de aan/uit-schakelaar per feest ----
+//
+// Automatisch: open volgens het agendavenster. Aan: open, ook daarbuiten, en
+// de algemene QR-code wijst ernaar. Uit: dicht, ook binnen het venster.
+//
+// Aan staat in één sleutel met daarin het feest. Daardoor kan er vanzelf maar
+// één feest tegelijk aan staan: een ander aanzetten overschrijft hem. De
+// sleutel vervalt na een etmaal, zodat een vergeten schakelaar niet blijft
+// openstaan terwijl de sticker overal hangt.
+
+export type Stand = "automatisch" | "aan" | "uit";
+
+export type Schakelaars = {
+  /** Het feest dat op Aan staat, en tot wanneer (milliseconden sinds 1970). */
+  aan: { feest: string; tot: number } | null;
+  /** Feesten die op Uit staan. */
+  uit: Set<string>;
+};
+
+function alsAan(waarde: unknown): Schakelaars["aan"] {
+  let ruw = waarde;
+  if (typeof ruw === "string") {
+    try {
+      ruw = JSON.parse(ruw);
+    } catch {
+      return null;
+    }
   }
+  if (!ruw || typeof ruw !== "object") return null;
+  const { feest, tot } = ruw as { feest?: unknown; tot?: unknown };
+  return typeof feest === "string" && typeof tot === "number" ? { feest, tot } : null;
 }
 
-export async function isHandmatigOpen(feest: string): Promise<boolean> {
+export async function leesSchakelaars(): Promise<Schakelaars> {
   const redis = geefOpslag();
-  if (redis) return redis.exists(`verzoekjes:open:${feest}`);
+  if (!redis) {
+    const aan = geheugenSchakelaar.aan;
+    return {
+      aan: aan && aan.tot > Date.now() ? aan : null,
+      uit: new Set(geheugenSchakelaar.uit),
+    };
+  }
+  const [aan, uit] = await Promise.all([redis.get(AAN_SLEUTEL), redis.hgetall(UIT_SLEUTEL)]);
+  return { aan: alsAan(aan), uit: new Set(Object.keys(uit ?? {})) };
+}
 
-  const tot = geheugenOpen.get(feest);
-  return tot !== undefined && tot > Date.now();
+export function standVan(feest: string, schakelaars: Schakelaars): Stand {
+  if (schakelaars.aan?.feest === feest) return "aan";
+  if (schakelaars.uit.has(feest)) return "uit";
+  return "automatisch";
+}
+
+/** Zet de schakelaar van een feest. */
+export async function zetStand(feest: string, stand: Stand): Promise<void> {
+  const redis = geefOpslag();
+  const huidig = await leesSchakelaars();
+  const wasAan = huidig.aan?.feest === feest;
+
+  if (!redis) {
+    if (stand === "aan") {
+      geheugenSchakelaar.aan = { feest, tot: Date.now() + AAN_SEC * 1000 };
+    } else if (wasAan) {
+      geheugenSchakelaar.aan = null;
+    }
+    if (stand === "uit") geheugenSchakelaar.uit.add(feest);
+    else geheugenSchakelaar.uit.delete(feest);
+    return;
+  }
+
+  if (stand === "aan") {
+    const tot = Date.now() + AAN_SEC * 1000;
+    await redis.set(AAN_SLEUTEL, JSON.stringify({ feest, tot }), AAN_SEC);
+  } else if (wasAan) {
+    await redis.del(AAN_SLEUTEL);
+  }
+
+  if (stand === "uit") await redis.hset(UIT_SLEUTEL, { [feest]: "1" });
+  else if (huidig.uit.has(feest)) await redis.hdel(UIT_SLEUTEL, feest);
 }
 
 /**
