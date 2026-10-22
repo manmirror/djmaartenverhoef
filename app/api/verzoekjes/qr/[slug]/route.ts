@@ -1,6 +1,6 @@
 import QRCode from "qrcode";
 
-import { vindFeest } from "@/app/verzoekjes/feesten";
+import { vindInAgenda } from "@/app/verzoekjes/agenda";
 import { siteContent } from "@/content/site";
 
 export const runtime = "nodejs";
@@ -26,7 +26,7 @@ export async function GET(
   if (slug === ALGEMEEN) {
     adres = `${siteContent.siteUrl}/verzoekjes`;
   } else {
-    const feest = vindFeest(slug);
+    const feest = await vindInAgenda(slug);
     if (!feest) return new Response("Onbekend feest", { status: 404 });
     adres = `${siteContent.siteUrl}/verzoekjes/f/${feest.slug}`;
   }

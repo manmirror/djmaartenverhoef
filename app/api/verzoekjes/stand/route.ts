@@ -1,5 +1,5 @@
 import { codeAntwoord, controleerCode } from "@/app/verzoekjes/code";
-import { vindFeest } from "@/app/verzoekjes/feesten";
+import { vindInAgenda } from "@/app/verzoekjes/agenda";
 import { opslagActief, zetStand, type Stand } from "@/app/verzoekjes/store";
 
 export const runtime = "nodejs";
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "invalid" }, { status: 400 });
   }
 
-  const feest = vindFeest((body.feest ?? "").trim());
+  const feest = await vindInAgenda((body.feest ?? "").trim());
   const stand = body.stand as Stand | undefined;
   if (!feest || !stand || !STANDEN.includes(stand)) {
     return Response.json({ error: "invalid" }, { status: 400 });

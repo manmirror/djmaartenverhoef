@@ -12,6 +12,7 @@ import type { FeestInfo } from "../feesten";
 import type { Stand } from "../store";
 import type { TopNummer, Verzoek, VerzoekStatus, Zoekresultaat } from "../types";
 
+import Agenda from "./Agenda";
 import Koppelen from "./Koppelen";
 import Materiaal from "./Materiaal";
 import SleepLijst, { type Greep } from "./SleepLijst";
@@ -125,7 +126,7 @@ function leesSortering(): Sortering {
     return "tijd";
   }
 }
-type Weergave = "lijst" | "archief" | "top";
+type Weergave = "lijst" | "archief" | "top" | "agenda";
 
 export default function Booth() {
   // Op de server weten we de code niet; vandaar de lege derde waarde.
@@ -170,6 +171,8 @@ export default function Booth() {
   const [standBezig, setStandBezig] = useState(false);
   /** Het feest dat in het archief openstaat; null is het overzicht. */
   const [archiefFeest, setArchiefFeest] = useState<string | null>(null);
+  /** Het feest dat in de agenda meteen open moet voor bewerken. */
+  const [agendaBewerk, setAgendaBewerk] = useState<string | null>(null);
 
   // Welk feest de lijst laat zien: in het archief het daar gekozen feest, en
   // anders het feest uit de keuzelijst (of, zonder keuze, dat van vanavond).
@@ -433,10 +436,22 @@ export default function Booth() {
 
   function kiesWeergave(nieuw: Weergave) {
     setWeergave(nieuw);
+    setAgendaBewerk(null);
     setKoppelId(null);
     // Anders staat heel even de lijst van het vorige scherm in beeld.
     setLijst(null);
     if (nieuw === "archief") setArchiefFeest(null);
+  }
+
+  /** Vanuit de agenda naar de verzoekjes van een feest. */
+  function openFeest(slug: string) {
+    kiesWeergave("lijst");
+    setGekozenFeest(slug);
+  }
+
+  function wijzigFeest(slug: string) {
+    kiesWeergave("agenda");
+    setAgendaBewerk(slug);
   }
 
   function openArchiefFeest(slug: string | null) {
@@ -525,7 +540,9 @@ export default function Booth() {
               ? `${nieuw.length} open${afgehandeld.length > 0 ? ` · ${afgehandeld.length} afgehandeld` : ""}`
               : weergave === "archief"
                 ? "Eerdere feesten"
-                : "Vaakst gevraagd"}
+                : weergave === "agenda"
+                  ? "Feesten aanmaken, wijzigen en weghalen"
+                  : "Vaakst gevraagd"}
             {lijst && lijst.collectie > 0 &&
               ` · ${lijst.collectie.toLocaleString("nl-NL")} nummers in de collectie`}
           </p>
@@ -567,6 +584,13 @@ export default function Booth() {
         >
           Jaarlijst
         </button>
+        <button
+          type="button"
+          className={weergave === "agenda" ? "aan" : undefined}
+          onClick={() => kiesWeergave("agenda")}
+        >
+          Agenda
+        </button>
       </div>
 
       {lijst && !lijst.opslag && (
@@ -591,7 +615,15 @@ export default function Booth() {
 
       {fout && <p className="bt-waarschuwing">{fout}</p>}
 
-      {weergave === "top" ? (
+      {weergave === "agenda" ? (
+        <Agenda
+          key={agendaBewerk ?? ""}
+          code={code}
+          codeHeader={CODE_HEADER}
+          bewerkStart={agendaBewerk}
+          onOpen={openFeest}
+        />
+      ) : weergave === "top" ? (
         <Jaaroverzicht data={top} opHalen={haalTop} />
       ) : weergave === "archief" ? (
         archiefFeest === null ? (
@@ -646,6 +678,11 @@ export default function Booth() {
                   ))}
                 </select>
               </label>
+              {feest && (
+                <button type="button" className="bt-mini" onClick={() => wijzigFeest(feest.slug)}>
+                  Naam of datum wijzigen
+                </button>
+              )}
             </div>
           )}
 
@@ -688,7 +725,7 @@ export default function Booth() {
 
           {lijst && lijst.agenda.length === 0 && (
             <p className="bt-leeg">
-              Er staan nog geen feesten in de agenda (content/feesten.ts).
+              Er staan nog geen feesten in de agenda. Maak er een aan onder Agenda.
             </p>
           )}
 

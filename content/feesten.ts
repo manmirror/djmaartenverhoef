@@ -4,8 +4,10 @@
 //   * een eigen QR-poster    djmaartenverhoef.nl/verzoekjes/qr/<slug>
 //   * een eigen lijst in de booth, die bewaard blijft
 //
-// Een feest toevoegen: zet er een regel bij en deploy. De volgorde maakt niet
-// uit; de booth zet ze zelf op datum.
+// Feesten aanmaken, hernoemen en verwijderen kan ook in de booth, onder Agenda;
+// dat komt in de database, bovenop dit bestand. Hier toevoegen kan nog steeds:
+// zet er een regel bij en deploy. De volgorde maakt niet uit; de booth zet ze
+// zelf op datum.
 //
 //   slug      wat er in het adres komt te staan: kleine letters, streepjes,
 //             geen spaties of accenten. Verander hem niet meer nadat je de

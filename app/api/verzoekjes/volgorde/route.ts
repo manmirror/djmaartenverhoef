@@ -1,5 +1,5 @@
 import { codeAntwoord, controleerCode } from "@/app/verzoekjes/code";
-import { vindFeest } from "@/app/verzoekjes/feesten";
+import { vindInAgenda } from "@/app/verzoekjes/agenda";
 import { zetVolgorde } from "@/app/verzoekjes/store";
 
 export const runtime = "nodejs";
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "invalid" }, { status: 400 });
   }
 
-  const feest = vindFeest((body.feest ?? "").trim());
+  const feest = await vindInAgenda((body.feest ?? "").trim());
   const ids = body.ids;
   if (
     !feest ||

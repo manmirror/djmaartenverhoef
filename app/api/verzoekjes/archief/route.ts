@@ -1,5 +1,6 @@
 import { codeAntwoord, controleerCode } from "@/app/verzoekjes/code";
-import { alleFeesten, naarInfo, venster } from "@/app/verzoekjes/feesten";
+import { leesAgenda } from "@/app/verzoekjes/agenda";
+import { naarInfo, venster } from "@/app/verzoekjes/feesten";
 import { leesOudeVerzoekjesIn } from "@/app/verzoekjes/import";
 import { leesMeerdere } from "@/app/verzoekjes/store";
 
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
   if (uitkomst !== "ok") return codeAntwoord(uitkomst);
 
   const nu = Date.now();
-  const geweest = alleFeesten().filter((feest) => venster(feest).van <= nu);
+  const geweest = (await leesAgenda()).filter((feest) => venster(feest).van <= nu);
 
   await leesOudeVerzoekjesIn(geweest);
   const lijsten = await leesMeerdere(geweest.map((feest) => feest.slug));

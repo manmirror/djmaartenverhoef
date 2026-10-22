@@ -22,6 +22,8 @@ const REM_MAX = 30;
 const AAN_SEC = 24 * 60 * 60;
 const AAN_SLEUTEL = "verzoekjes:aan";
 const UIT_SLEUTEL = "verzoekjes:uit";
+/** Feesten die in de booth zijn aangemaakt, aangepast of verwijderd: slug → json. */
+const AGENDA_SLEUTEL = "verzoekjes:agenda";
 
 export function opslagActief(): boolean {
   return geefOpslag() !== null;
@@ -43,6 +45,7 @@ function sleutel(feest: string): string {
 type Geheugen = {
   lijsten: Map<string, Map<string, Verzoek>>;
   schakelaar: { aan: { feest: string; tot: number } | null; uit: Set<string> };
+  agenda: Map<string, Aanpassing>;
   rem: Map<string, number[]>;
   import: Map<string, number>;
 };
@@ -50,11 +53,13 @@ const gedeeld = globalThis as typeof globalThis & { __verzoekjes?: Geheugen };
 gedeeld.__verzoekjes ??= {
   lijsten: new Map(),
   schakelaar: { aan: null, uit: new Set() },
+  agenda: new Map(),
   rem: new Map(),
   import: new Map(),
 };
 const geheugen = gedeeld.__verzoekjes.lijsten;
 const geheugenSchakelaar = gedeeld.__verzoekjes.schakelaar;
+const geheugenAgenda = gedeeld.__verzoekjes.agenda;
 const geheugenRem = gedeeld.__verzoekjes.rem;
 const geheugenImport = gedeeld.__verzoekjes.import;
 
@@ -322,6 +327,56 @@ export async function zetStand(feest: string, stand: Stand): Promise<void> {
 
   if (stand === "uit") await redis.hset(UIT_SLEUTEL, { [feest]: "1" });
   else if (huidig.uit.has(feest)) await redis.hdel(UIT_SLEUTEL, feest);
+}
+
+// ---- de agenda, aangevuld vanuit de booth ----
+// content/feesten.ts blijft de basis. Wat er in de booth aan de agenda
+// verandert, staat hier per slug: een nieuw feest, een aangepaste naam, datum
+// of plaats, of een verwijdering. De slug zelf verandert nooit, zodat geprinte
+// QR-codes blijven werken.
+
+export type Aanpassing = {
+  naam?: string;
+  datum?: string;
+  plaats?: string | null;
+  test?: boolean;
+  /** In de booth aangemaakt, dus niet in content/feesten.ts. */
+  nieuw?: boolean;
+  /** Uit de agenda gehaald. De verzoekjes blijven bewaard. */
+  verwijderd?: boolean;
+};
+
+function alsAanpassing(waarde: unknown): Aanpassing | null {
+  let ruw = waarde;
+  if (typeof ruw === "string") {
+    try {
+      ruw = JSON.parse(ruw);
+    } catch {
+      return null;
+    }
+  }
+  return ruw && typeof ruw === "object" ? (ruw as Aanpassing) : null;
+}
+
+export async function leesAanpassingen(): Promise<Map<string, Aanpassing>> {
+  const redis = geefOpslag();
+  if (!redis) return new Map(geheugenAgenda);
+  const alles = (await redis.hgetall(AGENDA_SLEUTEL)) ?? {};
+  const uitkomst = new Map<string, Aanpassing>();
+  for (const [slug, ruw] of Object.entries(alles)) {
+    const aanpassing = alsAanpassing(ruw);
+    if (aanpassing) uitkomst.set(slug, aanpassing);
+  }
+  return uitkomst;
+}
+
+export async function zetAanpassing(slug: string, aanpassing: Aanpassing): Promise<void> {
+  const redis = geefOpslag();
+  if (!redis) {
+    geheugenAgenda.set(slug, aanpassing);
+    return;
+  }
+  await redis.hset(AGENDA_SLEUTEL, { [slug]: JSON.stringify(aanpassing) });
 }
 
 /**

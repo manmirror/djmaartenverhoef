@@ -3,7 +3,8 @@ import { randomUUID } from "node:crypto";
 import { Resend } from "resend";
 
 import { kenmerk, naarMatch, vindInCollectie } from "@/app/verzoekjes/collectie";
-import { datumVoluit, vindFeest } from "@/app/verzoekjes/feesten";
+import { vindInAgenda } from "@/app/verzoekjes/agenda";
+import { datumVoluit } from "@/app/verzoekjes/feesten";
 import { openstand } from "@/app/verzoekjes/schakelaar";
 import {
   geefIp,
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
     return Response.json({ ok: true, resultaat: "toegevoegd" });
   }
 
-  const feest = vindFeest((body.feest ?? "").trim());
+  const feest = await vindInAgenda((body.feest ?? "").trim());
   if (!feest) {
     return Response.json({ error: "onbekend-feest" }, { status: 400 });
   }

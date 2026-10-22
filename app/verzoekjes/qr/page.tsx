@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 
-import { alleFeesten, datumVoluit } from "../feesten";
+import { leesAgenda } from "../agenda";
+import { datumVoluit } from "../feesten";
 
 export const metadata: Metadata = {
   title: "QR-codes verzoekjes — DJ Maarten Verhoef",
@@ -9,8 +11,10 @@ export const metadata: Metadata = {
 };
 
 /** Overzicht van alle posters: één per feest, plus de algemene. */
-export default function QrOverzicht() {
-  const feesten = alleFeesten();
+export default async function QrOverzicht() {
+  // De agenda wordt in de booth bijgehouden: altijd vers lezen.
+  await connection();
+  const feesten = await leesAgenda();
 
   return (
     <main className="qro">
@@ -64,7 +68,7 @@ export default function QrOverzicht() {
 
       {feesten.length === 0 && (
         <p className="qro-leeg">
-          Er staan nog geen feesten in de agenda. Zet ze in content/feesten.ts.
+          Er staan nog geen feesten in de agenda. Maak ze aan in de booth, onder Agenda.
         </p>
       )}
     </main>

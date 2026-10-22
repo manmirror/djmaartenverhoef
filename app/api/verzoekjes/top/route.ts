@@ -1,6 +1,7 @@
 import { codeAntwoord, controleerCode } from "@/app/verzoekjes/code";
 import { kenmerk } from "@/app/verzoekjes/collectie";
-import { alleFeesten, jaarVan, venster } from "@/app/verzoekjes/feesten";
+import { leesAgenda } from "@/app/verzoekjes/agenda";
+import { jaarVan, venster } from "@/app/verzoekjes/feesten";
 import { leesOudeVerzoekjesIn } from "@/app/verzoekjes/import";
 import { leesMeerdere } from "@/app/verzoekjes/store";
 import type { TopNummer } from "@/app/verzoekjes/types";
@@ -22,7 +23,8 @@ export async function GET(request: Request) {
   const jaar = gevraagd ? Number(gevraagd) : null;
 
   // Testfeesten tellen niet mee: anders staan je proefverzoekjes tussen de echte.
-  const agenda = alleFeesten().filter(
+  const alles = await leesAgenda();
+  const agenda = alles.filter(
     (feest) => !feest.test && (jaar === null || jaarVan(feest) === jaar)
   );
   await leesOudeVerzoekjesIn(agenda);
@@ -66,7 +68,7 @@ export async function GET(request: Request) {
 
   return Response.json({
     jaar,
-    jaren: [...new Set(alleFeesten().filter((feest) => !feest.test).map(jaarVan))].sort(
+    jaren: [...new Set(alles.filter((feest) => !feest.test).map(jaarVan))].sort(
       (a, b) => b - a
     ),
     // Alleen feesten die al begonnen zijn; de rest heeft nog niets te tellen.

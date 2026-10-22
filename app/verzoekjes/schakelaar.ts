@@ -2,7 +2,7 @@
 // (/verzoekjes, de sticker) wijst. Combineert de agenda met de aan/uit-
 // schakelaar uit de booth.
 
-import { alleFeesten, isOpen, vindFeest, type Feest } from "./feesten";
+import { isOpen, vindIn, type Feest } from "./feesten";
 import { leesSchakelaars, standVan, type Schakelaars, type Stand } from "./store";
 
 export type Openstand = {
@@ -32,13 +32,14 @@ export async function openstand(feest: Feest): Promise<Openstand> {
  * toch terug, maar dicht, zodat de pagina kan zeggen dat er nu niets open staat.
  */
 export function feestVoorAlgemeen(
+  agenda: Feest[],
   schakelaars: Schakelaars,
   nu = Date.now()
 ): { feest: Feest; stand: Stand } | null {
-  const aan = schakelaars.aan ? vindFeest(schakelaars.aan.feest) : null;
+  const aan = schakelaars.aan ? vindIn(agenda, schakelaars.aan.feest) : null;
   if (aan) return { feest: aan, stand: "aan" };
 
-  const volgensAgenda = alleFeesten().filter((feest) => isOpen(feest, nu));
+  const volgensAgenda = agenda.filter((feest) => isOpen(feest, nu));
   const open = volgensAgenda.find((feest) => !schakelaars.uit.has(feest.slug));
   if (open) return { feest: open, stand: "automatisch" };
   if (volgensAgenda[0]) return { feest: volgensAgenda[0], stand: "uit" };

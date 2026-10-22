@@ -1,6 +1,6 @@
 import { codeAntwoord, controleerCode } from "@/app/verzoekjes/code";
 import { naarMatch, trackOp } from "@/app/verzoekjes/collectie";
-import { vindFeest } from "@/app/verzoekjes/feesten";
+import { vindInAgenda } from "@/app/verzoekjes/agenda";
 import { verwijderVerzoek, zetMatch, zetStatus } from "@/app/verzoekjes/store";
 import type { VerzoekStatus } from "@/app/verzoekjes/types";
 
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "invalid" }, { status: 400 });
   }
 
-  const feest = vindFeest((body.feest ?? "").trim());
+  const feest = await vindInAgenda((body.feest ?? "").trim());
   if (!feest || !body.id) {
     return Response.json({ error: "invalid" }, { status: 400 });
   }

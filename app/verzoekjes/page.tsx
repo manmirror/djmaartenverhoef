@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 
 import VerzoekPagina from "./VerzoekPagina";
+import { leesAgenda } from "./agenda";
 import { volgendFeest } from "./feesten";
 import { feestVoorAlgemeen } from "./schakelaar";
 import { leesSchakelaars } from "./store";
@@ -22,13 +23,14 @@ export default async function Verzoekjes() {
   // Welk feest er nu is hangt van het moment af, dus niet vooraf uitrekenen.
   await connection();
 
-  const gekozen = feestVoorAlgemeen(await leesSchakelaars());
+  const agenda = await leesAgenda();
+  const gekozen = feestVoorAlgemeen(agenda, await leesSchakelaars());
 
   return (
     <VerzoekPagina
       feest={gekozen?.feest ?? null}
       stand={gekozen?.stand}
-      volgende={volgendFeest()}
+      volgende={volgendFeest(agenda)}
     />
   );
 }

@@ -1,12 +1,7 @@
 import { codeAntwoord, controleerCode } from "@/app/verzoekjes/code";
 import { collectieAantal } from "@/app/verzoekjes/collectie";
-import {
-  alleFeesten,
-  feestVoorBooth,
-  naarInfo,
-  venster,
-  vindFeest,
-} from "@/app/verzoekjes/feesten";
+import { leesAgenda } from "@/app/verzoekjes/agenda";
+import { feestVoorBooth, naarInfo, venster, vindIn } from "@/app/verzoekjes/feesten";
 import { leesOudeVerzoekjesIn } from "@/app/verzoekjes/import";
 import { feestVoorAlgemeen, openstandVan } from "@/app/verzoekjes/schakelaar";
 import {
@@ -30,16 +25,20 @@ export async function GET(request: Request) {
   const nu = Date.now();
   const schakelaars = await leesSchakelaars();
   const gevraagd = new URL(request.url).searchParams.get("feest");
-  const opAan = schakelaars.aan ? vindFeest(schakelaars.aan.feest) : null;
-  const feest = gevraagd ? vindFeest(gevraagd) : (opAan ?? feestVoorBooth(nu));
+  const alles = await leesAgenda();
+  const opAan = schakelaars.aan ? vindIn(alles, schakelaars.aan.feest) : null;
+  // Een gevraagd feest dat er niet (meer) is, bijvoorbeeld net verwijderd:
+  // dan gewoon het feest dat de booth anders ook zou kiezen.
+  const feest =
+    (gevraagd ? vindIn(alles, gevraagd) : null) ?? opAan ?? feestVoorBooth(alles, nu);
 
-  const agenda = alleFeesten().map((ander) => ({
+  const agenda = alles.map((ander) => ({
     ...naarInfo(ander, nu),
     ...openstandVan(ander, schakelaars, nu),
   }));
 
   // Waar de sticker en de algemene QR-code nu naartoe wijzen.
-  const algemeenGekozen = feestVoorAlgemeen(schakelaars, nu);
+  const algemeenGekozen = feestVoorAlgemeen(alles, schakelaars, nu);
   const algemeen =
     algemeenGekozen && algemeenGekozen.stand !== "uit"
       ? { slug: algemeenGekozen.feest.slug, naam: algemeenGekozen.feest.naam }

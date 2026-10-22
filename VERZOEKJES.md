@@ -61,7 +61,38 @@ vergeet hij hem weer.
 
 ## 2. De agenda
 
-De feesten staan in `content/feesten.ts`. Per feest één regel:
+### Bijhouden in de booth
+
+Het makkelijkst: in de booth, onder het tabblad **Agenda**.
+
+- **+ Nieuw feest** — naam, datum, en eventueel de plaats. Vink *Testfeest*
+  aan om iets uit te proberen; dat telt niet mee in de jaarlijst. Het feest
+  krijgt meteen een eigen adres, QR-code en poster (de knop *Naar het feest*
+  brengt je erheen, met daaronder *Posters, QR-codes en link*).
+- **Wijzig** — naam, datum, plaats of test aanpassen. Ook bij de verzoekjes
+  zelf, met de knop *Naam of datum wijzigen* naast de feestkeuze.
+- **Verwijder** — haalt het feest uit de agenda, na een bevestiging. De link
+  en de QR-code werken dan niet meer, en het feest telt niet mee in het
+  archief en de jaarlijst. De verzoekjes blijven wel bewaard: onderaan, bij
+  *Verwijderde feesten*, zet je het met **Zet terug** weer terug, met alles
+  erop en eraan.
+
+**De link en de QR-code van een feest veranderen nooit**, ook niet als je de
+naam aanpast. Het adres wordt één keer gemaakt uit de naam
+(`Bo Chantal & Mitchel` → `/verzoekjes/f/bo-chantal-en-mitchel`). Een geprinte
+poster blijft dus werken; download hem opnieuw als je de nieuwe naam erop wilt.
+Bestaat een adres al, dan komt de datum erachter (`…-2027-01-16`).
+
+Dit werkt alleen met de database: zonder database zou een wijziging maar op
+één server staan.
+
+### Het agendabestand
+
+De feesten die vóór het agendabeheer zijn ingevoerd staan in
+`content/feesten.ts`. Wat je daarvan in de booth wijzigt of verwijdert, komt in
+de database te staan, bovenop het bestand; het bestand zelf verandert niet. Wat
+je niet in de booth hebt aangepast, volgt het bestand gewoon. Per feest één
+regel:
 
 ```ts
 {
@@ -76,8 +107,9 @@ De feesten staan in `content/feesten.ts`. Per feest één regel:
 },
 ```
 
-Stuur me je agenda en ik zet ze erin, of pas het bestand zelf aan en deploy.
-Elk feest krijgt dan vanzelf een eigen poster op `/verzoekjes/qr`.
+Alleen in het bestand kun je de tijden (`vanafUur`, `totUur`) per feest
+aanpassen en oude verzoekjes inlezen. Elk feest krijgt vanzelf een eigen poster
+op `/verzoekjes/qr`.
 
 **Verander de slug niet meer nadat je de poster hebt geprint.** De code op
 papier wijst naar dat adres.

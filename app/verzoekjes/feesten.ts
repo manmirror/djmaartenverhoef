@@ -75,39 +75,48 @@ export function isOpen(feest: Feest, nu = Date.now()): boolean {
   return nu >= van && nu < tot;
 }
 
-/** Alle feesten, nieuwste bovenaan. */
-export function alleFeesten(): Feest[] {
-  return [...feesten].sort((a, b) => b.datum.localeCompare(a.datum));
+/** De feesten uit content/feesten.ts, zonder wat er in de booth aan veranderd is. */
+export function basisFeesten(): Feest[] {
+  return feesten;
 }
 
-export function vindFeest(slug: string): Feest | null {
-  return feesten.find((feest) => feest.slug === slug) ?? null;
+/** Nieuwste bovenaan. */
+export function opDatum(lijst: Feest[]): Feest[] {
+  return [...lijst].sort((a, b) => b.datum.localeCompare(a.datum));
+}
+
+export function vindIn(lijst: Feest[], slug: string): Feest | null {
+  return lijst.find((feest) => feest.slug === slug) ?? null;
 }
 
 /** Het feest dat op dit moment aan de gang is, als dat er is. */
-export function feestNu(nu = Date.now()): Feest | null {
-  return feesten.find((feest) => isOpen(feest, nu)) ?? null;
+export function feestNu(lijst: Feest[], nu = Date.now()): Feest | null {
+  return lijst.find((feest) => isOpen(feest, nu)) ?? null;
 }
 
 /** Het eerstvolgende feest dat nog moet komen. */
-export function volgendFeest(nu = Date.now()): Feest | null {
-  return [...feesten]
-    .filter((feest) => venster(feest).van > nu)
-    .sort((a, b) => a.datum.localeCompare(b.datum))[0] ?? null;
+export function volgendFeest(lijst: Feest[], nu = Date.now()): Feest | null {
+  return (
+    [...lijst]
+      .filter((feest) => venster(feest).van > nu)
+      .sort((a, b) => a.datum.localeCompare(b.datum))[0] ?? null
+  );
 }
 
 /**
  * Welk feest de booth standaard laat zien: wat er nu is, anders het feest dat
  * het dichtst bij vandaag ligt.
  */
-export function feestVoorBooth(nu = Date.now()): Feest | null {
-  const bezig = feestNu(nu);
+export function feestVoorBooth(lijst: Feest[], nu = Date.now()): Feest | null {
+  const bezig = feestNu(lijst, nu);
   if (bezig) return bezig;
 
-  return [...feesten].sort((a, b) => {
-    const afstand = (feest: Feest) => Math.abs(venster(feest).van - nu);
-    return afstand(a) - afstand(b);
-  })[0] ?? null;
+  return (
+    [...lijst].sort((a, b) => {
+      const afstand = (feest: Feest) => Math.abs(venster(feest).van - nu);
+      return afstand(a) - afstand(b);
+    })[0] ?? null
+  );
 }
 
 /** "zaterdag 24 oktober 2026" */

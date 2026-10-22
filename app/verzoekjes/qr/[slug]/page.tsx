@@ -1,24 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 
 import { siteContent } from "@/content/site";
 
 import PrintKnop from "../PrintKnop";
-import { alleFeesten, datumVoluit, vindFeest } from "../../feesten";
+import { vindInAgenda } from "../../agenda";
+import { datumVoluit } from "../../feesten";
 
 /** De poster zonder feest eraan, die naar het algemene adres wijst. */
 const ALGEMEEN = "algemeen";
-
-export function generateStaticParams() {
-  return [{ slug: ALGEMEEN }, ...alleFeesten().map((feest) => ({ slug: feest.slug }))];
-}
 
 export async function generateMetadata(
   props: PageProps<"/verzoekjes/qr/[slug]">
 ): Promise<Metadata> {
   const { slug } = await props.params;
-  const feest = vindFeest(slug);
+  const feest = slug === ALGEMEEN ? null : await vindInAgenda(slug);
 
   return {
     title: feest ? `QR-code — ${feest.naam}` : "QR-code verzoekjes",
@@ -27,10 +25,13 @@ export async function generateMetadata(
 }
 
 export default async function QrPoster(props: PageProps<"/verzoekjes/qr/[slug]">) {
+  // Naam, datum en plaats kunnen in de booth veranderd zijn: altijd vers lezen.
+  await connection();
+
   const { slug } = await props.params;
   const teksten = siteContent.verzoekjes;
 
-  const feest = slug === ALGEMEEN ? null : vindFeest(slug);
+  const feest = slug === ALGEMEEN ? null : await vindInAgenda(slug);
   if (!feest && slug !== ALGEMEEN) notFound();
 
   const code = `/api/verzoekjes/qr/${slug}`;
