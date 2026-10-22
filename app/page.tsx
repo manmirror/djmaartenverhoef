@@ -81,17 +81,22 @@ export default function Home() {
               ))}
             </div>
             <div
-              className="hero-photo"
-              style={
-                settings.heroImage
-                  ? {
-                      backgroundImage: `url(${settings.heroImage})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                    }
-                  : undefined
-              }
+              className={settings.heroImage ? "hero-photo met-foto" : "hero-photo"}
             >
+              {settings.heroImage && (
+                <Image
+                  src={settings.heroImage}
+                  alt={settings.heroImageAlt}
+                  fill
+                  sizes="(max-width: 1120px) 100vw, 1072px"
+                  // Bovenaan de pagina, dus meteen laden in plaats van pas als
+                  // je ernaartoe scrolt.
+                  loading="eager"
+                  fetchPriority="high"
+                  className="hero-photo-img"
+                  style={{ objectPosition: settings.heroImageFocus }}
+                />
+              )}
               <div className="hero-overlay">
                 <div className="hero-overlay-eyebrow">
                   {settings.heroOverlayEyebrow}

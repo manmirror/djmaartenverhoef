@@ -101,6 +101,14 @@ h1.wordmark{margin:0 0 28px;}
     radial-gradient(circle at 60% 10%, rgba(255,138,61,.35), transparent 50%),
     #171122;
 }
+.hero-photo-img{object-fit:cover; z-index:0;}
+/* Een donker verloop over de onderkant, zodat de tekst en het kaartje op
+   elke foto leesbaar blijven. */
+.hero-photo.met-foto::after{
+  content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:linear-gradient(to top, rgba(12,10,18,.82) 0%, rgba(12,10,18,.35) 45%, transparent 75%);
+}
+.hero-photo > :not(.hero-photo-img){position:relative; z-index:2;}
 .hero-overlay-eyebrow{
   font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:rgba(243,238,252,.75);

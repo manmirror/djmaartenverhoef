@@ -23,6 +23,11 @@ export const siteContent = {
   heroLabels: ["Bruiloften", "Bedrijfsfeesten", "Kroeg & festival"],
   // Grote sfeerfoto in de hero. Zet bv. "/images/hero.jpg", of laat op null.
   heroImage: null as string | null,
+  // Wat er op de foto staat, voor schermlezers en zoekmachines.
+  heroImageAlt: "Maarten achter de draaitafels",
+  // Welk deel van de foto in beeld blijft als hij bijgesneden wordt, als
+  // "links-rechts boven-onder": "50% 50%" is het midden.
+  heroImageFocus: "50% 50%",
   // Tekst linksonder over de foto.
   heroOverlayEyebrow: "Al ruim 30 jaar",
   heroOverlayTitle: "Dansvloer vol.",
