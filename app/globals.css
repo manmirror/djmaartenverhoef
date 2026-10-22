@@ -109,6 +109,13 @@ h1.wordmark{margin:0 0 28px;}
   background:linear-gradient(to top, rgba(12,10,18,.82) 0%, rgba(12,10,18,.35) 45%, transparent 75%);
 }
 .hero-photo > :not(.hero-photo-img){position:relative; z-index:2;}
+/* Op een telefoon nemen de tekst en het kaartje onderin samen zo'n 250px in.
+   Met een foto maken we het vak hoger, zodat het gezicht erboven vrij blijft
+   in plaats van achter "Dansvloer vol." te verdwijnen. */
+@media(max-width:640px){
+  /* align-content: tekst en kaartje samen onderaan, niet verspreid over het vak. */
+  .hero-photo.met-foto{min-height:500px; align-content:flex-end;}
+}
 .hero-overlay-eyebrow{
   font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:rgba(243,238,252,.75);

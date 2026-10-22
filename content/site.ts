@@ -22,12 +22,12 @@ export const siteContent = {
   // Drie labels boven de grote hero-foto.
   heroLabels: ["Bruiloften", "Bedrijfsfeesten", "Kroeg & festival"],
   // Grote sfeerfoto in de hero. Zet bv. "/images/hero.jpg", of laat op null.
-  heroImage: null as string | null,
+  heroImage: "/images/maarten-booth.jpg" as string | null,
   // Wat er op de foto staat, voor schermlezers en zoekmachines.
-  heroImageAlt: "Maarten achter de draaitafels",
+  heroImageAlt: "Maarten lachend achter zijn Pioneer DJ-set, in paars en roze licht",
   // Welk deel van de foto in beeld blijft als hij bijgesneden wordt, als
   // "links-rechts boven-onder": "50% 50%" is het midden.
-  heroImageFocus: "50% 50%",
+  heroImageFocus: "50% 45%",
   // Tekst linksonder over de foto.
   heroOverlayEyebrow: "Al ruim 30 jaar",
   heroOverlayTitle: "Dansvloer vol.",
