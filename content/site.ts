@@ -87,6 +87,9 @@ export const siteContent = {
     "Café Bloemenbeppie",
     "Hockeyclub Qui Vive",
     "Sportvereniging Legmeervogels",
+    "De Vink Vinkeveen",
+    "Sjiek aan de Amstel",
+    "Het Fort, De Kwakel",
   ],
 
   // Linkerkaart van het drieluik: tekst in het midden, stijlen draaien eromheen.
