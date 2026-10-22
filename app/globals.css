@@ -303,7 +303,8 @@ h1.wordmark{margin:0 0 28px;}
 
 /* MUZIEK */
 .muziek{padding:120px 0; background:var(--bg-soft); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
-.player-grid{display:grid; grid-template-columns:1fr 1fr; gap:24px;}
+/* Eén speler over de volle breedte, twee of meer naast elkaar. */
+.player-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap:24px;}
 @media(max-width:780px){.player-grid{grid-template-columns:1fr;}}
 .player{
   border:1px solid var(--line); border-radius:18px; padding:22px; background:var(--bg);

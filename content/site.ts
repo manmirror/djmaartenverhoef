@@ -228,13 +228,6 @@ export const siteContent = {
       audioFile: null as string | null,
       externalUrl: null as string | null,
     },
-    {
-      title: "Spotify — Bruiloften Mix",
-      dotColor: "var(--violet)",
-      embedUrl: "",
-      audioFile: null as string | null,
-      externalUrl: null as string | null,
-    },
   ],
 
   contactHeading: "Zullen we het even hebben over jouw feest?",
