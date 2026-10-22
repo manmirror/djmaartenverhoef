@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import CallbackForm from "./CallbackForm";
 import ChatCard from "./ChatCard";
 import Effects from "./Effects";
@@ -143,20 +145,21 @@ export default function Home() {
 
       <section className="over" id="over">
         <div className="wrap over-grid">
-          <div
-            className="over-photo"
-            style={
-              settings.aboutPhoto
-                ? {
-                    backgroundImage: `url(${settings.aboutPhoto})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    color: "transparent",
-                  }
-                : undefined
-            }
-          >
-            {!settings.aboutPhoto && "Foto van Maarten tijdens een optreden"}
+          <div className="over-photo">
+            {settings.aboutPhoto ? (
+              <Image
+                src={settings.aboutPhoto}
+                alt={settings.aboutPhotoAlt}
+                fill
+                // Naast de tekst ongeveer de helft van de 1120px brede kolom;
+                // op een telefoon de volle breedte.
+                sizes="(max-width: 860px) 100vw, 540px"
+                className="over-photo-img"
+                style={{ objectPosition: settings.aboutPhotoFocus }}
+              />
+            ) : (
+              "Foto van Maarten tijdens een optreden"
+            )}
           </div>
           <div>
             <h2>{settings.aboutHeading}</h2>

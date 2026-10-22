@@ -76,7 +76,12 @@ export const siteContent = {
   aboutText:
     "Sinds de jaren '90 draait Maarten in en rond Uithoorn — van kroeg tot koningsdag. Zijn stijl is veelzijdig: electro, dance, pop, R&B, disco en Nederlandstalig, vloeiend door elkaar gemengd zodat elke generatie op de vloer blijft staan.\nVaste gast op onder meer:",
   // Zet bv. "/images/maarten-optreden.jpg", of laat op null voor de placeholder.
-  aboutPhoto: null as string | null,
+  aboutPhoto: "/images/maarten-draait.jpg" as string | null,
+  // Wat er op de foto staat, voor schermlezers en zoekmachines.
+  aboutPhotoAlt: "Maarten achter de draaitafels, met koptelefoon op en een blauw colbert aan",
+  // Welk deel van de foto in beeld blijft als hij bijgesneden wordt: "50% 0%"
+  // houdt de bovenkant (het hoofd) vast en snijdt van onderen af.
+  aboutPhotoFocus: "50% 0%",
   venues: [
     "Koningsdag Uithoorn",
     "Watch Me Now",

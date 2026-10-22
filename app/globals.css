@@ -146,6 +146,7 @@ h1.wordmark{margin:0 0 28px;}
 .over-grid{display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;}
 @media(max-width:860px){.over-grid{grid-template-columns:1fr;}}
 .over-photo{
+  position:relative; overflow:hidden;
   aspect-ratio:4/5; border-radius:24px;
   background:
     radial-gradient(circle at 30% 20%, rgba(255,47,126,.55), transparent 55%),
@@ -155,6 +156,7 @@ h1.wordmark{margin:0 0 28px;}
   color:var(--muted); font-size:13px; font-weight:700; letter-spacing:0.03em;
   border:1px solid var(--line);
 }
+.over-photo-img{object-fit:cover;}
 .over h2{font-size:clamp(28px,3.6vw,42px); font-weight:900; letter-spacing:-0.02em; line-height:1.1; margin:0 0 22px;}
 .over p{color:var(--muted); font-size:16px; line-height:1.7; margin:0 0 16px; max-width:52ch;}
 .venues{display:flex; flex-wrap:wrap; gap:10px; margin-top:26px;}
