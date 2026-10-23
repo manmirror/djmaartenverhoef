@@ -104,8 +104,7 @@ export default function SleepLijst({ verzoeken, className, rij, onVolgorde }: Pr
       onPointerDown(event) {
         if (event.button !== 0) return;
         event.preventDefault();
-        const greep = event.currentTarget;
-        greep.setPointerCapture(event.pointerId);
+        const pointer = event.pointerId;
 
         sleepRef.current = verzoek.id;
         beginRef.current = volgorde;
@@ -115,13 +114,19 @@ export default function SleepLijst({ verzoeken, className, rij, onVolgorde }: Pr
         setLokaal(volgorde);
         frame.current = requestAnimationFrame(stap);
 
+        // Luisteren op het hele venster, niet op de greep: zodra de rij in de
+        // lijst verschuift, haalt de browser hem even uit de pagina, en met een
+        // vinger (Android, iPad) komen de bewegingen daarna niet meer bij de
+        // greep aan. Met een muis viel dat niet op.
         const beweeg = (beweging: PointerEvent) => {
+          if (beweging.pointerId !== pointer) return;
           laatsteY.current = beweging.clientY;
         };
-        const los = () => {
-          greep.removeEventListener("pointermove", beweeg);
-          greep.removeEventListener("pointerup", los);
-          greep.removeEventListener("pointercancel", los);
+        const los = (einde: PointerEvent) => {
+          if (einde.pointerId !== pointer) return;
+          window.removeEventListener("pointermove", beweeg);
+          window.removeEventListener("pointerup", los);
+          window.removeEventListener("pointercancel", los);
           if (frame.current !== null) cancelAnimationFrame(frame.current);
           frame.current = null;
 
@@ -131,9 +136,9 @@ export default function SleepLijst({ verzoeken, className, rij, onVolgorde }: Pr
           setLokaal(null);
           if (eind.join("|") !== beginRef.current.join("|")) onVolgorde(eind);
         };
-        greep.addEventListener("pointermove", beweeg);
-        greep.addEventListener("pointerup", los);
-        greep.addEventListener("pointercancel", los);
+        window.addEventListener("pointermove", beweeg);
+        window.addEventListener("pointerup", los);
+        window.addEventListener("pointercancel", los);
       },
 
       onKeyDown(event) {
