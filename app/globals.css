@@ -628,7 +628,7 @@ html[data-booth-thema="licht"]:has(.bt-pagina) body{background:#f5f3f8;}
 .bt-gevraagd{margin-top:4px; font-size:12px; font-style:italic; color:var(--muted);}
 .bt-meta{display:flex; flex-wrap:wrap; gap:10px; margin-top:7px; font-size:11px; color:var(--muted);}
 .bt-meta span{letter-spacing:0.04em;}
-.bt-van{color:var(--ink);}
+.bt-van{margin-top:4px; font-size:13px; line-height:1.4; color:var(--ink); overflow-wrap:anywhere;}
 .bt-niet{color:var(--bt-let-op);}
 .bt-cijfers{display:flex; flex-direction:column; align-items:flex-end; gap:3px;}
 .bt-bpm{
@@ -1072,11 +1072,28 @@ html[data-booth-thema="licht"]:has(.bt-pagina) body{background:#f5f3f8;}
 @media(min-width:960px) and (orientation:landscape) and (pointer:coarse){
   .bt{grid-template-columns:minmax(280px,310px) minmax(0,1fr); gap:20px;}
   .bt-hoofd .bt-lijst{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px;}
-  .bt-hoofd .bt-rij{padding:12px 14px; gap:10px;}
-  .bt-hoofd .bt-titel{font-size:17px;}
-  .bt-hoofd .bt-artiest{font-size:14px;}
+  /* Compacte kaarten: nummer en bpm bovenaan, Gedraaid en Overslaan klein
+     naast elkaar eronder. Zo krijgt de titel de volle breedte. */
+  .bt-hoofd .bt-rij{
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:2px 12px; padding:10px 14px 10px 12px;
+    /* Kaarten naast elkaar zijn even hoog: de tekst bovenaan, de knoppen onderaan. */
+    align-items:start; align-content:space-between;
+  }
+  .bt-hoofd .bt-rij-sleep .bt-greep{align-self:stretch;}
+  .bt-hoofd .bt-rij-sleep{grid-template-columns:auto minmax(0,1fr) auto;}
+  .bt-hoofd .bt-rij-sleep .bt-greep{grid-row:1 / span 2; margin:-4px 0 -4px -4px;}
+  .bt-hoofd .bt-titel{font-size:17px; line-height:1.25;}
+  .bt-hoofd .bt-artiest{margin-top:1px; font-size:14px;}
+  .bt-hoofd .bt-gevraagd{margin-top:2px;}
+  .bt-hoofd .bt-meta{margin-top:4px; gap:4px 10px;}
   .bt-hoofd .bt-bpm{font-size:20px;}
-  .bt-hoofd .bt-acties button{padding:8px 12px;}
+  .bt-hoofd .bt-acties{
+    grid-column:1 / -1; flex-direction:row; justify-content:flex-end; gap:6px;
+    margin-top:4px;
+  }
+  .bt-hoofd .bt-rij-sleep .bt-acties{grid-column:2 / -1;}
+  .bt-hoofd .bt-acties button{padding:7px 14px; font-size:12px;}
 }
 
 /* --- sticker van 20 × 20 cm --- */

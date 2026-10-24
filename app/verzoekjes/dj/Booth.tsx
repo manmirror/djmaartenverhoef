@@ -911,9 +911,14 @@ function Rij({
           <div className="bt-artiest">{match ? match.artiest : verzoek.artiest}</div>
         )}
         {toonGevraagd && <div className="bt-gevraagd">gevraagd: “{gevraagd}”</div>}
+        {/* Een naam of een berichtje van de gast; dat laatste kan een zin zijn. */}
+        {verzoek.van && (
+          <div className="bt-van">
+            <span aria-hidden="true">💬</span> {verzoek.van}
+          </div>
+        )}
         <div className="bt-meta">
           <span className="bt-tijd">{klok}</span>
-          {verzoek.van && <span className="bt-van">van {verzoek.van}</span>}
           {!match && <span className="bt-niet">niet in collectie</span>}
           {match?.andereArtiest && (
             <span className="bt-niet" title={`Gevraagd: ${gevraagd}`}>

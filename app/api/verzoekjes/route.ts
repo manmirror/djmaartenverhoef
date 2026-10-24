@@ -20,7 +20,8 @@ export const runtime = "nodejs";
 
 const MAX_TITEL = 120;
 const MAX_ARTIEST = 120;
-const MAX_VAN = 60;
+/** Een naam, of een berichtje voor het bruidspaar of de jarige. */
+const MAX_VAN = 140;
 
 /** Zelfde nummer binnen dit tijdvak telt als hetzelfde verzoekje. */
 const DUBBEL_VENSTER_MS = 2 * 60 * 60 * 1000;
@@ -133,7 +134,7 @@ async function mailDoor(verzoek: Verzoek, feestnaam: string) {
     `${verzoek.titel}${verzoek.artiest ? ` — ${verzoek.artiest}` : ""}`,
     "",
     `Feest: ${feestnaam}`,
-    verzoek.van ? `Aangevraagd door: ${verzoek.van}` : "Aangevraagd door: (niet ingevuld)",
+    verzoek.van ? `Naam of berichtje: ${verzoek.van}` : "Naam of berichtje: (niet ingevuld)",
     "",
     match
       ? `In je collectie: ${match.titel}${match.artiest ? ` — ${match.artiest}` : ""}`

@@ -133,8 +133,9 @@ export default function VerzoekForm({
           type="text"
           name="vanwie"
           placeholder={teksten.vanPlaceholder}
+          maxLength={140}
           autoComplete="off"
-          autoCapitalize="words"
+          autoCapitalize="sentences"
         />
       </label>
 
