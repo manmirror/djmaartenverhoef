@@ -1072,7 +1072,11 @@ html[data-booth-thema="licht"]:has(.bt-pagina) body{background:#f5f3f8;}
   .bt-zij .bt-stand-uitleg{font-size:12px;}
   .bt-zij .bt-materiaal{padding-top:8px;}
 
-  .bt-zij .bt-balk{margin:12px 0 0; flex-direction:column; align-items:stretch; gap:6px;}
+  /* Volgorde in de kolom: feest, dan de sortering, dan de aan/uit-schakelaar. */
+  .bt-zij{display:flex; flex-direction:column;}
+  .bt-zij > .bt-schakelaar,
+  .bt-zij > .bt-leeg{order:1;}
+  .bt-zij .bt-balk{margin:10px 0 0; flex-direction:column; align-items:stretch; gap:6px;}
   .bt-zij .bt-sorteer button{flex:1; padding:8px 6px; font-size:12px;}
 
   /* De lijst begint bovenaan, op dezelfde hoogte als de kop links. */
