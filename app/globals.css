@@ -1023,6 +1023,8 @@ html[data-booth-thema="licht"]:has(.bt-pagina) body{background:#f5f3f8;}
   .bt-rij-sleep .bt-acties{grid-column:2 / -1;}
 }
 
+.bt-wijzig-kort{display:none;}
+
 /* --- booth op een breed scherm, zoals een tablet liggend --- */
 /* De bediening als vaste kolom links, de lijst rechts over de volle hoogte.
    Smaller dan dit blijft alles onder elkaar, zoals op een telefoon. */
@@ -1033,33 +1035,45 @@ html[data-booth-thema="licht"]:has(.bt-pagina) body{background:#f5f3f8;}
     display:grid; grid-template-columns:minmax(300px,350px) minmax(0,1fr);
     gap:28px; align-items:start;
   }
+  /* De kolom is zo compact dat hij op een liggende tablet in één scherm past.
+     Is een scherm toch te laag, dan scrolt hij, maar zonder zichtbare balk. */
   .bt-zij{
-    position:sticky; top:18px;
-    max-height:calc(100dvh - 36px); overflow-y:auto;
-    /* Ruimte voor de schuifbalk, zodat die niet over de knoppen valt. */
-    padding-right:6px; margin-right:-6px;
-    scrollbar-width:thin;
+    position:sticky; top:14px;
+    max-height:calc(100dvh - 28px); overflow-y:auto;
+    scrollbar-width:none;
   }
+  .bt-zij::-webkit-scrollbar{display:none;}
   .bt-hoofd{min-width:0;}
+  .bt-pagina{padding-top:14px;}
 
-  .bt-kop{flex-wrap:wrap; gap:10px;}
-  .bt-kop h1{font-size:26px;}
+  /* Kop: "Booth" en de knoppen op één regel, de telling eronder. */
+  .bt-kop{display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:2px 8px;}
+  .bt-kop > div:first-child{display:contents;}
+  .bt-kop h1{grid-column:1; grid-row:1; font-size:24px;}
+  .bt-kop p{grid-column:1 / -1; grid-row:2; margin:0;}
+  .bt-kop-knoppen{grid-column:2; grid-row:1; flex-wrap:nowrap; gap:6px;}
+  .bt-kop-knoppen .bt-mini{padding:7px 12px;}
 
   .bt-zij .bt-tabs{
-    display:grid; grid-template-columns:1fr 1fr; gap:4px;
-    margin-top:16px; border-radius:18px;
+    display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:2px;
+    margin-top:12px; padding:3px;
   }
-  .bt-zij .bt-tabs button{border-radius:14px; padding:10px 8px;}
+  .bt-zij .bt-tabs button{padding:9px 2px; font-size:12px;}
 
-  .bt-zij .bt-feest{margin-top:16px;}
-  .bt-zij .bt-feest label{min-width:0; flex-basis:100%;}
-  .bt-zij .bt-feest select{font-size:14px; padding:12px 14px;}
+  .bt-zij .bt-feest{margin-top:12px; flex-wrap:nowrap; gap:8px;}
+  .bt-zij .bt-feest label{min-width:0; gap:4px;}
+  .bt-zij .bt-feest select{font-size:14px; padding:10px 12px;}
+  .bt-zij .bt-wijzig{flex:none; padding:11px 14px;}
+  .bt-zij .bt-wijzig-lang{display:none;}
+  .bt-zij .bt-wijzig-kort{display:inline;}
 
-  .bt-zij .bt-schakelaar{padding:12px 14px;}
-  .bt-zij .bt-stand button{padding:10px 6px;}
+  .bt-zij .bt-schakelaar{margin-top:10px; padding:10px 12px; gap:8px;}
+  .bt-zij .bt-stand button{padding:9px 6px;}
+  .bt-zij .bt-stand-uitleg{font-size:12px;}
+  .bt-zij .bt-materiaal{padding-top:8px;}
 
-  .bt-zij .bt-balk{margin:16px 0 0; flex-direction:column; align-items:stretch; gap:8px;}
-  .bt-zij .bt-sorteer button{flex:1; padding:9px 6px; font-size:12px;}
+  .bt-zij .bt-balk{margin:12px 0 0; flex-direction:column; align-items:stretch; gap:6px;}
+  .bt-zij .bt-sorteer button{flex:1; padding:8px 6px; font-size:12px;}
 
   /* De lijst begint bovenaan, op dezelfde hoogte als de kop links. */
   .bt-hoofd > :first-child{margin-top:0;}

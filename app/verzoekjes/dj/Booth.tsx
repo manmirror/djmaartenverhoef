@@ -664,8 +664,15 @@ export default function Booth() {
                   </select>
                 </label>
                 {feest && (
-                  <button type="button" className="bt-mini" onClick={() => wijzigFeest(feest.slug)}>
-                    Naam of datum wijzigen
+                  <button
+                    type="button"
+                    className="bt-mini bt-wijzig"
+                    aria-label="Naam of datum wijzigen"
+                    onClick={() => wijzigFeest(feest.slug)}
+                  >
+                    {/* In de smalle kolom op een tablet staat alleen "Wijzig". */}
+                    <span className="bt-wijzig-lang">Naam of datum wijzigen</span>
+                    <span className="bt-wijzig-kort">Wijzig</span>
                   </button>
                 )}
               </div>
