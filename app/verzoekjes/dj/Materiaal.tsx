@@ -10,8 +10,8 @@ type Props = {
 
 /**
  * Alles wat je bij een feest wilt downloaden of delen, bij elkaar: de poster,
- * de QR-code als plaatje, de link voor de gasten, en de sticker met de
- * algemene code. Ingeklapt, zodat het tijdens een feest niet in de weg zit.
+ * de QR-code als plaatje en de link voor de gasten. Elk feest heeft zijn eigen
+ * code. Ingeklapt, zodat het tijdens een feest niet in de weg zit.
  */
 export default function Materiaal({ feest }: Props) {
   const [gekopieerd, setGekopieerd] = useState(false);
@@ -51,6 +51,9 @@ export default function Materiaal({ feest }: Props) {
           <a className="bt-mini" href={code} download={`${bestandsnaam}.svg`}>
             QR-code SVG
           </a>
+          <a className="bt-mini" href="/verzoekjes/qr" target="_blank" rel="noopener">
+            Alle posters
+          </a>
         </div>
         <div className="bt-materiaal-link">
           <code>{link}</code>
@@ -65,24 +68,6 @@ export default function Materiaal({ feest }: Props) {
         </div>
       </div>
 
-      <div className="bt-materiaal-groep">
-        <span className="bt-materiaal-kop">Voor elk feest</span>
-        <div className="bt-materiaal-knoppen">
-          <a className="bt-mini" href="/verzoekjes/sticker" target="_blank" rel="noopener">
-            Sticker 20 × 20 cm
-          </a>
-          <a
-            className="bt-mini"
-            href="/api/verzoekjes/qr/algemeen?type=png"
-            download="verzoekjes-algemeen.png"
-          >
-            Algemene QR-code PNG
-          </a>
-          <a className="bt-mini" href="/verzoekjes/qr" target="_blank" rel="noopener">
-            Alle posters
-          </a>
-        </div>
-      </div>
     </details>
   );
 }

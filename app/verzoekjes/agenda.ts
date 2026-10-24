@@ -65,10 +65,9 @@ export function maakSlug(naam: string, datum: string, bezet: Set<string>): strin
       .slice(0, 50)
       .replace(/-+$/g, "") || "feest";
 
-  // "algemeen" is de algemene QR-code; die naam is dus niet vrij.
   const kandidaten = [basis, `${basis}-${datum}`];
   for (const kandidaat of kandidaten) {
-    if (kandidaat !== "algemeen" && !bezet.has(kandidaat)) return kandidaat;
+    if (!bezet.has(kandidaat)) return kandidaat;
   }
   let teller = 2;
   while (bezet.has(`${basis}-${datum}-${teller}`)) teller++;

@@ -9,14 +9,11 @@ import PrintKnop from "../PrintKnop";
 import { vindInAgenda } from "../../agenda";
 import { datumVoluit } from "../../feesten";
 
-/** De poster zonder feest eraan, die naar het algemene adres wijst. */
-const ALGEMEEN = "algemeen";
-
 export async function generateMetadata(
   props: PageProps<"/verzoekjes/qr/[slug]">
 ): Promise<Metadata> {
   const { slug } = await props.params;
-  const feest = slug === ALGEMEEN ? null : await vindInAgenda(slug);
+  const feest = await vindInAgenda(slug);
 
   return {
     title: feest ? `QR-code — ${feest.naam}` : "QR-code verzoekjes",
@@ -31,11 +28,11 @@ export default async function QrPoster(props: PageProps<"/verzoekjes/qr/[slug]">
   const { slug } = await props.params;
   const teksten = siteContent.verzoekjes;
 
-  const feest = slug === ALGEMEEN ? null : await vindInAgenda(slug);
-  if (!feest && slug !== ALGEMEEN) notFound();
+  const feest = await vindInAgenda(slug);
+  if (!feest) notFound();
 
-  const code = `/api/verzoekjes/qr/${slug}`;
-  const bestandsnaam = slug === ALGEMEEN ? "verzoekjes" : `verzoekjes-${slug}`;
+  const code = `/api/verzoekjes/qr/${feest.slug}`;
+  const bestandsnaam = `verzoekjes-${feest.slug}`;
 
   return (
     <main className="qr-pagina">
@@ -49,27 +46,17 @@ export default async function QrPoster(props: PageProps<"/verzoekjes/qr/[slug]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={code}
-            alt={
-              feest
-                ? `QR-code voor het feest van ${feest.naam}`
-                : `QR-code naar ${teksten.posterUrl}`
-            }
+            alt={`QR-code voor het feest van ${feest.naam}`}
             width={520}
             height={520}
           />
         </div>
 
-        {feest ? (
-          <>
-            <p className="qr-url">{feest.naam}</p>
-            <p className="qr-datum">
-              {datumVoluit(feest)}
-              {feest.plaats && ` · ${feest.plaats}`}
-            </p>
-          </>
-        ) : (
-          <p className="qr-url">{teksten.posterUrl}</p>
-        )}
+        <p className="qr-url">{feest.naam}</p>
+        <p className="qr-datum">
+          {datumVoluit(feest)}
+          {feest.plaats && ` · ${feest.plaats}`}
+        </p>
         <p className="qr-voet">{teksten.posterVoet}</p>
       </div>
 

@@ -286,7 +286,6 @@ export const siteContent = {
     // De printbare poster met de QR-code.
     posterKop: "Verzoekje?",
     posterRegel: "Scan de code en vraag je nummer aan",
-    posterUrl: "djmaartenverhoef.nl/verzoekjes",
     posterVoet: "DJ Maarten Verhoef",
   },
 

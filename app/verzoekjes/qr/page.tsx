@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-/** Overzicht van alle posters: één per feest, plus de algemene. */
+/** Overzicht van alle posters: één per feest. */
 export default async function QrOverzicht() {
   // De agenda wordt in de booth bijgehouden: altijd vers lezen.
   await connection();
@@ -43,27 +43,6 @@ export default async function QrOverzicht() {
           </li>
         ))}
 
-        <li>
-          <Link href="/verzoekjes/qr/algemeen">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/api/verzoekjes/qr/algemeen" alt="" width={120} height={120} />
-            <span>
-              <strong>Algemene code</strong>
-              <small>wijst naar het feest dat op dat moment aan de gang is</small>
-            </span>
-          </Link>
-        </li>
-
-        <li>
-          <Link href="/verzoekjes/sticker">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/api/verzoekjes/qr/algemeen" alt="" width={120} height={120} />
-            <span>
-              <strong>Sticker, 20 × 20 cm</strong>
-              <small>met de algemene code, voor op je laptop</small>
-            </span>
-          </Link>
-        </li>
       </ul>
 
       {feesten.length === 0 && (

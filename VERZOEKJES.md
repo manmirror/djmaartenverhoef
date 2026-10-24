@@ -10,9 +10,8 @@ eind van het jaar zien wat er het vaakst gevraagd is.
 | `/verzoekjes/f/<slug>` | het formulier voor de gasten van één feest |
 | `/verzoekjes/qr` | alle posters op een rij, één per feest |
 | `/verzoekjes/qr/<slug>` | de poster van één feest: printen, of downloaden als PNG/SVG |
-| `/verzoekjes/sticker` | een sticker van 20 × 20 cm met de algemene code, voor op de laptop |
 | `/verzoekjes/dj` | jouw booth (achter een code): de lijst per feest en de jaarlijst |
-| `/verzoekjes` | algemeen adres, ook op de sticker: wijst naar het feest dat in de booth op Aan staat, of anders naar het feest dat volgens de agenda bezig is |
+| `/verzoekjes` | algemeen adres, zonder eigen QR-code: wijst naar het feest dat in de booth op Aan staat, of anders naar het feest dat volgens de agenda bezig is |
 
 Deze pagina's staan niet in het menu van de site en Google laat ze links
 liggen.
@@ -137,18 +136,15 @@ In de booth heeft elk feest een schakelaar met drie standen:
 | Stand | Wat er gebeurt |
 | --- | --- |
 | **Automatisch** | Open volgens de agenda: van de middag van de feestdag (12:00) tot de ochtend erna (06:00), Nederlandse tijd. Dit is de standaard. |
-| **Aan** | Open, ook buiten de agendatijden. De algemene QR-code en de sticker wijzen dan naar dit feest. |
+| **Aan** | Open, ook buiten de agendatijden. Het algemene adres `/verzoekjes` wijst dan naar dit feest. |
 | **Uit** | Dicht, ook binnen de agendatijden. Gasten zien *Even geen verzoekjes*. |
 
 - Er kan maar één feest tegelijk op **Aan** staan. Zet je een ander feest aan,
   dan vraagt de booth het even en gaat het vorige terug naar Automatisch.
 - **Aan** gaat na 24 uur vanzelf terug naar Automatisch, zodat een vergeten
-  schakelaar niet dagen openstaat terwijl de sticker overal hangt. De booth
-  laat zien tot wanneer hij aan staat.
-- Onder de schakelaar staat altijd naar welk feest je vaste QR-code en de
-  sticker op dat moment wijzen.
-- Zo gebruik je steeds dezelfde code: zet het feest van vanavond op **Aan**
-  en de sticker op je laptop wijst ernaartoe.
+  schakelaar niet dagen openstaat. De booth laat zien tot wanneer hij aan staat.
+- Elk feest heeft zijn eigen QR-code, die altijd naar dat ene feest wijst. Met
+  **Aan** zet je de pagina achter die code open, ook buiten de agendatijden.
 - De schakelaar werkt alleen met een database. Zonder database laat de booth
   hem weg en werkt alles volgens de agenda.
 
@@ -182,7 +178,8 @@ lijsten het archief.
 Onder de schakelaar staat een inklapbaar blok **Posters, QR-codes en link** met
 alles voor het gekozen feest: de A4-poster, de QR-code als PNG en SVG, en de
 link voor de gasten met een knop om hem te kopiëren of via WhatsApp te delen.
-Daaronder de sticker en de algemene QR-code, die voor elk feest werken.
+Elk feest heeft zijn eigen QR-code; een algemene code of sticker is er niet
+(meer).
 
 ### Licht of donker
 
@@ -190,20 +187,7 @@ Rechtsboven in de booth staat een knop **Licht** / **Donker**. De lichte
 weergave is beter leesbaar in een lichte zaal of buiten; alle tekst haalt daar
 minstens het contrast dat voor leesbaarheid wordt aangeraden (4,5:1). Elk
 apparaat onthoudt zelf wat je kiest. Het geldt alleen voor de booth: de
-pagina's voor gasten, de posters en de sticker blijven zoals ze zijn.
-
----
-
-## 3a. De sticker
-
-Op `/verzoekjes/sticker` staat een vierkante sticker van 20 × 20 cm, met de
-algemene code erop. Die wijst altijd naar het feest dat op dat moment bezig
-is, dus de sticker kan blijvend op je laptop: hij werkt op elk feest.
-
-Print hem vanuit de browser met **Marges: geen** en **Achtergrondafbeeldingen**
-aan, of bewaar hem zo als pdf voor de drukker. Vraagt de drukker om afloop
-(bleed), gebruik dan `/verzoekjes/sticker?afloop=3`: die is 20,6 × 20,6 cm,
-met rondom 3 mm extra achtergrond die er bij het snijden af gaat.
+pagina's voor gasten en de posters blijven zoals ze zijn.
 
 ---
 

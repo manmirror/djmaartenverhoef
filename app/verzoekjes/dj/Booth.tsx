@@ -100,8 +100,6 @@ type Lijst = {
     | null;
   verzoeken: Verzoek[];
   agenda: (FeestInfo & Openstand)[];
-  /** Het feest waar de sticker en de algemene QR-code nu naartoe wijzen. */
-  algemeen: { slug: string; naam: string } | null;
   opslag: boolean;
   opslagInfo: { soort: "upstash" | "redis" | null; namen: string[] };
   collectie: number;
@@ -707,10 +705,6 @@ export default function Booth() {
                     database zou hij maar op één server staan.
                   </p>
                 )}
-                <p className="bt-stand-qr">
-                  Je vaste QR-code en de sticker wijzen nu naar:{" "}
-                  <strong>{lijst.algemeen?.naam ?? "geen enkel feest"}</strong>
-                </p>
                 <Materiaal feest={feest} />
               </div>
             )}

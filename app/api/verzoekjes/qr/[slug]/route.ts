@@ -5,9 +5,6 @@ import { siteContent } from "@/content/site";
 
 export const runtime = "nodejs";
 
-/** De code voor het algemene adres, zonder een feest erbij. */
-const ALGEMEEN = "algemeen";
-
 // Hoge foutcorrectie: een geprinte code met een kreukel of een glas erop blijft
 // dan nog leesbaar. De adressen zijn kort, dus de code blijft ruim genoeg.
 const OPTIES = {
@@ -22,14 +19,10 @@ export async function GET(
 ) {
   const { slug } = await context.params;
 
-  let adres: string;
-  if (slug === ALGEMEEN) {
-    adres = `${siteContent.siteUrl}/verzoekjes`;
-  } else {
-    const feest = await vindInAgenda(slug);
-    if (!feest) return new Response("Onbekend feest", { status: 404 });
-    adres = `${siteContent.siteUrl}/verzoekjes/f/${feest.slug}`;
-  }
+  // Elk feest zijn eigen code, naar zijn eigen pagina.
+  const feest = await vindInAgenda(slug);
+  if (!feest) return new Response("Onbekend feest", { status: 404 });
+  const adres = `${siteContent.siteUrl}/verzoekjes/f/${feest.slug}`;
 
   const png = new URL(request.url).searchParams.get("type") === "png";
 

@@ -252,12 +252,12 @@ export async function voegToeAlsNieuw(verzoek: Verzoek): Promise<void> {
 // ---- de aan/uit-schakelaar per feest ----
 //
 // Automatisch: open volgens het agendavenster. Aan: open, ook daarbuiten, en
-// de algemene QR-code wijst ernaar. Uit: dicht, ook binnen het venster.
+// het algemene adres /verzoekjes wijst ernaar. Uit: dicht, ook binnen het venster.
 //
 // Aan staat in één sleutel met daarin het feest. Daardoor kan er vanzelf maar
 // één feest tegelijk aan staan: een ander aanzetten overschrijft hem. De
 // sleutel vervalt na een etmaal, zodat een vergeten schakelaar niet blijft
-// openstaan terwijl de sticker overal hangt.
+// openstaan nadat het feest voorbij is.
 
 export type Stand = "automatisch" | "aan" | "uit";
 

@@ -791,8 +791,6 @@ html[data-booth-thema="licht"]:has(.bt-pagina) body{background:#f5f3f8;}
 .bt-stand button.aan.bt-stand-uit{background:#d6195f; color:#fff;}
 .bt-stand-uitleg{display:flex; align-items:baseline; gap:9px; margin:0; font-size:13px; line-height:1.5;}
 .bt-stand-uitleg .bt-stip{flex:none;}
-.bt-stand-qr{margin:0; font-size:12px; line-height:1.5; color:var(--muted);}
-.bt-stand-qr strong{color:var(--ink);}
 .bt-stip{
   width:9px; height:9px; border-radius:50%;
   background:var(--muted); box-shadow:0 0 0 3px var(--bt-stip-gloed);
@@ -1112,59 +1110,6 @@ html[data-booth-thema="licht"]:has(.bt-pagina) body{background:#f5f3f8;}
   }
   .bt-hoofd .bt-rij-sleep .bt-acties{grid-column:2 / -1;}
   .bt-hoofd .bt-acties button{padding:7px 14px; font-size:12px;}
-}
-
-/* --- sticker van 20 × 20 cm --- */
-/* Eigen paginaformaat, los van de A4 van de posters. */
-@page sticker{size:200mm 200mm; margin:0;}
-@page sticker-afloop{size:206mm 206mm; margin:0;}
-
-.st-pagina{
-  min-height:100dvh; padding:32px 16px 60px;
-  display:flex; flex-direction:column; align-items:center; gap:28px;
-}
-.st-vel{
-  --vel:200mm;
-  page:sticker;
-  /* Op het scherm passend gemaakt; op papier precies 20 cm. */
-  width:min(var(--vel), calc(100vw - 32px));
-  aspect-ratio:1;
-  display:flex; align-items:center; justify-content:center;
-  background:
-    radial-gradient(circle at 12% 8%, rgba(255,47,126,.55), transparent 42%),
-    radial-gradient(circle at 92% 96%, rgba(139,92,246,.6), transparent 45%),
-    #0c0a12;
-  color:var(--ink);
-  container-type:inline-size;
-  -webkit-print-color-adjust:exact; print-color-adjust:exact;
-}
-.st-vel-afloop{--vel:206mm; page:sticker-afloop;}
-/* Alles schaalt mee met het vel (cqw = procent van de breedte), zodat de
-   sticker op het scherm er precies zo uitziet als op papier. */
-.st-binnen{
-  width:86%; display:flex; flex-direction:column; align-items:center; text-align:center;
-}
-.st-kop{font-size:13cqw; line-height:1; letter-spacing:-0.035em; font-weight:900;}
-.st-regel{margin:2.2cqw 0 4cqw; font-size:3.6cqw; color:#d9cfee;}
-.st-kaart{
-  background:#fff; border-radius:4cqw; padding:2.4cqw;
-  width:56%; aspect-ratio:1; display:flex;
-}
-.st-kaart img{display:block; width:100%; height:100%;}
-.st-url{margin:3.6cqw 0 0; font-size:3.6cqw; font-weight:800; letter-spacing:-0.01em;}
-.st-voet{
-  margin:1.4cqw 0 0;
-  font-size:2.4cqw; font-weight:800; letter-spacing:0.16em; text-transform:uppercase;
-  color:#bfb2da;
-}
-.st-acties{max-width:420px;}
-.st-uitleg{margin:0; font-size:13px; line-height:1.6; color:var(--muted); text-align:center;}
-.st-uitleg a{color:var(--ink); text-decoration:underline;}
-
-@media print{
-  .st-pagina{min-height:0; padding:0; display:block;}
-  .st-acties{display:none;}
-  .st-vel{width:var(--vel); height:var(--vel);}
 }
 
 /* --- booth: posters, QR-codes en link per feest --- */

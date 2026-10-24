@@ -1,6 +1,6 @@
-// Of een feest nu verzoekjes aanneemt, en naar welk feest de algemene QR-code
-// (/verzoekjes, de sticker) wijst. Combineert de agenda met de aan/uit-
-// schakelaar uit de booth.
+// Of een feest nu verzoekjes aanneemt, en naar welk feest het algemene adres
+// /verzoekjes wijst. Combineert de agenda met de aan/uit-schakelaar uit de
+// booth.
 
 import { isOpen, vindIn, type Feest } from "./feesten";
 import { leesSchakelaars, standVan, type Schakelaars, type Stand } from "./store";

@@ -15,9 +15,10 @@ export const metadata: Metadata = {
 };
 
 /**
- * Het algemene adres, waar de sticker en de algemene QR-code naartoe wijzen.
- * Toont het feest dat in de booth op Aan staat, en anders het feest dat volgens
- * de agenda bezig is.
+ * Het algemene adres djmaartenverhoef.nl/verzoekjes. Er is geen algemene
+ * QR-code meer: elk feest heeft zijn eigen. Wie dit adres toch intypt, krijgt
+ * het feest dat in de booth op Aan staat, en anders het feest dat volgens de
+ * agenda bezig is.
  */
 export default async function Verzoekjes() {
   // Welk feest er nu is hangt van het moment af, dus niet vooraf uitrekenen.

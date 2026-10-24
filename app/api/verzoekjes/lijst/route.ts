@@ -3,7 +3,7 @@ import { collectieAantal } from "@/app/verzoekjes/collectie";
 import { leesAgenda } from "@/app/verzoekjes/agenda";
 import { feestVoorBooth, naarInfo, venster, vindIn } from "@/app/verzoekjes/feesten";
 import { leesOudeVerzoekjesIn } from "@/app/verzoekjes/import";
-import { feestVoorAlgemeen, openstandVan } from "@/app/verzoekjes/schakelaar";
+import { openstandVan } from "@/app/verzoekjes/schakelaar";
 import {
   leesSchakelaars,
   leesVerzoeken,
@@ -37,19 +37,12 @@ export async function GET(request: Request) {
     ...openstandVan(ander, schakelaars, nu),
   }));
 
-  // Waar de sticker en de algemene QR-code nu naartoe wijzen.
-  const algemeenGekozen = feestVoorAlgemeen(alles, schakelaars, nu);
-  const algemeen =
-    algemeenGekozen && algemeenGekozen.stand !== "uit"
-      ? { slug: algemeenGekozen.feest.slug, naam: algemeenGekozen.feest.naam }
-      : null;
 
   if (!feest) {
     return Response.json({
       feest: null,
       verzoeken: [],
       agenda,
-      algemeen,
       opslag: opslagActief(),
       opslagInfo: opslagInfo(),
       collectie: collectieAantal(),
@@ -71,7 +64,6 @@ export async function GET(request: Request) {
     },
     verzoeken: await leesVerzoeken(feest.slug),
     agenda,
-    algemeen,
     opslag: opslagActief(),
     opslagInfo: opslagInfo(),
     collectie: collectieAantal(),
