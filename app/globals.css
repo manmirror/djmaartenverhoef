@@ -1065,6 +1065,18 @@ html[data-booth-thema="licht"]:has(.bt-pagina) body{background:#f5f3f8;}
   .bt-hoofd .bt-artiest{font-size:15px;}
 }
 
+/* Alleen op een tablet liggend (breed, en bediend met een vinger): de lijst in
+   twee kolommen, voor meer overzicht. Op een laptop blijft het één kolom. */
+@media(min-width:960px) and (orientation:landscape) and (pointer:coarse){
+  .bt{grid-template-columns:minmax(280px,310px) minmax(0,1fr); gap:20px;}
+  .bt-hoofd .bt-lijst{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px;}
+  .bt-hoofd .bt-rij{padding:12px 14px; gap:10px;}
+  .bt-hoofd .bt-titel{font-size:17px;}
+  .bt-hoofd .bt-artiest{font-size:14px;}
+  .bt-hoofd .bt-bpm{font-size:20px;}
+  .bt-hoofd .bt-acties button{padding:8px 12px;}
+}
+
 /* --- sticker van 20 × 20 cm --- */
 /* Eigen paginaformaat, los van de A4 van de posters. */
 @page sticker{size:200mm 200mm; margin:0;}

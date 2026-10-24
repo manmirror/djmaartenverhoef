@@ -40,6 +40,7 @@ export default function SleepLijst({ verzoeken, className, rij, onVolgorde }: Pr
   const volgordeRef = useRef<string[]>([]);
   const beginRef = useRef<string[]>([]);
   const laatsteY = useRef(0);
+  const laatsteX = useRef(0);
   const frame = useRef<number | null>(null);
   const focusNa = useRef<string | null>(null);
 
@@ -70,17 +71,29 @@ export default function SleepLijst({ verzoeken, className, rij, onVolgorde }: Pr
     []
   );
 
-  /** Zet het gesleepte verzoekje op de plek die hoort bij hoogte `y`. */
-  function herschik(y: number) {
+  /** Zet het gesleepte verzoekje op de plek die hoort bij punt (`x`, `y`). */
+  function herschik(x: number, y: number) {
     const lijst = lijstRef.current;
     const gesleept = sleepRef.current;
     if (!lijst || !gesleept) return;
 
+    const rijen = [...lijst.querySelectorAll<HTMLElement>(":scope > [data-id]")];
+    // Twee kolommen (de tablet liggend): de eerste twee staan dan naast elkaar.
+    const kolommen =
+      rijen.length > 1 &&
+      rijen[0].getBoundingClientRect().top === rijen[1].getBoundingClientRect().top;
+    const anderen = rijen
+      .filter((element) => element.dataset.id !== gesleept)
+      .map((element) => element.getBoundingClientRect());
+
     let plek = 0;
-    for (const element of lijst.querySelectorAll<HTMLElement>(":scope > [data-id]")) {
-      if (element.dataset.id === gesleept) continue;
-      const vak = element.getBoundingClientRect();
-      if (y > vak.top + vak.height / 2) plek++;
+    for (const vak of anderen) {
+      const voorbij = kolommen
+        ? // Lezen van links naar rechts, dan naar beneden: een vak telt als
+          // voorbij als je eronder zit, of ernaast rechts van het midden.
+          y > vak.bottom || (y > vak.top && x > vak.left + vak.width / 2)
+        : y > vak.top + vak.height / 2;
+      if (voorbij) plek++;
     }
 
     const huidig = volgordeRef.current;
@@ -94,9 +107,10 @@ export default function SleepLijst({ verzoeken, className, rij, onVolgorde }: Pr
 
   function stap() {
     const y = laatsteY.current;
+    const x = laatsteX.current;
     if (y < RAND_PX) window.scrollBy(0, -SCROLL_PX);
     else if (y > window.innerHeight - RAND_PX) window.scrollBy(0, SCROLL_PX);
-    herschik(y);
+    herschik(x, y);
     frame.current = requestAnimationFrame(stap);
   }
 
@@ -111,6 +125,7 @@ export default function SleepLijst({ verzoeken, className, rij, onVolgorde }: Pr
         beginRef.current = volgorde;
         volgordeRef.current = volgorde;
         laatsteY.current = event.clientY;
+        laatsteX.current = event.clientX;
         setSleepId(verzoek.id);
         setLokaal(volgorde);
         frame.current = requestAnimationFrame(stap);
@@ -125,6 +140,7 @@ export default function SleepLijst({ verzoeken, className, rij, onVolgorde }: Pr
         const beweeg = (beweging: PointerEvent) => {
           if (beweging.pointerId !== pointer) return;
           laatsteY.current = beweging.clientY;
+          laatsteX.current = beweging.clientX;
         };
         const los = (einde: PointerEvent) => {
           if (einde.pointerId !== pointer) return;
