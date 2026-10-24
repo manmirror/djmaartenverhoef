@@ -886,6 +886,7 @@ function Rij({
           title="Slepen, of met de pijltjestoetsen verplaatsen"
           onPointerDown={greep.onPointerDown}
           onKeyDown={greep.onKeyDown}
+          onContextMenu={greep.onContextMenu}
         >
           ⋮⋮
         </button>

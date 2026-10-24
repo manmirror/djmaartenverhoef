@@ -8,6 +8,7 @@ import type { Verzoek } from "../types";
 export type Greep = {
   onPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => void;
   onKeyDown: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
+  onContextMenu: (event: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
 type Props = {
@@ -118,6 +119,9 @@ export default function SleepLijst({ verzoeken, className, rij, onVolgorde }: Pr
         // lijst verschuift, haalt de browser hem even uit de pagina, en met een
         // vinger (Android, iPad) komen de bewegingen daarna niet meer bij de
         // greep aan. Met een muis viel dat niet op.
+        // Chrome op een tablet opent bij lang indrukken een menu (Downloaden,
+        // Delen, Afdrukken), en dat breekt het slepen af.
+        const geenMenu = (menu: Event) => menu.preventDefault();
         const beweeg = (beweging: PointerEvent) => {
           if (beweging.pointerId !== pointer) return;
           laatsteY.current = beweging.clientY;
@@ -127,6 +131,7 @@ export default function SleepLijst({ verzoeken, className, rij, onVolgorde }: Pr
           window.removeEventListener("pointermove", beweeg);
           window.removeEventListener("pointerup", los);
           window.removeEventListener("pointercancel", los);
+          window.removeEventListener("contextmenu", geenMenu);
           if (frame.current !== null) cancelAnimationFrame(frame.current);
           frame.current = null;
 
@@ -139,6 +144,12 @@ export default function SleepLijst({ verzoeken, className, rij, onVolgorde }: Pr
         window.addEventListener("pointermove", beweeg);
         window.addEventListener("pointerup", los);
         window.addEventListener("pointercancel", los);
+        window.addEventListener("contextmenu", geenMenu);
+      },
+
+      // Ook als je de greep alleen even vasthoudt, zonder te schuiven.
+      onContextMenu(event) {
+        event.preventDefault();
       },
 
       onKeyDown(event) {

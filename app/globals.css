@@ -1002,6 +1002,11 @@ html[data-booth-thema="licht"]:has(.bt-pagina) body{background:#f5f3f8;}
   color:var(--muted); cursor:grab;
   /* Anders scrolt de pagina mee in plaats van dat de rij verschuift. */
   touch-action:none; user-select:none; -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+/* Met een vinger: een bredere greep, zodat je hem niet mist. */
+@media(pointer:coarse){
+  .bt-greep{width:44px; font-size:22px;}
 }
 .bt-greep:hover,.bt-greep:focus-visible{color:var(--ink); background:var(--bt-tint-sterk); outline:none;}
 .bt-sleept{
