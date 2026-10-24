@@ -980,6 +980,8 @@ html[data-booth-thema="licht"]:has(.bt-pagina) body{background:#f5f3f8;}
 }
 .bt-agenda-ok:disabled{opacity:.5; cursor:default;}
 .bt-agenda-rood{background:#d6195f;}
+/* Verwijderen apart rechts, zodat je hem niet raakt als je Opslaan bedoelt. */
+.bt-agenda-rechts{margin-left:auto;}
 .bt-agenda-plus{padding:13px 22px; font-size:14px;}
 .bt-agenda-melding{
   display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px;

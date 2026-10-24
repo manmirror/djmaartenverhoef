@@ -139,6 +139,7 @@ export default function Agenda({ code, codeHeader, bewerkStart, onOpen }: Props)
     const uitkomst = await stuur({ actie: "verwijder", slug: feest.slug });
     if (!uitkomst.ok) return;
     setWeg(null);
+    setBewerk(null);
     setMelding(null);
   }
 
@@ -209,14 +210,53 @@ export default function Agenda({ code, codeHeader, bewerkStart, onOpen }: Props)
         <button type="button" className="bt-mini" onClick={() => begin(null)}>
           Annuleer
         </button>
+        {bewerk !== "nieuw" && (
+          <button
+            type="button"
+            className="bt-mini bt-agenda-weg bt-agenda-rechts"
+            disabled={!data.opslag}
+            onClick={() => setWeg(weg === bewerk ? null : bewerk)}
+          >
+            Verwijder
+          </button>
+        )}
       </div>
     </form>
   );
 
+  /** De vraag of je het zeker weet, onder het feest of onder het formulier. */
+  const zeker = (feest: AgendaFeest) =>
+    weg === feest.slug && (
+      <div className="bt-agenda-zeker" role="alert">
+        <p>
+          {feest.naam} uit de agenda halen? De link en de QR-code werken dan niet meer,
+          en het feest telt niet meer mee in het archief en de jaarlijst.
+          {feest.aantal > 0 && ` De ${feest.aantal} verzoekjes blijven wel bewaard.`} Zet
+          je het feest later terug, dan is alles er weer.
+        </p>
+        <div className="bt-agenda-knoppen">
+          <button
+            type="button"
+            className="bt-agenda-ok bt-agenda-rood"
+            disabled={bezig}
+            onClick={() => verwijder(feest)}
+          >
+            Ja, verwijder
+          </button>
+          <button type="button" className="bt-mini" onClick={() => setWeg(null)}>
+            Laat staan
+          </button>
+        </div>
+      </div>
+    );
+
   const rij = (feest: AgendaFeest) => (
     <li key={feest.slug} className="bt-agenda-rij">
       {bewerk === feest.slug ? (
-        formulier
+        <>
+          {formulier}
+          {zeker(feest)}
+        </>
       ) : (
         <>
           <div className="bt-agenda-info">
@@ -266,29 +306,7 @@ export default function Agenda({ code, codeHeader, bewerkStart, onOpen }: Props)
               Verwijder
             </button>
           </div>
-          {weg === feest.slug && (
-            <div className="bt-agenda-zeker" role="alert">
-              <p>
-                {feest.naam} uit de agenda halen? De link en de QR-code werken dan niet meer,
-                en het feest telt niet meer mee in het archief en de jaarlijst.
-                {feest.aantal > 0 && ` De ${feest.aantal} verzoekjes blijven wel bewaard.`} Zet
-                je het feest later terug, dan is alles er weer.
-              </p>
-              <div className="bt-agenda-knoppen">
-                <button
-                  type="button"
-                  className="bt-agenda-ok bt-agenda-rood"
-                  disabled={bezig}
-                  onClick={() => verwijder(feest)}
-                >
-                  Ja, verwijder
-                </button>
-                <button type="button" className="bt-mini" onClick={() => setWeg(null)}>
-                  Laat staan
-                </button>
-              </div>
-            </div>
-          )}
+          {zeker(feest)}
         </>
       )}
     </li>
