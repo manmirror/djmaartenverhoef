@@ -1021,6 +1021,50 @@ html[data-booth-thema="licht"]:has(.bt-pagina) body{background:#f5f3f8;}
   .bt-rij-sleep .bt-acties{grid-column:2 / -1;}
 }
 
+/* --- booth op een breed scherm, zoals een tablet liggend --- */
+/* De bediening als vaste kolom links, de lijst rechts over de volle hoogte.
+   Smaller dan dit blijft alles onder elkaar, zoals op een telefoon. */
+@media(min-width:960px){
+  .bt-pagina{padding:18px 24px 40px;}
+  .bt{
+    max-width:1500px;
+    display:grid; grid-template-columns:minmax(300px,350px) minmax(0,1fr);
+    gap:28px; align-items:start;
+  }
+  .bt-zij{
+    position:sticky; top:18px;
+    max-height:calc(100dvh - 36px); overflow-y:auto;
+    /* Ruimte voor de schuifbalk, zodat die niet over de knoppen valt. */
+    padding-right:6px; margin-right:-6px;
+    scrollbar-width:thin;
+  }
+  .bt-hoofd{min-width:0;}
+
+  .bt-kop{flex-wrap:wrap; gap:10px;}
+  .bt-kop h1{font-size:26px;}
+
+  .bt-zij .bt-tabs{
+    display:grid; grid-template-columns:1fr 1fr; gap:4px;
+    margin-top:16px; border-radius:18px;
+  }
+  .bt-zij .bt-tabs button{border-radius:14px; padding:10px 8px;}
+
+  .bt-zij .bt-feest{margin-top:16px;}
+  .bt-zij .bt-feest label{min-width:0; flex-basis:100%;}
+  .bt-zij .bt-feest select{font-size:14px; padding:12px 14px;}
+
+  .bt-zij .bt-schakelaar{padding:12px 14px;}
+  .bt-zij .bt-stand button{padding:10px 6px;}
+
+  .bt-zij .bt-balk{margin:16px 0 0; flex-direction:column; align-items:stretch; gap:8px;}
+  .bt-zij .bt-sorteer button{flex:1; padding:9px 6px; font-size:12px;}
+
+  /* De lijst begint bovenaan, op dezelfde hoogte als de kop links. */
+  .bt-hoofd > :first-child{margin-top:0;}
+  .bt-hoofd .bt-titel{font-size:18px;}
+  .bt-hoofd .bt-artiest{font-size:15px;}
+}
+
 /* --- sticker van 20 × 20 cm --- */
 /* Eigen paginaformaat, los van de A4 van de posters. */
 @page sticker{size:200mm 200mm; margin:0;}

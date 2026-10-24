@@ -530,112 +530,101 @@ export default function Booth() {
   );
   const afgehandeld = alles.filter((verzoek) => verzoek.status !== "nieuw");
 
+  // Twee delen: de bediening en de lijst. Op een telefoon onder elkaar; op een
+  // breed scherm (een tablet liggend) de bediening als vaste kolom links, zodat
+  // de lijst de hele hoogte krijgt.
   return (
     <div className="bt">
-      <header className="bt-kop">
-        <div>
-          <h1>Booth</h1>
-          <p>
-            {weergave === "lijst"
-              ? `${nieuw.length} open${afgehandeld.length > 0 ? ` · ${afgehandeld.length} afgehandeld` : ""}`
-              : weergave === "archief"
-                ? "Eerdere feesten"
-                : weergave === "agenda"
-                  ? "Feesten aanmaken, wijzigen en weghalen"
-                  : "Vaakst gevraagd"}
-            {lijst && lijst.collectie > 0 &&
-              ` · ${lijst.collectie.toLocaleString("nl-NL")} nummers in de collectie`}
-          </p>
-        </div>
-        <div className="bt-kop-knoppen">
+      <aside className="bt-zij">
+        <header className="bt-kop">
+          <div>
+            <h1>Booth</h1>
+            <p>
+              {weergave === "lijst"
+                ? `${nieuw.length} open${afgehandeld.length > 0 ? ` · ${afgehandeld.length} afgehandeld` : ""}`
+                : weergave === "archief"
+                  ? "Eerdere feesten"
+                  : weergave === "agenda"
+                    ? "Feesten aanmaken, wijzigen en weghalen"
+                    : "Vaakst gevraagd"}
+              {lijst && lijst.collectie > 0 &&
+                ` · ${lijst.collectie.toLocaleString("nl-NL")} nummers in de collectie`}
+            </p>
+          </div>
+          <div className="bt-kop-knoppen">
+            <button
+              type="button"
+              className="bt-mini"
+              aria-pressed={thema === "licht"}
+              onClick={() => kiesThema(thema === "licht" ? "donker" : "licht")}
+            >
+              {thema === "licht" ? "Donker" : "Licht"}
+            </button>
+            <button type="button" className="bt-mini" onClick={() => bewaarCode("")}>
+              Vergrendel
+            </button>
+          </div>
+        </header>
+
+        <div className="bt-tabs">
           <button
             type="button"
-            className="bt-mini"
-            aria-pressed={thema === "licht"}
-            onClick={() => kiesThema(thema === "licht" ? "donker" : "licht")}
+            className={weergave === "lijst" ? "aan" : undefined}
+            onClick={() => kiesWeergave("lijst")}
           >
-            {thema === "licht" ? "Donker" : "Licht"}
+            Verzoekjes
           </button>
-          <button type="button" className="bt-mini" onClick={() => bewaarCode("")}>
-            Vergrendel
+          <button
+            type="button"
+            className={weergave === "archief" ? "aan" : undefined}
+            onClick={() => kiesWeergave("archief")}
+          >
+            Archief
+          </button>
+          <button
+            type="button"
+            className={weergave === "top" ? "aan" : undefined}
+            onClick={() => kiesWeergave("top")}
+          >
+            Jaarlijst
+          </button>
+          <button
+            type="button"
+            className={weergave === "agenda" ? "aan" : undefined}
+            onClick={() => kiesWeergave("agenda")}
+          >
+            Agenda
           </button>
         </div>
-      </header>
 
-      <div className="bt-tabs">
-        <button
-          type="button"
-          className={weergave === "lijst" ? "aan" : undefined}
-          onClick={() => kiesWeergave("lijst")}
-        >
-          Verzoekjes
-        </button>
-        <button
-          type="button"
-          className={weergave === "archief" ? "aan" : undefined}
-          onClick={() => kiesWeergave("archief")}
-        >
-          Archief
-        </button>
-        <button
-          type="button"
-          className={weergave === "top" ? "aan" : undefined}
-          onClick={() => kiesWeergave("top")}
-        >
-          Jaarlijst
-        </button>
-        <button
-          type="button"
-          className={weergave === "agenda" ? "aan" : undefined}
-          onClick={() => kiesWeergave("agenda")}
-        >
-          Agenda
-        </button>
-      </div>
+        {lijst && !lijst.opslag && (
+          <p className="bt-waarschuwing">
+            De site vindt geen database, dus deze lijsten worden niet bewaard en zijn
+            niet betrouwbaar. Verzoekjes gaan nu per mail. Zie VERZOEKJES.md.
+            <br />
+            {lijst.opslagInfo.namen.length > 0 ? (
+              <>
+                Wel gevonden, maar niet bruikbaar:{" "}
+                <code>{lijst.opslagInfo.namen.join(", ")}</code>
+              </>
+            ) : (
+              <>
+                Er staat geen enkele database-variabele in deze omgeving. Staat de
+                koppeling in Vercel aan voor Production, en is er daarna opnieuw
+                gedeployd?
+              </>
+            )}
+          </p>
+        )}
 
-      {lijst && !lijst.opslag && (
-        <p className="bt-waarschuwing">
-          De site vindt geen database, dus deze lijsten worden niet bewaard en zijn
-          niet betrouwbaar. Verzoekjes gaan nu per mail. Zie VERZOEKJES.md.
-          <br />
-          {lijst.opslagInfo.namen.length > 0 ? (
-            <>
-              Wel gevonden, maar niet bruikbaar:{" "}
-              <code>{lijst.opslagInfo.namen.join(", ")}</code>
-            </>
-          ) : (
-            <>
-              Er staat geen enkele database-variabele in deze omgeving. Staat de
-              koppeling in Vercel aan voor Production, en is er daarna opnieuw
-              gedeployd?
-            </>
-          )}
-        </p>
-      )}
+        {fout && <p className="bt-waarschuwing">{fout}</p>}
 
-      {fout && <p className="bt-waarschuwing">{fout}</p>}
-
-      {weergave === "agenda" ? (
-        <Agenda
-          key={agendaBewerk ?? ""}
-          code={code}
-          codeHeader={CODE_HEADER}
-          bewerkStart={agendaBewerk}
-          onOpen={openFeest}
-        />
-      ) : weergave === "top" ? (
-        <Jaaroverzicht data={top} opHalen={haalTop} />
-      ) : weergave === "archief" ? (
-        archiefFeest === null ? (
-          <Archiefoverzicht feesten={archief} onOpen={openArchiefFeest} />
-        ) : (
+        {weergave === "archief" && archiefFeest !== null && (
           <>
             <button type="button" className="bt-terug" onClick={() => openArchiefFeest(null)}>
               ← Alle feesten
             </button>
-            {!lijst || !feest ? (
-              <p className="bt-leeg">Laden…</p>
-            ) : (
+            {lijst && feest && (
               <>
                 <div className="bt-archiefkop">
                   <h2>{feest.naam}</h2>
@@ -650,111 +639,136 @@ export default function Booth() {
                   </p>
                 </div>
                 {sorteerKnoppen}
-                {alles.length === 0 ? (
-                  <p className="bt-leeg">Bij dit feest zijn geen verzoekjes binnengekomen.</p>
-                ) : (
-                  lijstVan(sorteer(alles, sortering))
+              </>
+            )}
+          </>
+        )}
+
+        {weergave === "lijst" && (
+          <>
+            {lijst && lijst.agenda.length > 0 && (
+              <div className="bt-feest">
+                <label>
+                  <span>Feest</span>
+                  <select
+                    value={feest?.slug ?? ""}
+                    onChange={(event) => setGekozenFeest(event.target.value)}
+                  >
+                    {lijst.agenda.map((ander) => (
+                      <option key={ander.slug} value={ander.slug}>
+                        {ander.naam} — {ander.kort}
+                        {ander.stand === "aan" ? " · AAN" : ander.stand === "uit" ? " · uit" : ""}
+                        {ander.test ? " (test, telt niet mee)" : ""}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {feest && (
+                  <button type="button" className="bt-mini" onClick={() => wijzigFeest(feest.slug)}>
+                    Naam of datum wijzigen
+                  </button>
+                )}
+              </div>
+            )}
+
+            {lijst && feest && (
+              <div className="bt-schakelaar">
+                {lijst.opslag && (
+                  <div className="bt-stand" role="radiogroup" aria-label="Verzoekjes voor dit feest">
+                    {STANDEN.map(([waarde, label]) => (
+                      <button
+                        key={waarde}
+                        type="button"
+                        role="radio"
+                        aria-checked={feest.stand === waarde}
+                        className={feest.stand === waarde ? `aan bt-stand-${waarde}` : undefined}
+                        disabled={standBezig}
+                        onClick={() => zetStand(waarde)}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <p className="bt-stand-uitleg">
+                  <span className={feest.open ? "bt-stip aan" : "bt-stip"} />
+                  <span>{standUitleg(feest)}</span>
+                </p>
+                {!lijst.opslag && (
+                  <p className="bt-stand-uitleg">
+                    De aan/uit-schakelaar werkt pas als de database gekoppeld is: zonder
+                    database zou hij maar op één server staan.
+                  </p>
+                )}
+                <p className="bt-stand-qr">
+                  Je vaste QR-code en de sticker wijzen nu naar:{" "}
+                  <strong>{lijst.algemeen?.naam ?? "geen enkel feest"}</strong>
+                </p>
+                <Materiaal feest={feest} />
+              </div>
+            )}
+
+            {lijst && lijst.agenda.length === 0 && (
+              <p className="bt-leeg">
+                Er staan nog geen feesten in de agenda. Maak er een aan onder Agenda.
+              </p>
+            )}
+
+            {sorteerKnoppen}
+          </>
+        )}
+      </aside>
+
+      <section className="bt-hoofd">
+        {weergave === "agenda" ? (
+          <Agenda
+            key={agendaBewerk ?? ""}
+            code={code}
+            codeHeader={CODE_HEADER}
+            bewerkStart={agendaBewerk}
+            onOpen={openFeest}
+          />
+        ) : weergave === "top" ? (
+          <Jaaroverzicht data={top} opHalen={haalTop} />
+        ) : weergave === "archief" ? (
+          archiefFeest === null ? (
+            <Archiefoverzicht feesten={archief} onOpen={openArchiefFeest} />
+          ) : (
+            !lijst || !feest ? (
+              <p className="bt-leeg">Laden…</p>
+            ) : alles.length === 0 ? (
+              <p className="bt-leeg">Bij dit feest zijn geen verzoekjes binnengekomen.</p>
+            ) : (
+              lijstVan(sorteer(alles, sortering))
+            )
+          )
+        ) : (
+          <>
+            {!lijst && <p className="bt-leeg">Laden…</p>}
+
+            {lijst && feest && nieuw.length === 0 && (
+              <p className="bt-leeg">Nog geen open verzoekjes voor dit feest.</p>
+            )}
+
+            {lijstVan(nieuw)}
+
+            {afgehandeld.length > 0 && (
+              <>
+                <button
+                  type="button"
+                  className="bt-klap"
+                  onClick={() => setToonAf((vorig) => !vorig)}
+                >
+                  {toonAf ? "Verberg" : "Toon"} afgehandeld ({afgehandeld.length})
+                </button>
+                {toonAf && (
+                  lijstVan(sorteer(afgehandeld, sortering), "bt-lijst bt-lijst-af")
                 )}
               </>
             )}
           </>
-        )
-      ) : (
-        <>
-          {lijst && lijst.agenda.length > 0 && (
-            <div className="bt-feest">
-              <label>
-                <span>Feest</span>
-                <select
-                  value={feest?.slug ?? ""}
-                  onChange={(event) => setGekozenFeest(event.target.value)}
-                >
-                  {lijst.agenda.map((ander) => (
-                    <option key={ander.slug} value={ander.slug}>
-                      {ander.naam} — {ander.kort}
-                      {ander.stand === "aan" ? " · AAN" : ander.stand === "uit" ? " · uit" : ""}
-                      {ander.test ? " (test, telt niet mee)" : ""}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              {feest && (
-                <button type="button" className="bt-mini" onClick={() => wijzigFeest(feest.slug)}>
-                  Naam of datum wijzigen
-                </button>
-              )}
-            </div>
-          )}
-
-          {lijst && feest && (
-            <div className="bt-schakelaar">
-              {lijst.opslag && (
-                <div className="bt-stand" role="radiogroup" aria-label="Verzoekjes voor dit feest">
-                  {STANDEN.map(([waarde, label]) => (
-                    <button
-                      key={waarde}
-                      type="button"
-                      role="radio"
-                      aria-checked={feest.stand === waarde}
-                      className={feest.stand === waarde ? `aan bt-stand-${waarde}` : undefined}
-                      disabled={standBezig}
-                      onClick={() => zetStand(waarde)}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              )}
-              <p className="bt-stand-uitleg">
-                <span className={feest.open ? "bt-stip aan" : "bt-stip"} />
-                <span>{standUitleg(feest)}</span>
-              </p>
-              {!lijst.opslag && (
-                <p className="bt-stand-uitleg">
-                  De aan/uit-schakelaar werkt pas als de database gekoppeld is: zonder
-                  database zou hij maar op één server staan.
-                </p>
-              )}
-              <p className="bt-stand-qr">
-                Je vaste QR-code en de sticker wijzen nu naar:{" "}
-                <strong>{lijst.algemeen?.naam ?? "geen enkel feest"}</strong>
-              </p>
-              <Materiaal feest={feest} />
-            </div>
-          )}
-
-          {lijst && lijst.agenda.length === 0 && (
-            <p className="bt-leeg">
-              Er staan nog geen feesten in de agenda. Maak er een aan onder Agenda.
-            </p>
-          )}
-
-          {sorteerKnoppen}
-
-          {!lijst && <p className="bt-leeg">Laden…</p>}
-
-          {lijst && feest && nieuw.length === 0 && (
-            <p className="bt-leeg">Nog geen open verzoekjes voor dit feest.</p>
-          )}
-
-          {lijstVan(nieuw)}
-
-          {afgehandeld.length > 0 && (
-            <>
-              <button
-                type="button"
-                className="bt-klap"
-                onClick={() => setToonAf((vorig) => !vorig)}
-              >
-                {toonAf ? "Verberg" : "Toon"} afgehandeld ({afgehandeld.length})
-              </button>
-              {toonAf && (
-                lijstVan(sorteer(afgehandeld, sortering), "bt-lijst bt-lijst-af")
-              )}
-            </>
-          )}
-        </>
-      )}
+        )}
+      </section>
     </div>
   );
 }
